@@ -29,8 +29,6 @@ const Login = () => {
     
     // Use the auth service to handle login
     login(response.data.webAccessToken);
-    
-    // Optionally store email if available in response
     if (response.data.email) {
       localStorage.setItem('userEmail', response.data.email);
     }
