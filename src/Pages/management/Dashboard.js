@@ -1,3 +1,5 @@
+
+
 // import React from 'react';
 // import { Card, Row, Col } from 'react-bootstrap';
 // import {
@@ -86,7 +88,7 @@
 //         ))}
 //       </Row>
 
-     
+//       {/* Module Navigation Cards */}
 //       <Row className="g-4 mb-4">
 //         {modules.map((module, idx) => (
 //           <Col key={idx} xs={12} sm={6} md={3}>
@@ -120,7 +122,7 @@
 //         ))}
 //       </Row>
 
-     
+//       {/* Bottom Widgets */}
 //       <Row className="g-4 mt-4">
 //         <Col md={6}>
 //           <Card className="shadow-sm border-0 rounded-3 h-100">
@@ -189,11 +191,6 @@
 // };
 
 // export default Dashboard;
-
-
-
-// new dashboard
-
 
 
 import React from 'react';
