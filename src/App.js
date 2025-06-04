@@ -12,9 +12,11 @@ import Mentors from './Pages/management/Mentors';
 import Instructors from './Pages/management/Instructors';
 import Data from './Pages/management/Data';
 import Layout from './components/Layout';
-import AddUserModal from './Pages/AddUserModal';
-import NotFound from './Pages/NotFound';
 
+import NotFound from './Pages/NotFound';
+import AddUserOffcanvas from './Pages/AddUserOffcanvas';
+import AddMentorOffcanvas from './Pages/AddMentorOffcanvas';
+import AddInstructorOffcanvas from './Pages/AddInstructorOffcanvas';
 function App() {
   return (
     <Router>
@@ -32,7 +34,9 @@ function App() {
           <Route path="/data" element={<Data />} />
           <Route path="*" element={<NotFound />} />
 
-              {/* <Route path="/adduser" element={<AddUserModal />} /> */}
+              <Route path="/adduser" element={<AddUserOffcanvas />} />
+                 <Route path="/addmentor" element={<AddMentorOffcanvas />} />
+                   <Route path="/addinstructor" element={<AddInstructorOffcanvas/  >} />
         </Route>
       </Routes>
     </Router>
