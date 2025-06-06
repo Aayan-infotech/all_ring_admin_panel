@@ -20,12 +20,12 @@ const Instructors = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Fetch instructors on page load
+ 
   useEffect(() => {
     fetchInstructors();
   }, []);
 
-  // API call to fetch instructors
+
   const fetchInstructors = async () => {
     try {
       setLoading(true);
@@ -43,7 +43,7 @@ const Instructors = () => {
     }
   };
 
-  // Toggle active/inactive status locally
+  
   const toggleStatus = (id) => {
     setInstructors(instructors.map(instructor =>
       instructor._id === id

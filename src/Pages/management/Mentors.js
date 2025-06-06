@@ -21,12 +21,11 @@ const Mentors = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
 
-  // Fetch mentors from API
+ 
  const fetchMentors = async () => {
   try {
     setLoading(true);
-    const token = localStorage.getItem('adminToken'); // Get token from localStorage
-
+    const token = localStorage.getItem('adminToken'); 
     const res = await axios.get('http://18.209.91.97:5010/api/admin/getRegister/mentor', {
       headers: {
         Authorization: `Bearer ${token}`
@@ -46,7 +45,7 @@ const Mentors = () => {
     fetchMentors();
   }, []);
 
-  // Toggle active/inactive status (local only)
+ 
   const toggleStatus = (id) => {
     setMentors(mentors.map(mentor =>
       mentor._id === id
@@ -193,7 +192,7 @@ const Mentors = () => {
       <AddMentorOffcanvas
         show={showAddMentor}
         handleClose={() => setShowAddMentor(false)}
-        onMentorAdded={fetchMentors} // Optional: Refresh after adding
+        onMentorAdded={fetchMentors} 
       />
     </div>
   );
