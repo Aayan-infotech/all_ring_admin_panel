@@ -241,7 +241,7 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-container p-4" style={{ background: '#f1f5f9', minHeight: '100vh' }}>
-      {/* Header */}
+      <h2>hello</h2>
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 style={{ color: 'var(--secondary)' }}>Dashboard Overview</h2>
         <div className="d-flex align-items-center">
