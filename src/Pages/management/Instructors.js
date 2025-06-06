@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import AddInstructorOffcanvas from '../AddInstructorOffcanvas';
 import { Table, Button, ButtonGroup, Badge, InputGroup, Form } from 'react-bootstrap';
 import { 
   PencilSquare, 
@@ -11,6 +12,7 @@ import {
 } from 'react-bootstrap-icons';
 
 const Instructors = () => {
+  const [showAddInstructor, setShowAddInstructor] = useState(false);
   const [instructors, setInstructors] = useState([
     {
       id: 1,
@@ -57,6 +59,7 @@ const Instructors = () => {
         <h2 style={{ color: 'var(--secondary)', fontWeight: '600' }}>Instructor Management</h2>
         <Button 
           variant="primary"
+          onClick={() => setShowAddInstructor(true)}
           style={{
             backgroundColor: 'var(--primary)',
             border: 'none',
@@ -167,6 +170,13 @@ const Instructors = () => {
           </tbody>
         </Table>
       </div>
+
+
+      <AddInstructorOffcanvas
+  show={showAddInstructor}
+  handleClose={() => setShowAddInstructor(false)}
+  // onInstructorAdded={fetchInstructors}
+/>
     </div>
   );
 };

@@ -9,8 +9,11 @@ import {
   PlusCircle,
   StarFill
 } from 'react-bootstrap-icons';
+import AddMentorOffcanvas from '../AddMentorOffcanvas'
 
 const Mentors = () => {
+  const [showAddMentor, setShowAddMentor] = useState(false);
+
   const [mentors, setMentors] = useState([
     {
       id: 1,
@@ -60,12 +63,14 @@ const Mentors = () => {
         <h2 style={{ color: 'var(--secondary)', fontWeight: '600' }}>Mentor Management</h2>
         <Button 
           variant="primary"
+          onClick={() => setShowAddMentor(true)}
           style={{
             backgroundColor: 'var(--primary)',
             border: 'none',
             padding: '10px 20px',
             borderRadius: '8px'
           }}
+          
         >
           <PlusCircle className="me-2" />
           Add New Mentor
@@ -175,6 +180,11 @@ const Mentors = () => {
           </tbody>
         </Table>
       </div>
+      <AddMentorOffcanvas
+  show={showAddMentor}
+  handleClose={() => setShowAddMentor(false)}
+  // onMentorAdded={fetchMentors}
+/>
     </div>
   );
 };

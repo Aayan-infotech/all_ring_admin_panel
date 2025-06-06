@@ -13,10 +13,15 @@ import {
 } from 'react-bootstrap-icons';
 import axios from 'axios';
 
+import AddUserOffcanvas from  '../AddUserOffcanvas'
 const Users = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
 
+const [showAddUser, setShowAddUser] = useState(false);
+
+const handleShowAddUser = () => setShowAddUser(true);
+const handleCloseAddUser = () => setShowAddUser(false);
 
 
 const fetchUsers = async () => {
@@ -58,7 +63,7 @@ const toggleStatus = async (user) => {
         },
       }
     );
-    // Optional: fetchUsers() to ensure sync with server
+  
   } catch (error) {
     console.error('Failed to update user status:', error);
     // Revert on error
@@ -72,28 +77,6 @@ const toggleStatus = async (user) => {
 };
 
 
-//   const toggleStatus = async (user) => {
-//   const token = localStorage.getItem('adminToken'); 
-//   const newStatus = user.user_status === 1 ? 2 : 1;
-
-//   try {
-//     await axios.patch(
-//       `http://18.209.91.97:5010/api/admin/editUserStatus/${user._id}`,
-//       { user_status: newStatus },
-//       {
-//         headers: {
-//           'Content-Type': 'application/json',
-//           Authorization: `Bearer ${token}`, 
-//         },
-//       }
-//     );
-//     fetchUsers(); 
-//   } catch (error) {
-//     console.error('Failed to update user status:', error.response?.data || error.message);
-//     alert('Failed to toggle status: ' + (error.response?.data?.message || error.message));
-//   }
-// };
-
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -102,18 +85,21 @@ const toggleStatus = async (user) => {
     <div className="p-4" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 style={{ color: 'var(--secondary)' }}>User Management</h2>
+       
         <Button
-          variant="primary"
-          style={{
-            backgroundColor: 'var(--primary)',
-            border: 'none',
-            padding: '10px 20px',
-            borderRadius: '8px'
-          }}
-        >
-          <PlusCircle className="me-2" />
-          Add New User
-        </Button>
+  variant="primary"
+  onClick={handleShowAddUser}
+  style={{
+    backgroundColor: 'var(--primary)',
+    border: 'none',
+    padding: '10px 20px',
+    borderRadius: '8px'
+  }}
+>
+  <PlusCircle className="me-2" />
+  Add New User
+</Button>
+
       </div>
 
       <div className="mb-4">
@@ -233,6 +219,12 @@ const toggleStatus = async (user) => {
           </Table>
         </div>
       )}
+      <AddUserOffcanvas
+  show={showAddUser}
+  handleClose={handleCloseAddUser}
+  onUserAdded={fetchUsers}
+/>
+
     </div>
   );
 };
