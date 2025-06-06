@@ -1,5 +1,6 @@
 
 
+
 // import React from 'react';
 // import { Card, Row, Col } from 'react-bootstrap';
 // import {
@@ -48,7 +49,7 @@
 
 //   return (
 //     <div className="dashboard-container p-4" style={{ background: '#f1f5f9', minHeight: '100vh' }}>
-//       {/* Header */}
+    
 //       <div className="d-flex justify-content-between align-items-center mb-4">
 //         <h2 style={{ color: 'var(--secondary)' }}>Dashboard Overview</h2>
 //         <div className="d-flex align-items-center">
@@ -195,13 +196,14 @@
 
 import React from 'react';
 import { Card, Row, Col } from 'react-bootstrap';
+import { LinearProgress, Box, Typography } from '@mui/material';
+
 import {
   PeopleFill,
   PersonCheckFill,
   PersonLinesFill,
   DatabaseFill,
   CalendarCheck,
-  ClockHistory,
 } from 'react-bootstrap-icons';
 
 const Dashboard = () => {
@@ -239,9 +241,22 @@ const Dashboard = () => {
     { title: 'Data Management', icon: <DatabaseFill size={24} />, route: '/data', id: 'data' },
   ];
 
+  const trendingInstructors = [
+    { name: 'Anjali Mehta', location: 'Delhi', sessions: 25 },
+    { name: 'Rajiv Kumar', location: 'Mumbai', sessions: 22 },
+    { name: 'Pooja Sharma', location: 'Bangalore', sessions: 18 },
+    { name: 'Amit Singh', location: 'Hyderabad', sessions: 16 },
+  ];
+
+  const participationData = [
+    { label: 'Total Classes', value: 100, color: '#1976d2' },
+    { label: 'Total Registered', value: 80, color: '#f9a825' },
+    { label: 'Total Present', value: 60, color: '#43a047' },
+  ];
+
   return (
     <div className="dashboard-container p-4" style={{ background: '#f1f5f9', minHeight: '100vh' }}>
-      <h2>hello</h2>
+      {/* Header */}
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 style={{ color: 'var(--secondary)' }}>Dashboard Overview</h2>
         <div className="d-flex align-items-center">
@@ -281,7 +296,7 @@ const Dashboard = () => {
         ))}
       </Row>
 
-      {/* Module Navigation Cards */}
+      {/* Module Cards */}
       <Row className="g-4 mb-4">
         {modules.map((module, idx) => (
           <Col key={idx} xs={12} sm={6} md={3}>
@@ -315,66 +330,65 @@ const Dashboard = () => {
         ))}
       </Row>
 
-      {/* Bottom Widgets */}
+      {/* Widgets */}
       <Row className="g-4 mt-4">
         <Col md={6}>
           <Card className="shadow-sm border-0 rounded-3 h-100">
             <Card.Body>
               <h5 style={{ color: 'var(--secondary)' }} className="mb-3">
-                User Distribution
+                Participation Overview
               </h5>
-              <div
-                style={{
-                  height: '200px',
-                  background: '#f8f9fa',
-                  borderRadius: '8px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <p className="text-muted">[User distribution chart here]</p>
-              </div>
+              {participationData.map((item, idx) => (
+                <Box key={idx} sx={{ mb: 2 }}>
+                  <Typography variant="subtitle2" gutterBottom>
+                    {item.label}
+                  </Typography>
+                  <LinearProgress
+                    variant="determinate"
+                    value={item.value}
+                    sx={{
+                      height: 12,
+                      borderRadius: 6,
+                      '& .MuiLinearProgress-bar': {
+                        backgroundColor: item.color,
+                      },
+                      backgroundColor: '#e0e0e0',
+                    }}
+                  />
+                </Box>
+              ))}
             </Card.Body>
           </Card>
         </Col>
+
         <Col md={6}>
           <Card className="shadow-sm border-0 rounded-3 h-100">
             <Card.Body>
               <h5 style={{ color: 'var(--secondary)' }} className="mb-3">
-                Upcoming Events
+                Trending Instructors & Locations
               </h5>
-              {[
-                {
-                  title: 'Monthly Review Meeting',
-                  time: 'Tomorrow, 10:00 AM',
-                },
-                {
-                  title: 'New Feature Launch',
-                  time: 'In 3 days, 2:00 PM',
-                },
-              ].map((event, index) => (
-                <div key={index} className="d-flex align-items-center mb-3">
-                  <div
-                    style={{
-                      width: '40px',
-                      height: '40px',
-                      borderRadius: '8px',
-                      backgroundColor: 'var(--accent)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      marginRight: '15px',
-                    }}
-                  >
-                    <CalendarCheck color="var(--primary)" />
-                  </div>
-                  <div>
-                    <strong>{event.title}</strong>
-                    <div className="text-muted small">{event.time}</div>
-                  </div>
-                </div>
-              ))}
+              <div className="table-responsive">
+                <table className="table table-hover">
+                  <thead style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
+                    <tr>
+                      <th>#</th>
+                      <th>Instructor</th>
+                      <th>Location</th>
+                      <th>Sessions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {trendingInstructors.map((item, idx) => (
+                      <tr key={idx}>
+                        <td>{idx + 1}</td>
+                        <td>{item.name}</td>
+                        <td>{item.location}</td>
+                        <td>{item.sessions}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </Card.Body>
           </Card>
         </Col>
