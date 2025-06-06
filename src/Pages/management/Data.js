@@ -6,6 +6,7 @@ const Data = () => {
   const [formData, setFormData] = useState({ name: '', status: 'Active' });
   const [dataList, setDataList] = useState([
     { id: 1, name: 'Ankit Sharma', status: 'Active' },
+     { id: 2, name: 'Tiya Bhandari', status: 'Active' },
   ]);
 
   const handleShow = () => setShowCanvas(true);
