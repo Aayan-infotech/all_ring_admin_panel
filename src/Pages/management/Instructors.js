@@ -35,7 +35,7 @@ const Instructors = () => {
           Authorization: `Bearer ${token}`
         }
       });
-      setInstructors(res.data.data || []);
+      setInstructors(res.data.users || []);
     } catch (err) {
       console.error('Failed to fetch instructors:', err);
     } finally {

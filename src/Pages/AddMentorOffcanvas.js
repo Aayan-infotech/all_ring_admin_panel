@@ -1,37 +1,164 @@
-import React, { useState } from 'react';
+// import React, { useState } from 'react';
+// import { Offcanvas, Form, Button, Spinner } from 'react-bootstrap';
+// import axios from 'axios';
+
+// const AddMentorOffcanvas = ({ show, handleClose, onMentorAdded }) => {
+//   const [formData, setFormData] = useState({
+//     name: '',
+//     email: '',
+//     expertise: '',
+//     phone: ''
+//   });
+//   const [loading, setLoading] = useState(false);
+
+//   const handleChange = (e) => {
+//     setFormData({ ...formData, [e.target.name]: e.target.value });
+//   };
+
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     setLoading(true);
+//     const token = localStorage.getItem('adminToken');
+//     try {
+//       await axios.post('http://18.209.91.97:5010/api/admin/addMentor', formData, {
+//         headers: {
+//           Authorization: `Bearer ${token}`,
+//           'Content-Type': 'application/json',
+//         }
+//       });
+//       onMentorAdded();
+//       handleClose();
+//     } catch (err) {
+//       alert('Error adding mentor: ' + (err.response?.data?.message || err.message));
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   return (
+//     <Offcanvas show={show} onHide={handleClose} placement="end">
+//       <Offcanvas.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
+//         <Offcanvas.Title>Add New Mentor</Offcanvas.Title>
+//       </Offcanvas.Header>
+//       <Offcanvas.Body style={{ backgroundColor: 'var(--accent)' }}>
+//         <Form onSubmit={handleSubmit} className="p-3 rounded shadow-sm" style={{ backgroundColor: '#fff' }}>
+//           <Form.Group className="mb-4" controlId="name">
+//             <Form.Label style={{ color: 'var(--secondary)', fontWeight: 'bold' }}>Name</Form.Label>
+//             <Form.Control
+//               type="text"
+//               name="name"
+//               value={formData.name}
+//               onChange={handleChange}
+//               required
+//               style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
+//               placeholder="Enter full name"
+//             />
+//           </Form.Group>
+
+//           <Form.Group className="mb-4" controlId="email">
+//             <Form.Label style={{ color: 'var(--secondary)', fontWeight: 'bold' }}>Email</Form.Label>
+//             <Form.Control
+//               type="email"
+//               name="email"
+//               value={formData.email}
+//               onChange={handleChange}
+//               required
+//               style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
+//               placeholder="Enter email address"
+//             />
+//           </Form.Group>
+
+//           <Form.Group className="mb-4" controlId="expertise">
+//             <Form.Label style={{ color: 'var(--secondary)', fontWeight: 'bold' }}>Expertise</Form.Label>
+//             <Form.Control
+//               type="text"
+//               name="expertise"
+//               value={formData.expertise}
+//               onChange={handleChange}
+//               required
+//               style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
+//               placeholder="Enter domain expertise (e.g., Data Science)"
+//             />
+//           </Form.Group>
+
+//           <Form.Group className="mb-4" controlId="phone">
+//             <Form.Label style={{ color: 'var(--secondary)', fontWeight: 'bold' }}>Phone</Form.Label>
+//             <Form.Control
+//               type="text"
+//               name="phone"
+//               value={formData.phone}
+//               onChange={handleChange}
+//               required
+//               style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
+//               placeholder="Enter phone number"
+//             />
+//           </Form.Group>
+
+//           <div className="d-grid">
+//             <Button
+//               type="submit"
+//               variant="primary"
+//               disabled={loading}
+//               style={{
+//                 backgroundColor: 'var(--primary)',
+//                 border: 'none',
+//                 padding: '10px',
+//                 borderRadius: '10px',
+//                 fontWeight: 'bold'
+//               }}
+//             >
+//               {loading ? <Spinner animation="border" size="sm" /> : 'Add Mentor'}
+//             </Button>
+//           </div>
+//         </Form>
+//       </Offcanvas.Body>
+//     </Offcanvas>
+//   );
+// };
+
+// export default AddMentorOffcanvas;
+
+
+import React from 'react';
+import { useForm } from 'react-hook-form';
 import { Offcanvas, Form, Button, Spinner } from 'react-bootstrap';
 import axios from 'axios';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const AddMentorOffcanvas = ({ show, handleClose, onMentorAdded }) => {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    expertise: '',
-    phone: ''
-  });
-  const [loading, setLoading] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    watch,
+    reset,
+    formState: { errors, isSubmitting }
+  } = useForm();
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const onSubmit = async (data) => {
+    const formData = new FormData();
+    formData.append('name', data.name);
+    formData.append('number', data.number);
+    formData.append('email', data.email);
+    formData.append('password', data.password);
+    formData.append('confirmPassword', data.confirmPassword);
+    formData.append('dateofbirth', data.dateofbirth);
+    formData.append('location', data.location);
+    formData.append('expertise', data.expertise);
+    formData.append('files', data.files[0]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    const token = localStorage.getItem('adminToken');
     try {
-      await axios.post('http://18.209.91.97:5010/api/admin/addMentor', formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        }
-      });
+      await axios.post(
+        'http://18.209.91.97:5010/api/auth/register/mentor',
+        formData,
+        { headers: { 'Content-Type': 'multipart/form-data' } }
+      );
+      toast.success('Mentor registered successfully!');
       onMentorAdded();
+      reset();
       handleClose();
     } catch (err) {
-      alert('Error adding mentor: ' + (err.response?.data?.message || err.message));
-    } finally {
-      setLoading(false);
+      toast.error(`Failed: ${err.response?.data?.message || err.message}`);
     }
   };
 
@@ -41,64 +168,130 @@ const AddMentorOffcanvas = ({ show, handleClose, onMentorAdded }) => {
         <Offcanvas.Title>Add New Mentor</Offcanvas.Title>
       </Offcanvas.Header>
       <Offcanvas.Body style={{ backgroundColor: 'var(--accent)' }}>
-        <Form onSubmit={handleSubmit} className="p-3 rounded shadow-sm" style={{ backgroundColor: '#fff' }}>
-          <Form.Group className="mb-4" controlId="name">
-            <Form.Label style={{ color: 'var(--secondary)', fontWeight: 'bold' }}>Name</Form.Label>
+        <Form onSubmit={handleSubmit(onSubmit)} className="p-3 rounded shadow-sm" style={{ backgroundColor: '#fff' }}>
+          
+          {/* Name */}
+          <Form.Group className="mb-3" controlId="name">
+            <Form.Label>Name</Form.Label>
             <Form.Control
               type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
               placeholder="Enter full name"
+              {...register('name', { required: 'Name is required' })}
             />
+            {errors.name && <span className="text-danger small">{errors.name.message}</span>}
           </Form.Group>
 
-          <Form.Group className="mb-4" controlId="email">
-            <Form.Label style={{ color: 'var(--secondary)', fontWeight: 'bold' }}>Email</Form.Label>
+          {/* Phone Number */}
+          <Form.Group className="mb-3" controlId="number">
+            <Form.Label>Phone Number</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Enter phone number"
+              {...register('number', { required: 'Phone number is required' })}
+            />
+            {errors.number && <span className="text-danger small">{errors.number.message}</span>}
+          </Form.Group>
+
+          {/* Email */}
+          <Form.Group className="mb-3" controlId="email">
+            <Form.Label>Email</Form.Label>
             <Form.Control
               type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
-              placeholder="Enter email address"
+              placeholder="Enter email"
+              {...register('email', { required: 'Email is required' })}
             />
+            {errors.email && <span className="text-danger small">{errors.email.message}</span>}
           </Form.Group>
 
-          <Form.Group className="mb-4" controlId="expertise">
-            <Form.Label style={{ color: 'var(--secondary)', fontWeight: 'bold' }}>Expertise</Form.Label>
+          {/* Password */}
+          <Form.Group className="mb-3" controlId="password">
+            <Form.Label>Password</Form.Label>
             <Form.Control
-              type="text"
-              name="expertise"
-              value={formData.expertise}
-              onChange={handleChange}
-              required
-              style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
-              placeholder="Enter domain expertise (e.g., Data Science)"
+              type="password"
+              placeholder="Enter password"
+              {...register('password', { required: 'Password is required' })}
             />
+            {errors.password && <span className="text-danger small">{errors.password.message}</span>}
           </Form.Group>
 
-          <Form.Group className="mb-4" controlId="phone">
-            <Form.Label style={{ color: 'var(--secondary)', fontWeight: 'bold' }}>Phone</Form.Label>
+          {/* Confirm Password */}
+          <Form.Group className="mb-3" controlId="confirmPassword">
+            <Form.Label>Confirm Password</Form.Label>
+            <Form.Control
+              type="password"
+              placeholder="Re-enter password"
+              {...register('confirmPassword', {
+                required: 'Confirm Password is required',
+                validate: (val) => val === watch('password') || 'Passwords do not match'
+              })}
+            />
+            {errors.confirmPassword && <span className="text-danger small">{errors.confirmPassword.message}</span>}
+          </Form.Group>
+
+          {/* Date of Birth */}
+          {/* <Form.Group className="mb-3" controlId="dateofbirth">
+            <Form.Label>Date of Birth</Form.Label>
+            <Form.Control
+              type="date"
+              {...register('dateofbirth', { required: 'Date of Birth is required' })}
+            />
+            {errors.dateofbirth && <span className="text-danger small">{errors.dateofbirth.message}</span>}
+          </Form.Group> */}
+
+          <Form.Group className="mb-3" controlId="dateofbirth">
+  <Form.Label>Date of Birth (DD-MM-YYYY or DD/MM/YYYY)</Form.Label>
+  <Form.Control
+    type="text"
+    placeholder="e.g. 25-12-1995 or 25/12/1995"
+    {...register('dateofbirth', {
+      required: 'Date of Birth is required',
+      pattern: {
+        value: /^(0?[1-9]|[12][0-9]|3[01])[-\/](0?[1-9]|1[012])[-\/]\d{4}$/,
+        message: 'Use format DD-MM-YYYY or DD/MM/YYYY'
+      }
+    })}
+  />
+  {errors.dateofbirth && <span className="text-danger small">{errors.dateofbirth.message}</span>}
+</Form.Group>
+
+
+          {/* Location */}
+          <Form.Group className="mb-3" controlId="location">
+            <Form.Label>Location</Form.Label>
             <Form.Control
               type="text"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              required
-              style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
-              placeholder="Enter phone number"
+              placeholder="Enter location"
+              {...register('location', { required: 'Location is required' })}
             />
+            {errors.location && <span className="text-danger small">{errors.location.message}</span>}
+          </Form.Group>
+
+          {/* Expertise */}
+          <Form.Group className="mb-3" controlId="expertise">
+            <Form.Label>Expertise</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="e.g., Data Science"
+              {...register('expertise', { required: 'Expertise is required' })}
+            />
+            {errors.expertise && <span className="text-danger small">{errors.expertise.message}</span>}
+          </Form.Group>
+
+          {/* Image Upload */}
+          <Form.Group className="mb-4" controlId="files">
+            <Form.Label>Upload Profile Image</Form.Label>
+            <Form.Control
+              type="file"
+              accept="image/*"
+              {...register('files', { required: 'Image is required' })}
+            />
+            {errors.files && <span className="text-danger small">{errors.files.message}</span>}
           </Form.Group>
 
           <div className="d-grid">
             <Button
               type="submit"
-              variant="primary"
-              disabled={loading}
+              disabled={isSubmitting}
               style={{
                 backgroundColor: 'var(--primary)',
                 border: 'none',
@@ -107,7 +300,7 @@ const AddMentorOffcanvas = ({ show, handleClose, onMentorAdded }) => {
                 fontWeight: 'bold'
               }}
             >
-              {loading ? <Spinner animation="border" size="sm" /> : 'Add Mentor'}
+              {isSubmitting ? <Spinner animation="border" size="sm" /> : 'Register Mentor'}
             </Button>
           </div>
         </Form>
@@ -117,3 +310,4 @@ const AddMentorOffcanvas = ({ show, handleClose, onMentorAdded }) => {
 };
 
 export default AddMentorOffcanvas;
+

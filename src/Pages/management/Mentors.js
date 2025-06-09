@@ -22,7 +22,9 @@ const Mentors = () => {
   const [loading, setLoading] = useState(true);
 
  
- const fetchMentors = async () => {
+
+
+const fetchMentors = async () => {
   try {
     setLoading(true);
     const token = localStorage.getItem('adminToken'); 
@@ -32,14 +34,13 @@ const Mentors = () => {
       }
     });
 
-    setMentors(res.data.data || []);
+    setMentors(res.data.users || []);  
     setLoading(false);
   } catch (err) {
     console.error('Error fetching mentors:', err);
     setLoading(false);
   }
 };
-
 
   useEffect(() => {
     fetchMentors();
@@ -110,81 +111,95 @@ const Mentors = () => {
       ) : (
         <div className="table-responsive">
           <Table striped bordered hover>
+
             <thead style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
-              <tr>
-                <th>#</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Specialization</th>
-                <th>Rating</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
+  <tr>
+    <th>#</th>
+    <th>Profile</th>
+    <th>Name</th>
+    <th>Email</th>
+    {/* <th>Phone</th>
+    <th>DOB</th> */}
+    <th>Location</th>
+    <th>Expertise</th>
+    <th>Status</th>
+    <th>Actions</th>
+  </tr>
+</thead>
+
+      
+
             <tbody>
-              {filteredMentors.map((mentor, index) => (
-                <tr key={mentor._id}>
-                  <td>{index + 1}</td>
-                  <td>{mentor.name || '-'}</td>
-                  <td>{mentor.email || '-'}</td>
-                  <td>{mentor.specialization || '-'}</td>
-                  <td>
-                    <StarFill color="gold" className="me-1" />
-                    {mentor.rating || '4.5'}
-                  </td>
-                  <td>
-                    <Badge 
-                      pill 
-                      style={{ 
-                        padding: '8px 12px',
-                        fontWeight: '500',
-                        backgroundColor: mentor.status === 'active' ? 'var(--success)' : 'var(--danger)'
-                      }}
-                    >
-                      {mentor.status === 'active' ? 'Active' : 'Inactive'}
-                    </Badge>
-                  </td>
-                  <td>
-                    <ButtonGroup>
-                      <Button 
-                        variant={mentor.status === 'active' ? 'danger' : 'success'} 
-                        size="sm"
-                        onClick={() => toggleStatus(mentor._id)}
-                        className="me-2"
-                        style={{
-                          backgroundColor: mentor.status === 'active' ? 'var(--danger)' : 'var(--success)',
-                          border: 'none'
-                        }}
-                      >
-                        {mentor.status === 'active' ? <XCircleFill className="me-1" /> : <CheckCircleFill className="me-1" />}
-                        {mentor.status === 'active' ? 'Deactivate' : 'Activate'}
-                      </Button>
-                      <Button 
-                        variant="warning" 
-                        size="sm" 
-                        className="me-2"
-                        style={{
-                          backgroundColor: '#ffc107',
-                          border: 'none'
-                        }}
-                      >
-                        <PencilSquare className="me-1" /> Edit
-                      </Button>
-                      <Button 
-                        variant="info" 
-                        size="sm"
-                        style={{
-                          backgroundColor: '#17a2b8',
-                          border: 'none'
-                        }}
-                      >
-                        <PersonCheckFill className="me-1" /> Profile
-                      </Button>
-                    </ButtonGroup>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+  {filteredMentors.map((mentor, index) => (
+    <tr key={mentor._id}>
+      <td>{index + 1}</td>
+      <td>
+        <img 
+          src={mentor.profilePicture || 'https://via.placeholder.com/40'} 
+          alt="Profile" 
+          style={{ width: '40px', height: '40px', borderRadius: '50%' }} 
+        />
+      </td>
+      <td>{mentor.name || '-'}</td>
+      <td>{mentor.email || '-'}</td>
+      {/* <td>{mentor.number || '-'}</td>
+      <td>{mentor.dateofbirth || '-'}</td> */}
+      <td>{mentor.location || '-'}</td>
+      <td>{mentor.expertise || '-'}</td>
+      <td>
+        <Badge 
+          pill 
+          style={{ 
+            padding: '8px 12px',
+            fontWeight: '500',
+            backgroundColor: mentor.accountStatus === 'active' ? 'var(--success)' : 'var(--danger)'
+          }}
+        >
+          {mentor.accountStatus === 'active' ? 'Active' : 'Inactive'}
+        </Badge>
+      </td>
+      <td>
+        <ButtonGroup>
+          <Button 
+            variant={mentor.accountStatus === 'active' ? 'danger' : 'success'} 
+            size="sm"
+            onClick={() => toggleStatus(mentor._id)}
+            className="me-2"
+            style={{
+              backgroundColor: mentor.accountStatus === 'active' ? 'var(--danger)' : 'var(--success)',
+              border: 'none'
+            }}
+          >
+            {mentor.accountStatus === 'active' ? <XCircleFill className="me-1" /> : <CheckCircleFill className="me-1" />}
+            {mentor.accountStatus === 'active' ? 'Deactivate' : 'Activate'}
+          </Button>
+          <Button 
+            variant="warning" 
+            size="sm" 
+            className="me-2"
+            style={{
+              backgroundColor: '#ffc107',
+              border: 'none'
+            }}
+          >
+            <PencilSquare className="me-1" /> Edit
+          </Button>
+          <Button 
+            variant="info" 
+            size="sm"
+            style={{
+              backgroundColor: '#17a2b8',
+              border: 'none'
+            }}
+          >
+            <PersonCheckFill className="me-1" /> Profile
+          </Button>
+        </ButtonGroup>
+      </td>
+    </tr>
+  ))}
+</tbody>
+
           </Table>
         </div>
       )}

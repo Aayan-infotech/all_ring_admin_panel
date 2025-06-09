@@ -3,7 +3,8 @@
 
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Login from './Pages/auth/Login';
 import PrivateRoute from './components/PrivateRoute';
 import Dashboard from './Pages/management/Dashboard';
@@ -20,6 +21,7 @@ import AddInstructorOffcanvas from './Pages/AddInstructorOffcanvas';
 function App() {
   return (
     <Router>
+      <ToastContainer/>
       <Routes>
         <Route path="/login" element={<Login />} />
         
