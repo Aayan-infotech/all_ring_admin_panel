@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
@@ -6,10 +5,12 @@ import {
   PersonCheckFill, 
   PersonLinesFill, 
   DatabaseFill,
-  HouseFill
+  HouseFill,
+  ChevronLeft,
+  ChevronRight
 } from 'react-bootstrap-icons';
 
-const Sidebar = ({ collapsed }) => {
+const Sidebar = ({ collapsed, mobileVisible, onMobileClose,setSidebarCollapsed  }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [activeModule, setActiveModule] = useState('');
@@ -67,10 +68,10 @@ const Sidebar = ({ collapsed }) => {
 
   const handleModuleClick = (module) => {
     setActiveModule(module);
-    // Redirect to first route of that module (optional)
     if (subMenus[module]?.length) {
       navigate(subMenus[module][0].path);
     }
+    onMobileClose(); // Close mobile sidebar when module is selected
   };
 
   const menuItems = [
@@ -79,12 +80,41 @@ const Sidebar = ({ collapsed }) => {
   ];
 
   return (
-    <div className={`admin-sidebar ${collapsed ? 'collapsed' : ''}`}>
+  <div 
+      className={`admin-sidebar ${collapsed ? 'collapsed' : ''} ${mobileVisible ? 'mobile-visible' : ''}`}
+      onClick={(e) => {
+        if (mobileVisible && e.target.closest('.menu-item')) {
+          onMobileClose();
+        }
+      }}
+    >
       <div className="sidebar-logo">
         {collapsed ? (
-          <span style={{ color: 'var(--primary)', fontWeight: 'bold' }}>AB</span>
+          <span className="logo-collapsed">AB</span>
         ) : (
-          <span style={{ color: 'var(--primary)', fontWeight: 'bold' }}>Admin Panel</span>
+          <span className="logo-expanded">Admin Panel</span>
+        )}
+        {!collapsed && (
+          <button 
+            className="sidebar-collapse-btn"
+            onClick={() => {
+              setSidebarCollapsed(true);
+              onMobileClose();
+            }}
+          >
+            <ChevronLeft />
+          </button>
+        )}
+        {collapsed && (
+          <button 
+            className="sidebar-expand-btn"
+            onClick={() => {
+              setSidebarCollapsed(false);
+              onMobileClose();
+            }}
+          >
+            <ChevronRight />
+          </button>
         )}
       </div>
 
@@ -133,72 +163,3 @@ const Sidebar = ({ collapsed }) => {
 };
 
 export default Sidebar;
-
-
-// import React from 'react';
-// import { Link, useLocation } from 'react-router-dom';
-// import { 
-//   PeopleFill, 
-//   PersonCheckFill, 
-//   PersonLinesFill, 
-//   DatabaseFill,
-//   HouseFill
-// } from 'react-bootstrap-icons';
-
-// const Sidebar = ({ collapsed }) => {
-//   const location = useLocation();
-
-//   const menuItems = [
-//     {
-//       path: "/dashboard",
-//       icon: <HouseFill />,
-//       label: "Dashboard"
-//     },
-//     {
-//       path: "/users",
-//       icon: <PeopleFill />,
-//       label: "User Management"
-//     },
-//     {
-//       path: "/mentors",
-//       icon: <PersonCheckFill />,
-//       label: "Mentor Management"
-//     },
-//     {
-//       path: "/instructors",
-//       icon: <PersonLinesFill />,
-//       label: "Instructor Management"
-//     },
-//     {
-//       path: "/data",
-//       icon: <DatabaseFill />,
-//       label: "Data Management"
-//     }
-//   ];
-
-//   return (
-//     <div className={`admin-sidebar ${collapsed ? 'collapsed' : ''}`}>
-//       <div className="sidebar-logo">
-//         {collapsed ? (
-//           <span style={{ color: 'var(--primary)', fontWeight: 'bold' }}>AB</span>
-//         ) : (
-//           <span style={{ color: 'var(--primary)', fontWeight: 'bold' }}>Admin Panel</span>
-//         )}
-//       </div>
-//       <div className="sidebar-menu">
-//         {menuItems.map((item) => (
-//           <Link
-//             key={item.path}
-//             to={item.path}
-//             className={`menu-item ${location.pathname === item.path ? 'active' : ''}`}
-//           >
-//             <span className="menu-icon">{item.icon}</span>
-//             <span className="menu-text">{item.label}</span>
-//           </Link>
-//         ))}
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Sidebar;

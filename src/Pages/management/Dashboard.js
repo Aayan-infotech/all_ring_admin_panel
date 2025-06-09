@@ -1,10 +1,7 @@
 
-
-
 import React from 'react';
 import { Card, Row, Col } from 'react-bootstrap';
 import { LinearProgress, Box, Typography } from '@mui/material';
-
 import {
   PeopleFill,
   PersonCheckFill,
@@ -62,38 +59,28 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="dashboard-container p-4" style={{ background: '#f1f5f9', minHeight: '100vh' }}>
+    <div className="dashboard-container">
       {/* Header */}
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2 style={{ color: 'var(--secondary)' }}>Dashboard Overview</h2>
-        <div className="d-flex align-items-center">
-          <span className="me-3">Today: {new Date().toLocaleDateString()}</span>
-          <CalendarCheck size={20} color="var(--primary)" />
+      <div className="dashboard-header">
+        <h2>Dashboard Overview</h2>
+        <div className="dashboard-date">
+          <span>Today: {new Date().toLocaleDateString()}</span>
+          <CalendarCheck size={20} className="calendar-icon" />
         </div>
       </div>
 
       {/* Stats */}
-      <Row className="g-4 mb-4">
+      <Row className="stats-row">
         {stats.map((stat, idx) => (
-          <Col key={idx} xs={12} sm={6} md={3}>
-            <Card className="shadow-sm border-0 rounded-3 hover-scale h-100">
+          <Col key={idx} xs={6} sm={6} md={3}>
+            <Card className="stat-card">
               <Card.Body>
-                <div className="d-flex justify-content-between align-items-center">
+                <div className="stat-content">
                   <div>
-                    <h6 className="text-muted mb-1">{stat.title}</h6>
+                    <h6>{stat.title}</h6>
                     <h3 style={{ color: stat.color }}>{stat.value}</h3>
                   </div>
-                  <div
-                    style={{
-                      width: '48px',
-                      height: '48px',
-                      borderRadius: '12px',
-                      backgroundColor: `${stat.color}20`,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
+                  <div className="stat-icon" style={{ backgroundColor: `${stat.color}20` }}>
                     {stat.icon}
                   </div>
                 </div>
@@ -104,33 +91,21 @@ const Dashboard = () => {
       </Row>
 
       {/* Module Cards */}
-      <Row className="g-4 mb-4">
+      <Row className="modules-row">
         {modules.map((module, idx) => (
-          <Col key={idx} xs={12} sm={6} md={3}>
+          <Col key={idx} xs={6} sm={6} md={3}>
             <Card
               onClick={() => {
                 localStorage.setItem('activeModule', module.id);
                 window.location.href = module.route;
               }}
-              className="shadow-sm border-0 rounded-3 hover-scale text-center h-100"
-              style={{ cursor: 'pointer' }}
+              className="module-card"
             >
               <Card.Body>
-                <div
-                  style={{
-                    width: '48px',
-                    height: '48px',
-                    borderRadius: '12px',
-                    backgroundColor: 'var(--primary)20',
-                    margin: '0 auto 10px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
+                <div className="module-icon-container">
                   {module.icon}
                 </div>
-                <h6 style={{ color: 'var(--secondary)' }}>{module.title}</h6>
+                <h6>{module.title}</h6>
               </Card.Body>
             </Card>
           </Col>
@@ -138,13 +113,11 @@ const Dashboard = () => {
       </Row>
 
       {/* Widgets */}
-      <Row className="g-4 mt-4">
-        <Col md={6}>
-          <Card className="shadow-sm border-0 rounded-3 h-100">
+      <Row className="widgets-row">
+        <Col xs={12} md={6}>
+          <Card className="participation-card">
             <Card.Body>
-              <h5 style={{ color: 'var(--secondary)' }} className="mb-3">
-                Participation Overview
-              </h5>
+              <h5 className="widget-title">Participation Overview</h5>
               {participationData.map((item, idx) => (
                 <Box key={idx} sx={{ mb: 2 }}>
                   <Typography variant="subtitle2" gutterBottom>
@@ -168,15 +141,13 @@ const Dashboard = () => {
           </Card>
         </Col>
 
-        <Col md={6}>
-          <Card className="shadow-sm border-0 rounded-3 h-100">
+        <Col xs={12} md={6}>
+          <Card className="instructors-card">
             <Card.Body>
-              <h5 style={{ color: 'var(--secondary)' }} className="mb-3">
-                Trending Instructors & Locations
-              </h5>
+              <h5 className="widget-title">Trending Instructors & Locations</h5>
               <div className="table-responsive">
-                <table className="table table-hover">
-                  <thead style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
+                <table className="instructors-table">
+                  <thead>
                     <tr>
                       <th>#</th>
                       <th>Instructor</th>
