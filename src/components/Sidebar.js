@@ -52,15 +52,15 @@ const Sidebar = ({ collapsed, mobileVisible, onMobileClose,setSidebarCollapsed  
   const subMenus = {
     users: [
       { path: "/users", icon: <PeopleFill />, label: "All Users" },
-      { path: "/users/add", icon: <PeopleFill />, label: "Add User" },
+      // { path: "/users/add", icon: <PeopleFill />, label: "Add User" },
     ],
     mentors: [
       { path: "/mentors", icon: <PersonCheckFill />, label: "All Mentors" },
-      { path: "/mentors/add", icon: <PersonCheckFill />, label: "Add Mentor" },
+      // { path: "/mentors/add", icon: <PersonCheckFill />, label: "Add Mentor" },
     ],
     instructors: [
       { path: "/instructors", icon: <PersonLinesFill />, label: "All Instructors" },
-      { path: "/instructors/add", icon: <PersonLinesFill />, label: "Add Instructor" },
+      // { path: "/instructors/add", icon: <PersonLinesFill />, label: "Add Instructor" },
     ],
     data: [
       { path: "/data", icon: <DatabaseFill />, label: "Location" },

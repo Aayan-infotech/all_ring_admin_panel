@@ -1,15 +1,57 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Offcanvas, Form, Button, Spinner } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
+import axios from 'axios';
+import { toast } from 'react-toastify'; // ⬅️ Add this import
 
 const AddClassOffcanvas = ({ show, handleClose, onSave }) => {
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm();
+  const [instructors, setInstructors] = useState([]);
+  const [locations, setLocations] = useState([]);
+
+useEffect(() => {
+  const token = localStorage.getItem('adminToken'); // Replace with your token retrieval logic
+
+  // Fetch instructors with token
+axios.get('http://18.209.91.97:5010/api/admin/getRegister/instructor', {
+  headers: {
+    Authorization: `Bearer ${token}`
+  }
+})
+  .then(res => setInstructors(res.data?.users || []))  // ✅ fix here
+  .catch(err => console.error('Error fetching instructors:', err));
+
+
+  // Fetch locations (no auth needed)
+  axios.get('http://18.209.91.97:5010/api/location/getAllLocations')
+    .then(res => setLocations(res.data?.data || []))
+    .catch(err => console.error('Error fetching locations:', err));
+}, []);
+
 
   const onSubmit = async (data) => {
-    onSave(data); // handle API outside
-    reset();
-    handleClose();
+    const formData = new FormData();
+    formData.append('title', data.title);
+    formData.append('theme', data.theme);
+    formData.append('Date', data.date);
+    formData.append('startTime', data.time);
+    formData.append('endTime', data.endtime);
+    formData.append('location', data.location);
+    formData.append('Instructor', data.instructor);
+    formData.append('Image', data.image[0]);
+    formData.append('Type', data.type);
+
+    try {
+      await axios.post('http://18.209.91.97:5010/api/AdminClasses/addClass', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      onSave();
+      reset();
+      handleClose();
+    } catch (error) {
+      console.error('Error posting class:', error);
+    }
   };
 
   return (
@@ -59,9 +101,9 @@ const AddClassOffcanvas = ({ show, handleClose, onSave }) => {
             <Form.Label>Select Instructor</Form.Label>
             <Form.Control as="select" {...register('instructor', { required: 'Instructor is required' })}>
               <option value="">-- Select Instructor --</option>
-              <option value="John Doe">John Doe</option>
-              <option value="Jane Smith">Jane Smith</option>
-              <option value="Amit Sharma">Amit Sharma</option>
+              {instructors.map(inst => (
+                <option key={inst._id} value={inst._id}>{inst.name}</option>
+              ))}
             </Form.Control>
             {errors.instructor && <span className="text-danger small">{errors.instructor.message}</span>}
           </Form.Group>
@@ -79,7 +121,12 @@ const AddClassOffcanvas = ({ show, handleClose, onSave }) => {
 
           <Form.Group className="mb-4">
             <Form.Label>Select Location</Form.Label>
-            <Form.Control {...register('location', { required: 'Location is required' })} />
+            <Form.Control as="select" {...register('location', { required: 'Location is required' })}>
+              <option value="">-- Select Location --</option>
+              {locations.map(loc => (
+                <option key={loc._id} value={loc._id}>{loc.location}</option>
+              ))}
+            </Form.Control>
             {errors.location && <span className="text-danger small">{errors.location.message}</span>}
           </Form.Group>
 

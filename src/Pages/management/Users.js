@@ -256,7 +256,7 @@ const Users = () => {
   // New filter states
   const [filterLocation, setFilterLocation] = useState('');
   const [filterStatus, setFilterStatus] = useState('all'); // all, active, inactive
-  const [filterRole, setFilterRole] = useState('all'); // all, user, mentor, instructor
+  // const [filterRole, setFilterRole] = useState('all'); // all, user, mentor, instructor
 
   const handleShowAddUser = () => setShowAddUser(true);
   const handleCloseAddUser = () => setShowAddUser(false);
@@ -333,11 +333,11 @@ const Users = () => {
     // Filter by Role
     // Assuming user.role is a string like 'user', 'mentor', 'instructor'
     // Adjust if your actual data structure is different
-    if (filterRole !== 'all') {
-      if (!user.role || user.role.toLowerCase() !== filterRole) {
-        return false;
-      }
-    }
+    // if (filterRole !== 'all') {
+    //   if (!user.role || user.role.toLowerCase() !== filterRole) {
+    //     return false;
+    //   }
+    // }
 
     // Optional: You can keep searchTerm filter here as well on name or email
     if (searchTerm) {
@@ -412,7 +412,7 @@ const Users = () => {
           </Form.Select>
         </Col>
         <Col md={3}>
-          <Form.Select
+          {/* <Form.Select
             value={filterRole}
             onChange={e => setFilterRole(e.target.value)}
             style={{
@@ -424,7 +424,7 @@ const Users = () => {
             <option value="user">User</option>
             <option value="mentor">Mentor</option>
             <option value="instructor">Instructor</option>
-          </Form.Select>
+          </Form.Select> */}
         </Col>
       </Row>
 
