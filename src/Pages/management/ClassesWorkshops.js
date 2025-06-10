@@ -106,8 +106,9 @@ const handleDelete = async (id) => {
                 <th>Image</th>
                 <th>Title</th>
                 <th>Theme</th>
-                <th>Date</th>
-                <th>Time</th>
+                   <th>Type</th>
+                {/* <th>Date</th>
+                <th>Time</th> */}
                 <th>Location</th>
                 <th>Status</th>
                 <th>Actions</th>
@@ -126,8 +127,9 @@ const handleDelete = async (id) => {
               /></td>
                   <td>{item.title}</td>
                   <td>{item.theme}</td>
-                  <td>{item.date}</td>
-                  <td>{item.time}</td>
+                      <td>{item.Type}</td>
+                  {/* <td>{item.date}</td>
+                  <td>{item.time}</td> */}
                   <td>{item.location}</td>
                   <td>
                     <Badge bg={item.status === 'active' ? 'success' : 'danger'}>{item.status}</Badge>
