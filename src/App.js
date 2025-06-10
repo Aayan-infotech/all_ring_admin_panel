@@ -18,6 +18,8 @@ import NotFound from './Pages/NotFound';
 import AddUserOffcanvas from './Pages/AddUserOffcanvas';
 import AddMentorOffcanvas from './Pages/AddMentorOffcanvas';
 import AddInstructorOffcanvas from './Pages/AddInstructorOffcanvas';
+import ClassesWorkshops from './Pages/management/ClassesWorkshops';
+import ClassAttendance from './Pages/management/ClassAttendance';
 function App() {
   return (
     <Router>
@@ -34,6 +36,8 @@ function App() {
           <Route path="/mentors" element={<Mentors />} />
           <Route path="/instructors" element={<Instructors />} />
           <Route path="/data" element={<Data />} />
+          <Route path="data/classses" element={<ClassesWorkshops />}   />
+           <Route path="data/attendance" element={<ClassAttendance />}   />
           <Route path="*" element={<NotFound />} />
 
               <Route path="/adduser" element={<AddUserOffcanvas />} />

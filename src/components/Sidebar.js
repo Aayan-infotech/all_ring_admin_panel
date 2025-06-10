@@ -5,6 +5,8 @@ import {
   PersonCheckFill, 
   PersonLinesFill, 
   DatabaseFill,
+  ClipboardCheckFill ,
+  JournalBookmarkFill ,
   HouseFill,
   ChevronLeft,
   ChevronRight
@@ -61,8 +63,10 @@ const Sidebar = ({ collapsed, mobileVisible, onMobileClose,setSidebarCollapsed  
       { path: "/instructors/add", icon: <PersonLinesFill />, label: "Add Instructor" },
     ],
     data: [
-      { path: "/data", icon: <DatabaseFill />, label: "All Data" },
-      { path: "/data/upload", icon: <DatabaseFill />, label: "Upload Data" },
+      { path: "/data", icon: <DatabaseFill />, label: "Location" },
+      { path: "/data/classses", icon: <JournalBookmarkFill  />, label: "Classes & Workshops" },
+       { path: "/data/attendance", icon: <ClipboardCheckFill />, label: "Class Attendance" }
+
     ]
   };
 
