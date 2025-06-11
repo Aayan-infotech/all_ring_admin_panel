@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Form, Offcanvas, Table, Spinner } from 'react-bootstrap';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const API_BASE = 'http://18.209.91.97:5010/api/location';
 
@@ -42,6 +43,28 @@ const Data = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+
+//   const handleToggleStatus = async (id) => {
+//   try {
+//     await axios.patch(`${API_BASE}/changeStatus/${id}`);
+//     await fetchLocations();
+//   } catch (err) {
+//     console.error('Error toggling status', err);
+//   }
+// };
+
+const handleToggleStatus = async (id) => {
+  try {
+    await axios.patch(`${API_BASE}/changeStatus/${id}`);
+    toast.success('Status updated successfully!');
+    await fetchLocations();
+  } catch (err) {
+    console.error('Error toggling status', err);
+    toast.error('Failed to update status');
+  }
+};
+
+
   const handleAddOrUpdate = async () => {
     try {
       if (editId) {
@@ -77,7 +100,7 @@ const Data = () => {
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h4 style={{ color: 'var(--secondary)' }}>Location Management</h4>
         <div className="d-flex gap-2">
-          <Form.Control type="text" placeholder="Search by location..." />
+          {/* <Form.Control type="text" placeholder="Search by location..." /> */}
           <Button onClick={handleShow} style={{ background: 'var(--primary)', border: 'none' }}>
             Add
           </Button>
@@ -90,13 +113,15 @@ const Data = () => {
       ) : (
         <Table bordered hover responsive>
           <thead style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
-            <tr>
-              <th>#</th>
-              <th>Location</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
+  <tr>
+    <th>#</th>
+    <th>Location</th>
+    <th>Status</th>
+    <th>Action</th>
+  </tr>
+</thead>
+
+          {/* <tbody>
             {dataList.map((item, index) => (
               <tr key={item._id}>
                 <td>{index + 1}</td>
@@ -109,7 +134,31 @@ const Data = () => {
                 </td>
               </tr>
             ))}
-          </tbody>
+          </tbody> */}
+          <tbody>
+  {dataList.map((item, index) => (
+    <tr key={item._id}>
+      <td>{index + 1}</td>
+      <td>{item.location}</td>
+      <td>
+        <span
+          className={`badge ${item.status === 'Blocked' ? 'bg-danger' : 'bg-success'}`}
+          style={{ cursor: 'pointer' }}
+          onClick={() => handleToggleStatus(item._id)}
+        >
+          {item.status === 'Blocked' ? 'Blocked' : 'Active'}
+        </span>
+      </td>
+      <td>
+        <div className="d-flex gap-2">
+          <Button size="sm" variant="info" onClick={() => handleEdit(item)}>Edit</Button>
+          <Button size="sm" variant="danger" onClick={() => handleDelete(item._id)}>Delete</Button>
+        </div>
+      </td>
+    </tr>
+  ))}
+</tbody>
+
         </Table>
       )}
 

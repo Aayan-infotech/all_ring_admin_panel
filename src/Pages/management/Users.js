@@ -1,292 +1,129 @@
 
-
-
-// import React, { useEffect, useState } from 'react';
-// import { Table, Button, ButtonGroup, Badge, InputGroup, Form, Spinner } from 'react-bootstrap';
-// import {
-//   PencilSquare,
-//   Lock,
-//   CheckCircleFill,
-//   XCircleFill,
-//   Search,
-//   PlusCircle
-// } from 'react-bootstrap-icons';
-// import axios from 'axios';
-
-// import AddUserOffcanvas from  '../AddUserOffcanvas'
-// const Users = () => {
-//   const [users, setUsers] = useState([]);
-//   const [loading, setLoading] = useState(false);
-
-// const [showAddUser, setShowAddUser] = useState(false);
-
-// const handleShowAddUser = () => setShowAddUser(true);
-// const handleCloseAddUser = () => setShowAddUser(false);
-
-
-// const fetchUsers = async () => {
-//   const token = localStorage.getItem('adminToken'); 
-//   try {
-//     setLoading(true);
-//     const response = await axios.get('http://18.209.91.97:5010/api/admin/getRegister/user', {
-//       headers: {
-//         Authorization: `Bearer ${token}`,
-//       },
-//     });
-//     setUsers(response.data.users); 
-//   } catch (error) {
-//     console.error('Error fetching users:', error);
-//     setUsers([]); 
-//   } finally {
-//     setLoading(false);
-//   }
-// };
-// const toggleStatus = async (user) => {
-//   const token = localStorage.getItem('adminToken');
-//   const newStatus = user.user_status === 1 ? 2 : 1;
-  
-  
-//   setUsers(prevUsers => 
-//     prevUsers.map(u => 
-//       u._id === user._id ? {...u, user_status: newStatus} : u
-//     )
-//   );
-
-//   try {
-//     await axios.patch(
-//       `http://18.209.91.97:5010/api/admin/editUserStatus/${user._id}`,
-//       { user_status: newStatus },
-//       {
-//         headers: {
-//           'Content-Type': 'application/json',
-//           Authorization: `Bearer ${token}`, 
-//         },
-//       }
-//     );
-  
-//   } catch (error) {
-//     console.error('Failed to update user status:', error);
-   
-//     setUsers(prevUsers => 
-//       prevUsers.map(u => 
-//         u._id === user._id ? {...u, user_status: user.user_status} : u
-//       )
-//     );
-//     alert('Failed to toggle status: ' + (error.response?.data?.message || error.message));
-//   }
-// };
-
-
-//   useEffect(() => {
-//     fetchUsers();
-//   }, []);
-
-//   return (
-//     <div className="p-4" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
-//       <div className="d-flex justify-content-between align-items-center mb-4">
-//         <h2 style={{ color: 'var(--secondary)' }}>User Management</h2>
-       
-//         <Button
-//   variant="primary"
-//   onClick={handleShowAddUser}
-//   style={{
-//     backgroundColor: 'var(--primary)',
-//     border: 'none',
-//     padding: '10px 20px',
-//     borderRadius: '8px'
-//   }}
-// >
-//   <PlusCircle className="me-2" />
-//   Add New User
-// </Button>
-
-//       </div>
-
-//       <div className="mb-4">
-//         <InputGroup style={{ maxWidth: '400px' }}>
-//           <Form.Control
-//             placeholder="Search users..."
-//             style={{
-//               border: '2px solid var(--accent)',
-//               borderRadius: '8px 0 0 8px'
-//             }}
-//           />
-//           <Button
-//             variant="primary"
-//             style={{
-//               backgroundColor: 'var(--primary)',
-//               border: 'none',
-//               borderRadius: '0 8px 8px 0'
-//             }}
-//           >
-//             <Search />
-//           </Button>
-//         </InputGroup>
-//       </div>
-
-//       {loading ? (
-//         <div className="text-center">
-//           <Spinner animation="border" variant="primary" />
-//         </div>
-//       ) : (
-//         <div className="table-responsive">
-//           <Table striped bordered hover className="management-table">
-//             <thead
-//               style={{
-//                 backgroundColor: 'var(--secondary)',
-//                 color: 'white'
-//               }}
-//             >
-//               <tr>
-//                 <th>Sr No</th>
-//                 <th>Name</th>
-//                 <th>Email</th>
-//                 <th>Location</th>
-//                 <th>Status</th>
-//                 <th>Actions</th>
-//               </tr>
-//             </thead>
-//             <tbody>
-//               {users.map((user, index) => (
-//                 <tr key={user._id}>
-//                   <td>{index + 1}</td>
-//                   <td>{user.name}</td>
-//                   <td>{user.email}</td>
-//                   <td>{user.location || 'N/A'}</td>
-//                   <td>
-//                     <Badge
-//                       pill
-//                       bg={user.user_status === 1 ? 'success' : 'danger'}
-//                       style={{
-//                         padding: '8px 12px',
-//                         fontWeight: '500',
-//                         backgroundColor: user.user_status === 1 ? 'var(--success)' : 'var(--danger)'
-//                       }}
-//                     >
-//                       {user.user_status === 1 ? 'Active' : 'Inactive'}
-//                     </Badge>
-//                   </td>
-//                   <td>
-//                     <ButtonGroup>
-//                       <Button
-//                         variant={user.user_status === 1 ? 'danger' : 'success'}
-//                         size="sm"
-//                         onClick={() => toggleStatus(user)}
-//                         className="d-flex align-items-center me-2"
-//                         style={{
-//                           backgroundColor: user.user_status === 1 ? 'var(--danger)' : 'var(--success)',
-//                           border: 'none',
-//                           borderRadius: '6px',
-//                           padding: '6px 12px'
-//                         }}
-//                       >
-//                         {user.user_status === 1 ? <XCircleFill className="me-1" /> : <CheckCircleFill className="me-1" />}
-//                         {user.user_status === 1 ? 'Block' : 'Activate'}
-//                       </Button>
-//                       {/* <Button
-//                         variant="warning"
-//                         size="sm"
-//                         className="d-flex align-items-center me-2"
-//                         style={{
-//                           backgroundColor: '#ffc107',
-//                           border: 'none',
-//                           borderRadius: '6px',
-//                           padding: '6px 12px',
-//                           color: 'var(--text-primary)'
-//                         }}
-//                       >
-//                         <PencilSquare className="me-1" /> Edit */}
-//                       {/* </Button> */}
-//                       <Button
-//                         variant="info"
-//                         size="sm"
-//                         className="d-flex align-items-center"
-//                         style={{
-//                           backgroundColor: '#17a2b8',
-//                           border: 'none',
-//                           borderRadius: '6px',
-//                           padding: '6px 12px',
-//                           color: 'white'
-//                         }}
-//                       >
-//                         <Lock className="me-1" /> Reset
-//                       </Button>
-//                     </ButtonGroup>
-//                   </td>
-//                 </tr>
-//               ))}
-//             </tbody>
-//           </Table>
-//         </div>
-//       )}
-//       <AddUserOffcanvas
-//   show={showAddUser}
-//   handleClose={handleCloseAddUser}
-//   onUserAdded={fetchUsers}
-// />
-
-//     </div>
-//   );
-// };
-
-// export default Users;
-
-
 import React, { useEffect, useState } from 'react';
-import { Table, Button, ButtonGroup, Badge, InputGroup, Form, Spinner, Row, Col } from 'react-bootstrap';
+import {
+  Table,
+  Button,
+  ButtonGroup,
+  Badge,
+  Form,
+  Spinner,
+  Row,
+  Col,
+  Modal,
+} from 'react-bootstrap';
 import {
   PencilSquare,
   Lock,
   CheckCircleFill,
   XCircleFill,
-  Search,
-  PlusCircle
+  PlusCircle,
+  EyeFill
 } from 'react-bootstrap-icons';
 import axios from 'axios';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-import AddUserOffcanvas from  '../AddUserOffcanvas'
+import AddUserOffcanvas from '../AddUserOffcanvas';
+import { useForm } from 'react-hook-form';
 
 const Users = () => {
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors }
+  } = useForm();
+
   const [users, setUsers] = useState([]);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [viewUser, setViewUser] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
+
+  const [locations, setLocations] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const [showAddUser, setShowAddUser] = useState(false);
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState('');
+  const [passwords, setPasswords] = useState({ newPassword: '', confirmPassword: '' });
+  console.log(selectedUserId, '...')
   const [searchTerm, setSearchTerm] = useState('');
-  
-  // New filter states
   const [filterLocation, setFilterLocation] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all'); // all, active, inactive
-  // const [filterRole, setFilterRole] = useState('all'); // all, user, mentor, instructor
+  const [filterStatus, setFilterStatus] = useState('all');
 
   const handleShowAddUser = () => setShowAddUser(true);
   const handleCloseAddUser = () => setShowAddUser(false);
 
+  const handleShowResetModal = (userId) => {
+    setSelectedUserId(userId);
+    setPasswords({ newPassword: '', confirmPassword: '' });
+    setShowResetModal(true);
+  };
+  const handleViewProfile = (user) => {
+    setViewUser(user);
+    setShowViewModal(true);
+  };
+
+  const handleResetPassword = async (formData) => {
+    if (formData.newPassword !== formData.confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('adminToken');
+      const response = await axios.put(
+        `http://18.209.91.97:5010/api/admin/changeUserPassword/${selectedUserId}`,
+        {
+          newPassword: formData.newPassword,
+          confirmPassword: formData.confirmPassword,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      toast.success('Password updated successfully!');
+      setShowResetModal(false);
+    } catch (err) {
+      console.error(err);
+      toast.error('Something went wrong while updating the password.');
+    }
+  };
+
   const fetchUsers = async () => {
-    const token = localStorage.getItem('adminToken'); 
+    const token = localStorage.getItem('adminToken');
     try {
       setLoading(true);
-      const response = await axios.get('http://18.209.91.97:5010/api/admin/getRegister/user', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const res = await axios.get('http://18.209.91.97:5010/api/admin/getRegister/user', {
+        headers: { Authorization: `Bearer ${token}` },
       });
-      setUsers(response.data.users); 
+      setUsers(res.data.users);
     } catch (error) {
       console.error('Error fetching users:', error);
-      setUsers([]); 
+      setUsers([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchLocations = async () => {
+    try {
+      const res = await axios.get('http://18.209.91.97:5010/api/location/getAllLocations');
+      setLocations(res.data.data || []);
+    } catch (error) {
+      console.error('Failed to fetch locations:', error);
     }
   };
 
   const toggleStatus = async (user) => {
     const token = localStorage.getItem('adminToken');
     const newStatus = user.user_status === 1 ? 2 : 1;
-    
-    setUsers(prevUsers => 
-      prevUsers.map(u => 
-        u._id === user._id ? {...u, user_status: newStatus} : u
-      )
+
+    setUsers((prev) =>
+      prev.map((u) => (u._id === user._id ? { ...u, user_status: newStatus } : u))
     );
 
     try {
@@ -296,68 +133,43 @@ const Users = () => {
         {
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`, 
+            Authorization: `Bearer ${token}`,
           },
         }
       );
-    
-    } catch (error) {
-      console.error('Failed to update user status:', error);
-     
-      setUsers(prevUsers => 
-        prevUsers.map(u => 
-          u._id === user._id ? {...u, user_status: user.user_status} : u
-        )
+    } catch (err) {
+      toast.error('Failed to update status!');
+      setUsers((prev) =>
+        prev.map((u) => (u._id === user._id ? { ...u, user_status: user.user_status } : u))
       );
-      alert('Failed to toggle status: ' + (error.response?.data?.message || error.message));
     }
   };
 
   useEffect(() => {
     fetchUsers();
+    fetchLocations();
   }, []);
 
-  // Filter logic
-  const filteredUsers = users.filter(user => {
-    // Filter by Location
-    if (filterLocation && !user.location?.toLowerCase().includes(filterLocation.toLowerCase())) {
-      return false;
-    }
-
-    // Filter by Status
-    if (filterStatus !== 'all') {
-      if (filterStatus === 'active' && user.user_status !== 1) return false;
-      if (filterStatus === 'inactive' && user.user_status !== 2) return false;
-    }
-
-    // Filter by Role
-    // Assuming user.role is a string like 'user', 'mentor', 'instructor'
-    // Adjust if your actual data structure is different
-    // if (filterRole !== 'all') {
-    //   if (!user.role || user.role.toLowerCase() !== filterRole) {
-    //     return false;
-    //   }
-    // }
-
-    // Optional: You can keep searchTerm filter here as well on name or email
+  const filteredUsers = users.filter((user) => {
+    if (filterLocation && user.location !== filterLocation) return false;
+    if (filterStatus === 'active' && user.user_status !== 1) return false;
+    if (filterStatus === 'inactive' && user.user_status !== 2) return false;
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       if (
-        !user.name?.toLowerCase().includes(term) && 
+        !user.name?.toLowerCase().includes(term) &&
         !user.email?.toLowerCase().includes(term)
-      ) {
+      )
         return false;
-      }
     }
-
     return true;
   });
 
   return (
     <div className="p-4" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
+      <ToastContainer position="top-right" autoClose={3000} />
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 style={{ color: 'var(--secondary)' }}>User Management</h2>
-       
         <Button
           variant="primary"
           onClick={handleShowAddUser}
@@ -365,69 +177,51 @@ const Users = () => {
             backgroundColor: 'var(--primary)',
             border: 'none',
             padding: '10px 20px',
-            borderRadius: '8px'
+            borderRadius: '8px',
           }}
         >
-          <PlusCircle className="me-2" />
-          Add New User
+          <PlusCircle className="me-2" /> Add New User
         </Button>
       </div>
 
-      {/* Filters row */}
+      {/* Filters */}
       <Row className="mb-4 g-3">
         <Col md={3}>
           <Form.Control
             placeholder="Search by name or email"
             value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-            style={{
-              border: '2px solid var(--accent)',
-              borderRadius: '8px'
-            }}
-          />
-        </Col>
-        <Col md={3}>
-          <Form.Control
-            placeholder="Filter by Location"
-            value={filterLocation}
-            onChange={e => setFilterLocation(e.target.value)}
-            style={{
-              border: '2px solid var(--accent)',
-              borderRadius: '8px'
-            }}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
           />
         </Col>
         <Col md={3}>
           <Form.Select
+            value={filterLocation}
+            onChange={(e) => setFilterLocation(e.target.value)}
+            style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
+          >
+            <option value="">All Locations</option>
+            {locations.map((loc) => (
+              <option key={loc._id} value={loc.location}>
+                {loc.location}
+              </option>
+            ))}
+          </Form.Select>
+        </Col>
+        <Col md={3}>
+          <Form.Select
             value={filterStatus}
-            onChange={e => setFilterStatus(e.target.value)}
-            style={{
-              border: '2px solid var(--accent)',
-              borderRadius: '8px'
-            }}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
           >
             <option value="all">All Status</option>
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
           </Form.Select>
         </Col>
-        <Col md={3}>
-          {/* <Form.Select
-            value={filterRole}
-            onChange={e => setFilterRole(e.target.value)}
-            style={{
-              border: '2px solid var(--accent)',
-              borderRadius: '8px'
-            }}
-          >
-            <option value="all">All Roles</option>
-            <option value="user">User</option>
-            <option value="mentor">Mentor</option>
-            <option value="instructor">Instructor</option>
-          </Form.Select> */}
-        </Col>
       </Row>
 
+      {/* Table */}
       {loading ? (
         <div className="text-center">
           <Spinner animation="border" variant="primary" />
@@ -435,18 +229,14 @@ const Users = () => {
       ) : (
         <div className="table-responsive">
           <Table striped bordered hover className="management-table">
-            <thead
-              style={{
-                backgroundColor: 'var(--secondary)',
-                color: 'white'
-              }}
-            >
+            <thead style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
               <tr>
                 <th>Sr No</th>
                 <th>Name</th>
                 <th>Email</th>
                 <th>Location</th>
-                <th>Role</th> {/* Added Role column */}
+                <th>Phone</th>
+
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
@@ -454,7 +244,9 @@ const Users = () => {
             <tbody>
               {filteredUsers.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="text-center">No users found.</td>
+                  <td colSpan="7" className="text-center">
+                    No users found.
+                  </td>
                 </tr>
               ) : (
                 filteredUsers.map((user, index) => (
@@ -463,7 +255,8 @@ const Users = () => {
                     <td>{user.name}</td>
                     <td>{user.email}</td>
                     <td>{user.location || 'N/A'}</td>
-                    <td>{user.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : 'N/A'}</td>
+                    <td>{user.number || 'N/A'}</td>
+
                     <td>
                       <Badge
                         pill
@@ -471,45 +264,77 @@ const Users = () => {
                         style={{
                           padding: '8px 12px',
                           fontWeight: '500',
-                          backgroundColor: user.user_status === 1 ? 'var(--success)' : 'var(--danger)'
+                          backgroundColor:
+                            user.user_status === 1 ? 'var(--success)' : 'var(--danger)',
                         }}
                       >
                         {user.user_status === 1 ? 'Active' : 'Inactive'}
                       </Badge>
                     </td>
+                 
                     <td>
-                      <ButtonGroup>
-                        <Button
-                          variant={user.user_status === 1 ? 'danger' : 'success'}
-                          size="sm"
-                          onClick={() => toggleStatus(user)}
-                          className="d-flex align-items-center me-2"
-                          style={{
-                            backgroundColor: user.user_status === 1 ? 'var(--danger)' : 'var(--success)',
-                            border: 'none',
-                            borderRadius: '6px',
-                            padding: '6px 12px'
-                          }}
-                        >
-                          {user.user_status === 1 ? <XCircleFill className="me-1" /> : <CheckCircleFill className="me-1" />}
-                          {user.user_status === 1 ? 'Block' : 'Activate'}
-                        </Button>
-                        <Button
-                          variant="info"
-                          size="sm"
-                          className="d-flex align-items-center"
-                          style={{
-                            backgroundColor: '#17a2b8',
-                            border: 'none',
-                            borderRadius: '6px',
-                            padding: '6px 12px',
-                            color: 'white'
-                          }}
-                        >
-                          <Lock className="me-1" /> Reset
-                        </Button>
-                      </ButtonGroup>
-                    </td>
+  <ButtonGroup>
+    <Button
+      size="sm"
+      onClick={() => toggleStatus(user)}
+      style={{
+        backgroundColor: 'transparent',
+        border: 'none',
+        padding: '0 5px',
+        color: user.user_status === 1 ? 'var(--danger)' : 'var(--success)'
+      }}
+    >
+      {user.user_status === 1 ? (
+        <XCircleFill size={20} />
+      ) : (
+        <CheckCircleFill size={20} />
+      )}
+    </Button>
+
+    <Button
+      size="sm"
+      onClick={() => handleShowResetModal(user._id)}
+      style={{
+        backgroundColor: 'transparent',
+        border: 'none',
+        padding: '0 5px',
+        color: '#17a2b8'
+      }}
+    >
+      <Lock size={20} />
+    </Button>
+
+    <Button
+      size="sm"
+      onClick={() => {
+        setEditingUser(user);
+        setShowEditModal(true);
+      }}
+      style={{
+        backgroundColor: 'transparent',
+        border: 'none',
+        padding: '0 5px',
+        color: 'var(--warning)'
+      }}
+    >
+      <PencilSquare size={20} />
+    </Button>
+
+    <Button
+      size="sm"
+      onClick={() => handleViewProfile(user)}
+      style={{
+        backgroundColor: 'transparent',
+        border: 'none',
+        padding: '0 5px',
+        color: '#0d6efd'  // Changed to darker blue for better visibility
+      }}
+    >
+      {/* <i className="bi bi-eye" style={{ fontSize: '20px' }}></i> */}
+       <EyeFill size={20} />
+    </Button>
+  </ButtonGroup>
+</td>
                   </tr>
                 ))
               )}
@@ -517,11 +342,220 @@ const Users = () => {
           </Table>
         </div>
       )}
+
+      {/* Add User Offcanvas */}
       <AddUserOffcanvas
         show={showAddUser}
         handleClose={handleCloseAddUser}
-        onUserAdded={fetchUsers}
+        onUserAdded={() => {
+          fetchUsers();
+          toast.success('User added successfully!');
+        }}
       />
+
+      {/* Reset Password Modal */}
+      <Modal
+        show={showResetModal}
+        onHide={() => setShowResetModal(false)}
+        centered
+        className="reset-password-modal"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Reset Password</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form onSubmit={handleSubmit(handleResetPassword)}>
+            <Form.Group controlId="newPassword">
+              <Form.Label>New Password</Form.Label>
+              <Form.Control
+                type="password"
+                {...register("newPassword", { required: true })}
+                placeholder="Enter new password"
+              />
+              {errors.newPassword && (
+                <small className="text-danger">New password is required</small>
+              )}
+            </Form.Group>
+
+            <Form.Group controlId="confirmPassword" className="mt-3">
+              <Form.Label>Confirm Password</Form.Label>
+              <Form.Control
+                type="password"
+                {...register("confirmPassword", {
+                  required: true,
+                  validate: (value) =>
+                    value === watch("newPassword") || "Passwords do not match",
+                })}
+                placeholder="Confirm new password"
+              />
+              {errors.confirmPassword && (
+                <small className="text-danger">
+                  {errors.confirmPassword.message || "Confirm password is required"}
+                </small>
+              )}
+            </Form.Group>
+
+            <div className="d-flex justify-content-end mt-4">
+              <Button variant="secondary" onClick={() => setShowResetModal(false)} className="me-2">
+                Cancel
+              </Button>
+              <Button type="submit" variant="danger">
+                Update Password
+              </Button>
+            </div>
+          </Form>
+        </Modal.Body>
+      </Modal>
+      {/* view profile  Modal */}
+
+      <Modal
+        show={showViewModal}
+        onHide={() => setShowViewModal(false)}
+        centered
+        className="view-profile-modal"
+      >
+        <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
+          <Modal.Title>👤 User Profile</Modal.Title>
+        </Modal.Header>
+        <Modal.Body style={{ backgroundColor: 'var(--accent)' }}>
+          {viewUser ? (
+            <div>
+              <Row className="mb-3">
+                <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Name:</strong></Col>
+                <Col md={8}>{viewUser.name}</Col>
+              </Row>
+              <Row className="mb-3">
+                <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Email:</strong></Col>
+                <Col md={8}>{viewUser.email}</Col>
+              </Row>
+              <Row className="mb-3">
+                <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Phone:</strong></Col>
+                <Col md={8}>{viewUser.number || 'N/A'}</Col>
+              </Row>
+              <Row className="mb-3">
+                <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Location:</strong></Col>
+                <Col md={8}>{viewUser.location || 'N/A'}</Col>
+              </Row>
+              <Row className="mb-3">
+                <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Status:</strong></Col>
+                <Col md={8}>
+                  <Badge
+                    bg={viewUser.user_status === 1 ? 'success' : 'danger'}
+                    style={{ backgroundColor: viewUser.user_status === 1 ? 'var(--success)' : 'var(--danger)' }}
+                  >
+                    {viewUser.user_status === 1 ? 'Active' : 'Inactive'}
+                  </Badge>
+                </Col>
+              </Row>
+            </div>
+          ) : (
+            <p>Loading user data...</p>
+          )}
+        </Modal.Body>
+        <Modal.Footer style={{ backgroundColor: 'var(--accent)' }}>
+          <Button variant="secondary" onClick={() => setShowViewModal(false)} style={{ borderRadius: '6px' }}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+
+
+      {/*edit modal */}
+
+      <Modal
+        show={showEditModal}
+        onHide={() => setShowEditModal(false)}
+        centered
+        className="edit-profile-modal"
+      >
+        <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
+          <Modal.Title>Edit User Profile</Modal.Title>
+        </Modal.Header>
+        <Modal.Body style={{ backgroundColor: 'var(--accent)' }}>
+          {editingUser ? (
+            <Form
+              onSubmit={handleSubmit(async (data) => {
+                try {
+                  const token = localStorage.getItem('adminToken');
+                  const res = await axios.put(
+                    `http://18.209.91.97:5010/api/admin/updateUser/${editingUser._id}`,
+                    data,
+                    {
+                      headers: {
+                        Authorization: `Bearer ${token}`,
+                      },
+                    }
+                  );
+                  toast.success("User updated successfully!");
+                  fetchUsers();
+                  setShowEditModal(false);
+                } catch (error) {
+                  console.error(error);
+                  toast.error("Failed to update user.");
+                }
+              })}
+            >
+              <Form.Group className="mb-3">
+                <Form.Label>Name</Form.Label>
+                <Form.Control
+                  defaultValue={editingUser.name}
+                  {...register('name', { required: true })}
+                  placeholder="Enter name"
+                />
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Email</Form.Label>
+                <Form.Control
+                  defaultValue={editingUser.email}
+                  {...register('email', { required: true })}
+                  placeholder="Enter email"
+                />
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Phone</Form.Label>
+                <Form.Control
+                  defaultValue={editingUser.number}
+                  {...register('number')}
+                  placeholder="Enter phone number"
+                />
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Location</Form.Label>
+                <Form.Select
+                  defaultValue={editingUser.location}
+                  {...register('location')}
+                >
+                  <option value="">Select Location</option>
+                  {locations.map((loc) => (
+                    <option key={loc._id} value={loc.location}>
+                      {loc.location}
+                    </option>
+                  ))}
+                </Form.Select>
+              </Form.Group>
+
+              <div className="d-flex justify-content-end mt-4">
+                <Button variant="secondary" onClick={() => setShowEditModal(false)} className="me-2">
+                  Cancel
+                </Button>
+                <Button type="submit" variant="primary">
+                  Save Changes
+                </Button>
+              </div>
+            </Form>
+          ) : (
+            <p>Loading...</p>
+          )}
+        </Modal.Body>
+      </Modal>
+
+
+
+
     </div>
   );
 };

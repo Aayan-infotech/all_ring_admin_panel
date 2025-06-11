@@ -34,6 +34,22 @@
 }
 
 
+.modal-dialog {
+  margin: 1.75rem auto;   /* ✅ Centers horizontally */
+  transform: none !important;  /* ✅ Prevents left-align glitches */
+}
+
+.modal-backdrop {
+  z-index: 1040 !important;
+}
+
+.reset-password-modal .modal-dialog {
+  margin: 1.75rem auto;
+  transform: none !important;
+}
+
+
+
 .admin-sidebar {
   width: var(--sidebar-width);
   background: var(--secondary);
@@ -205,7 +221,16 @@
     width: 90%;
 }
 
-.modal {
+/* .modal {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 30px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  max-width: 400px;
+  width: 90%;
+} */
+/* ✅ GOOD: Scoped to your custom confirmation modal only */
+.custom-modal-box {
   background-color: #fff;
   border-radius: 10px;
   padding: 30px;
@@ -224,6 +249,33 @@
   justify-content: flex-end;
   gap: 10px;
 }
+
+.custom-modal .modal-header {
+  background-color: var(--secondary);
+  color: white;
+}
+
+.custom-modal .modal-body {
+  background-color: var(--accent);
+  color: var(--text-primary);
+}
+
+.custom-modal .btn-primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+.custom-modal .btn-danger {
+  background-color: var(--danger);
+  border-color: var(--danger);
+}
+
+.custom-modal .btn-secondary {
+  background-color: var(--secondary);
+  border-color: var(--secondary);
+  color: white;
+}
+
 
 .cancel-button {
   padding: 8px 16px;
@@ -386,6 +438,8 @@
 .instructors-table tbody tr:nth-child(even) {
   background-color: #f8f9fa;
 }
+
+
 
 /* Responsive Styles */
 @media (max-width: 992px) {
