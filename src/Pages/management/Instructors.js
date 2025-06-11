@@ -57,7 +57,7 @@ const fetchInstructors = async () => {
     setInstructors(allUsers);
 
     const locations = [...new Set(allUsers.map(user => user.location).filter(Boolean))];
-    setLocationList(locations);
+    
   } catch (err) {
     console.error('Failed to fetch instructors:', err);
   } finally {

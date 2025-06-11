@@ -30,6 +30,9 @@ const { register, handleSubmit, watch, reset, formState: { errors } } = useForm(
   const [selectedUser, setSelectedUser] = useState(null);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+const [locationList, setLocationList] = useState([]);
+const [selectedLocation, setSelectedLocation] = useState('');
+const [selectedStatus, setSelectedStatus] = useState('');
 
   const fetchMentors = async () => {
     try {
@@ -50,8 +53,23 @@ const { register, handleSubmit, watch, reset, formState: { errors } } = useForm(
 
   useEffect(() => {
     fetchMentors();
+      fetchLocations();
+
   }, []);
 
+const fetchLocations = async () => {
+  try {
+    const res = await axios.get('http://18.209.91.97:5010/api/location/getAllLocations');
+    const locations = res.data?.data || [];
+    const activeLocations = locations
+      .filter(loc => loc.status === 'Active')
+      .map(loc => loc.location);
+    setLocationList(activeLocations);
+  } catch (err) {
+    console.error("Failed to fetch locations:", err);
+    toast.error("Failed to load locations");
+  }
+};
 
 
 const toggleStatus = async (id, status) => {
@@ -120,11 +138,17 @@ const handleResetPassword = async (formData) => {
   }
 };
 
-  const filteredMentors = mentors.filter((mentor) =>
+const filteredMentors = mentors.filter((mentor) => {
+  const nameMatch =
     mentor.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    mentor.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    mentor.specialization?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+    mentor.email?.toLowerCase().includes(searchTerm.toLowerCase());
+
+  const locationMatch = selectedLocation ? mentor.location === selectedLocation : true;
+
+  const statusMatch = selectedStatus ? mentor.accountStatus === selectedStatus : true;
+
+  return nameMatch && locationMatch && statusMatch;
+});
 
   return (
     <div className="p-4" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
@@ -145,7 +169,7 @@ const handleResetPassword = async (formData) => {
         </Button>
       </div>
 
-      <div className="mb-4">
+      {/* <div className="mb-4">
         <InputGroup style={{ maxWidth: '400px' }}>
           <Form.Control
             placeholder="Search mentors..."
@@ -160,7 +184,52 @@ const handleResetPassword = async (formData) => {
             <Search />
           </Button>
         </InputGroup>
-      </div>
+      </div> */}
+
+      <div className="row mb-4">
+  <div className="col-md-4 mb-2">
+    <InputGroup>
+      <Form.Control
+        placeholder="Search by name or email..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        style={{ border: '2px solid var(--accent)', borderRadius: '8px 0 0 8px' }}
+      />
+      <Button
+        variant="primary"
+        style={{ backgroundColor: 'var(--primary)', border: 'none', borderRadius: '0 8px 8px 0' }}
+      >
+        <Search />
+      </Button>
+    </InputGroup>
+  </div>
+
+  <div className="col-md-4 mb-2">
+    <Form.Select
+      value={selectedLocation}
+      onChange={(e) => setSelectedLocation(e.target.value)}
+      style={{ borderRadius: '8px' }}
+    >
+      <option value="">Filter by Location</option>
+      {locationList.map((loc, idx) => (
+        <option key={idx} value={loc}>{loc}</option>
+      ))}
+    </Form.Select>
+  </div>
+
+  <div className="col-md-4 mb-2">
+    <Form.Select
+      value={selectedStatus}
+      onChange={(e) => setSelectedStatus(e.target.value)}
+      style={{ borderRadius: '8px' }}
+    >
+      <option value="">Filter by Status</option>
+      <option value="active">Active</option>
+      <option value="inactive">Inactive</option>
+    </Form.Select>
+  </div>
+</div>
+
 
       {loading ? (
         <div className="text-center my-5">
