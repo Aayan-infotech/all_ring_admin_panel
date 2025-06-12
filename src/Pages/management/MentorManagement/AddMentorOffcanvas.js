@@ -1,11 +1,11 @@
 
 
-import React from 'react';
 import { useForm } from 'react-hook-form';
 import { Offcanvas, Form, Button, Spinner } from 'react-bootstrap';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import React, { useEffect, useState } from 'react';
 
 const AddMentorOffcanvas = ({ show, handleClose, onMentorAdded }) => {
   const {
@@ -15,6 +15,23 @@ const AddMentorOffcanvas = ({ show, handleClose, onMentorAdded }) => {
     reset,
     formState: { errors, isSubmitting }
   } = useForm();
+  const [locations, setLocations] = useState([]);
+
+
+
+  useEffect(() => {
+  const fetchLocations = async () => {
+    try {
+      const response = await axios.get('http://18.209.91.97:5010/api/location/getAllLocations');
+      setLocations(response.data?.data || []); // ✅ fix: use response.data.data instead of response.data.locations
+    } catch (error) {
+      console.error('Error fetching locations:', error);
+      toast.error('Failed to load locations');
+    }
+  };
+
+  fetchLocations();
+}, []);
 
   const onSubmit = async (data) => {
     const formData = new FormData();
@@ -128,13 +145,26 @@ const AddMentorOffcanvas = ({ show, handleClose, onMentorAdded }) => {
 
           {/* Location */}
           <Form.Group className="mb-3" controlId="location">
-            <Form.Label>Location</Form.Label>
+            {/* <Form.Label>Location</Form.Label>
             <Form.Control
               type="text"
               placeholder="Enter location"
               {...register('location', { required: 'Location is required' })}
             />
-            {errors.location && <span className="text-danger small">{errors.location.message}</span>}
+            {errors.location && <span className="text-danger small">{errors.location.message}</span>} */}
+            <Form.Select
+  {...register('location', { required: 'Location is required' })}
+  isInvalid={!!errors.location}
+  style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
+>
+  <option value="">Select location</option>
+  {locations.map((loc) => (
+    <option key={loc._id} value={loc.location}>
+      {loc.location}
+    </option>
+  ))}
+</Form.Select>
+
           </Form.Group>
 
           {/* Expertise */}

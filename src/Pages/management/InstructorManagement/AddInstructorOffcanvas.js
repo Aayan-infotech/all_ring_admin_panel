@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Offcanvas, Form, Button, Spinner } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
@@ -14,6 +14,21 @@ const AddInstructorOffcanvas = ({ show, handleClose, onInstructorAdded }) => {
     reset,
     formState: { errors, isSubmitting }
   } = useForm();
+  const [locations, setLocations] = useState([]);
+ // Fetch locations from API
+useEffect(() => {
+  const fetchLocations = async () => {
+    try {
+      const response = await axios.get('http://18.209.91.97:5010/api/location/getAllLocations');
+      setLocations(response.data?.data || []); // ✅ fix: use response.data.data instead of response.data.locations
+    } catch (error) {
+      console.error('Error fetching locations:', error);
+      toast.error('Failed to load locations');
+    }
+  };
+
+  fetchLocations();
+}, []);
 
   const onSubmit = async (data) => {
     const token = localStorage.getItem('adminToken');
@@ -101,13 +116,26 @@ const AddInstructorOffcanvas = ({ show, handleClose, onInstructorAdded }) => {
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label>Location</Form.Label>
+            {/* <Form.Label>Location</Form.Label>
             <Form.Control
               type="text"
               {...register('location', { required: 'Location is required' })}
               placeholder="Enter location"
             />
-            {errors.location && <span className="text-danger small">{errors.location.message}</span>}
+            {errors.location && <span className="text-danger small">{errors.location.message}</span>} */}
+            <Form.Select
+  {...register('location', { required: 'Location is required' })}
+  isInvalid={!!errors.location}
+  style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
+>
+  <option value="">Select location</option>
+  {locations.map((loc) => (
+    <option key={loc._id} value={loc.location}>
+      {loc.location}
+    </option>
+  ))}
+</Form.Select>
+
           </Form.Group>
 
           <Form.Group className="mb-4">

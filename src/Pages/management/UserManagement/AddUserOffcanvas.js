@@ -1,11 +1,12 @@
 
 
 
-import React from 'react';
+
 import { Offcanvas, Form, Button, Spinner } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import React, { useEffect, useState } from 'react';
 
 const AddUserOffcanvas = ({ show, handleClose, onUserAdded , editingUser }) => {
   const {
@@ -26,6 +27,23 @@ const AddUserOffcanvas = ({ show, handleClose, onUserAdded , editingUser }) => {
       files: null,
     },
   });
+    const [locations, setLocations] = useState([]);
+
+
+useEffect(() => {
+  const fetchLocations = async () => {
+    try {
+      const response = await axios.get('http://18.209.91.97:5010/api/location/getAllLocations');
+      setLocations(response.data?.data || []); // ✅ fix: use response.data.data instead of response.data.locations
+    } catch (error) {
+      console.error('Error fetching locations:', error);
+      toast.error('Failed to load locations');
+    }
+  };
+
+  fetchLocations();
+}, []);
+
 
   const formatDate = (dateString) => {
     if (!dateString) return '';
@@ -45,30 +63,28 @@ const AddUserOffcanvas = ({ show, handleClose, onUserAdded , editingUser }) => {
     formData.append('dateofbirth', formatDate(data.dateofbirth));
     if (data.files?.[0]) formData.append('files', data.files[0]);
 
- try {
-  await axios.post(
-    `http://18.209.91.97:5010/api/auth/register/user`,
-    formData,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'multipart/form-data',
-      },
+    try {
+      await axios.post(
+        `http://18.209.91.97:5010/api/auth/register/user`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+      toast.success('User added successfully!', { autoClose: 3000 });
+      onUserAdded();
+      handleClose();
+      reset();
+    } catch (err) {
+      toast.error('Failed to add user: ' + (err.response?.data?.message || err.message), {
+        autoClose: 4000,
+      });
     }
-  );
-  toast.success('User added successfully!', { autoClose: 3000 });
-  onUserAdded();
-  handleClose();
-  reset();
-} catch (err) {
-  toast.error('Failed to add user: ' + (err.response?.data?.message || err.message), {
-    autoClose: 4000,
-  });
-}
-
   };
 
-  
 
   return (
     <Offcanvas show={show} onHide={handleClose} placement="end">
@@ -107,15 +123,23 @@ const AddUserOffcanvas = ({ show, handleClose, onUserAdded , editingUser }) => {
             <Form.Control.Feedback type="invalid">{errors.email?.message}</Form.Control.Feedback>
           </Form.Group>
 
+         
+
           <Form.Group className="mb-4" controlId="location">
             <Form.Label style={{ color: 'var(--secondary)', fontWeight: 'bold' }}>Location</Form.Label>
-            <Form.Control
-              type="text"
-              {...register('location', { required: 'Location is required' })}
-              isInvalid={!!errors.location}
-              style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
-              placeholder="Enter city or location"
-            />
+      <Form.Select
+  {...register('location', { required: 'Location is required' })}
+  isInvalid={!!errors.location}
+  style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
+>
+  <option value="">Select location</option>
+  {locations.map((loc) => (
+    <option key={loc._id} value={loc.location}>
+      {loc.location}
+    </option>
+  ))}
+</Form.Select>
+
             <Form.Control.Feedback type="invalid">{errors.location?.message}</Form.Control.Feedback>
           </Form.Group>
 
