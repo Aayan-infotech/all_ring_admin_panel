@@ -14,7 +14,7 @@ import {
 import axios from 'axios';
 import { useForm } from 'react-hook-form';
 
-import AddMentorOffcanvas from '../AddMentorOffcanvas';
+import AddMentorOffcanvas from './AddMentorOffcanvas';
 import { toast } from 'react-toastify';
 
 const Mentors = () => {

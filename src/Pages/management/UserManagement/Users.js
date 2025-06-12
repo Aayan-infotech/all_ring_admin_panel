@@ -22,8 +22,8 @@ import {
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
-import AddUserOffcanvas from '../AddUserOffcanvas';
+import AddUserOffcanvas from './AddUserOffcanvas';
+// import AddUserOffcanvas from './AddUserOffcanvas';
 import { useForm } from 'react-hook-form';
 
 const Users = () => {

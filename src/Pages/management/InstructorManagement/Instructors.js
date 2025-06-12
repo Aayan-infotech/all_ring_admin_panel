@@ -10,6 +10,9 @@ import {
 import {
   PencilSquare, EyeFill, LockFill, CheckCircleFill, XCircleFill
 } from 'react-bootstrap-icons';
+
+
+import AddInstructorOffcanvas from './AddInstructorOffcanvas';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -19,6 +22,7 @@ const InstructorManagement = () => {
   const [statusFilter, setStatusFilter] = useState('');
   const [locationFilter, setLocationFilter] = useState('');
   const [uniqueLocations, setUniqueLocations] = useState([]);
+const [showAddCanvas, setShowAddCanvas] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [selectedInstructor, setSelectedInstructor] = useState(null);
@@ -125,6 +129,20 @@ const fetchLocations = async () => {
   <h3>Instructor Management</h3>
 </div>
 
+<div className="d-flex justify-content-end mb-3">
+  <Button
+    onClick={() => setShowAddCanvas(true)}
+    style={{
+      backgroundColor: 'var(--primary)',
+      border: 'none',
+      borderRadius: '8px',
+      fontWeight: 'bold',
+    }}
+  >
+    + Add Instructor
+  </Button>
+</div>
+
 <Row className="mb-3">
   <Col md={4}>
     <InputGroup>
@@ -174,6 +192,8 @@ const fetchLocations = async () => {
 </Row>
 
 
+
+
       {loading ? (
         <Spinner animation="border" variant="primary" />
       ) : (
@@ -215,6 +235,16 @@ const fetchLocations = async () => {
           </tbody>
         </Table>
       )}
+
+
+
+<AddInstructorOffcanvas
+  show={showAddCanvas}
+  handleClose={() => setShowAddCanvas(false)}
+  onInstructorAdded={fetchInstructors}
+/>
+
+
 
       {/* View Modal */}
       <Modal show={viewModal} onHide={() => setViewModal(false)} centered className="custom-modal">

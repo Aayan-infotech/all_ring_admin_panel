@@ -8,18 +8,21 @@ import 'react-toastify/dist/ReactToastify.css';
 import Login from './Pages/auth/Login';
 import PrivateRoute from './components/PrivateRoute';
 import Dashboard from './Pages/management/Dashboard';
-import Users from './Pages/management/Users';
-import Mentors from './Pages/management/Mentors';
-import Instructors from './Pages/management/Instructors';
-import Data from './Pages/management/Data';
+// import Users from './Pages/management/Users';
+import Users from './Pages/management/UserManagement/Users';
+import Mentors from './Pages/management/MentorManagement/Mentors';
+import Instructors from './Pages/management/InstructorManagement/Instructors';
+import Data from './Pages/management/DataManagement/Data';
 import Layout from './components/Layout';
 
 import NotFound from './Pages/NotFound';
-import AddUserOffcanvas from './Pages/AddUserOffcanvas';
-import AddMentorOffcanvas from './Pages/AddMentorOffcanvas';
-import AddInstructorOffcanvas from './Pages/AddInstructorOffcanvas';
-import ClassesWorkshops from './Pages/management/ClassesWorkshops';
-import ClassAttendance from './Pages/management/ClassAttendance';
+// import AddUserOffcanvas from './Pages/AddUserOffcanvas';
+import AddUserOffcanvas from './Pages/management/UserManagement/AddUserOffcanvas';
+import AddMentorOffcanvas from './Pages/management/MentorManagement/AddMentorOffcanvas';
+// import AddInstructorOffcanvas from './Pages/AddInstructorOffcanvas';
+import AddInstructorOffcanvas from './Pages/management/InstructorManagement/AddInstructorOffcanvas';
+import ClassesWorkshops from './Pages/management/DataManagement/ClassesWorkshops';
+import ClassAttendance from './Pages/management/DataManagement/ClassAttendance';
 function App() {
   return (
     <Router>
