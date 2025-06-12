@@ -143,15 +143,8 @@ const AddMentorOffcanvas = ({ show, handleClose, onMentorAdded }) => {
 </Form.Group>
 
 
-          {/* Location */}
           <Form.Group className="mb-3" controlId="location">
-            {/* <Form.Label>Location</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="Enter location"
-              {...register('location', { required: 'Location is required' })}
-            />
-            {errors.location && <span className="text-danger small">{errors.location.message}</span>} */}
+           
             <Form.Select
   {...register('location', { required: 'Location is required' })}
   isInvalid={!!errors.location}

@@ -84,26 +84,39 @@ const fetchLocations = async () => {
   }
 };
 
+const toggleStatus = async (instructor) => {
+  // Block toggle if user_status === 0 and show toast
+  if (instructor.user_status === 0) {
+    toast.error("❌ User email is not verified!", {
+      position: "top-right",
+      autoClose: 3000,
+    });
+    return; // Exit early
+  }
 
+  // Proceed with status toggle for verified users (status 1 or 2)
+  const token = localStorage.getItem('adminToken');
+  const newStatus = instructor.user_status === 1 ? 2 : 1;
 
-  const toggleStatus = async (id, status) => {
-    try {
-      const token = localStorage.getItem('adminToken');
-      await axios.patch(`http://18.209.91.97:5010/api/admin/editUserStatus/${id}`, {
-        user_status: status === 'active' ? 2 : 1
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setInstructors(prev =>
-        prev.map(inst =>
-          inst._id === id ? { ...inst, status: status === 'active' ? 'inactive' : 'active' } : inst
-        )
-      );
-      toast.success('Status updated successfully');
-    } catch (err) {
-      toast.error('Failed to update status');
-    }
-  };
+  try {
+    await axios.patch(
+      `http://18.209.91.97:5010/api/admin/editUserStatus/${instructor._id}`,
+      { user_status: newStatus },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    // Update UI optimistically
+    setInstructors(prev => 
+      prev.map(i => 
+        i._id === instructor._id ? { ...i, user_status: newStatus } : i
+      )
+    );
+    toast.success(`Status updated to ${newStatus === 1 ? 'Active' : 'Inactive'}`);
+  } catch (err) {
+    toast.error("Failed to update status!");
+    console.error(err);
+  }
+};
 
   const updatePassword = async () => {
     if (passwords.newPassword !== passwords.confirmPassword) return toast.error('Passwords do not match');
@@ -223,25 +236,36 @@ const fetchLocations = async () => {
                     {instructor.status}
                   </Badge>
                 </td>
-                {/* <td>
-                  <ButtonGroup>
-                    <Button variant="info" onClick={() => { setSelectedInstructor(instructor); setViewModal(true); }}><EyeFill /></Button>
-                    <Button variant="warning" onClick={() => { setSelectedInstructor(instructor); setEditForm(instructor); setEditModal(true); }}><PencilSquare /></Button>
-                    <Button variant="secondary" onClick={() => { setSelectedInstructor(instructor); setResetModal(true); }}><LockFill /></Button>
-                    <Button variant={instructor.status === 'active' ? 'danger' : 'success'} onClick={() => toggleStatus(instructor._id, instructor.status)}>
-                      {instructor.status === 'active' ? <XCircleFill /> : <CheckCircleFill />}
-                    </Button>
-                  </ButtonGroup>
-                </td> */}
-
-                <td>
+             
+              <td>
   <ButtonGroup>
     <Button variant="info" onClick={() => { setSelectedInstructor(instructor); setViewModal(true); }}><EyeFill /></Button>
     <Button variant="warning" onClick={() => { setSelectedInstructor(instructor); setEditForm(instructor); setEditModal(true); }}><PencilSquare /></Button>
     <Button variant="secondary" onClick={() => { setSelectedInstructor(instructor); setResetModal(true); }}><LockFill /></Button>
-    <Button variant={instructor.status === 'active' ? 'danger' : 'success'} onClick={() => toggleStatus(instructor._id, instructor.status)}>
-      {instructor.status === 'active' ? <XCircleFill /> : <CheckCircleFill />}
-    </Button>
+   
+
+<Button
+  size="sm"
+  onClick={() => toggleStatus(instructor)}
+  style={{
+    backgroundColor: 'transparent',
+    border: 'none',
+    padding: '0 5px',
+    color: instructor.user_status === 0 ? 'gray' : 
+           instructor.user_status === 1 ? 'var(--danger)' : 'var(--success)',
+    cursor: 'pointer', // Always clickable
+  }}
+  title={instructor.user_status === 0 ? "Not verified" : "Toggle status"}
+>
+  {instructor.user_status === 0 ? (
+    <XCircleFill size={20} /> // ❌ 
+  ) : instructor.user_status === 1 ? (
+    <CheckCircleFill size={20} /> // ✅ 
+  ) : (
+    <XCircleFill size={20} /> // ❌ 
+  )}
+</Button>
+      
     <Button
       variant="dark"
       onClick={() => {

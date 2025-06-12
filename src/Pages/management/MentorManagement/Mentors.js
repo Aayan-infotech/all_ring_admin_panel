@@ -72,13 +72,51 @@ const fetchLocations = async () => {
 };
 
 
-const toggleStatus = async (id, status) => {
+// const toggleStatus = async (id, status) => {
+//   try {
+//     const token = localStorage.getItem('adminToken');
+//     const user_status = status === 'active' ? 2 : 1;
+
+//     await axios.patch(
+//       `http://18.209.91.97:5010/api/admin/editUserStatus/${id}`,
+//       { user_status },
+//       {
+//         headers: {
+//           Authorization: `Bearer ${token}`,
+//         },
+//       }
+//     );
+
+   
+//     setMentors((prevMentors) =>
+//       prevMentors.map((mentor) =>
+//         mentor._id === id
+//           ? { ...mentor, accountStatus: status === 'active' ? 'inactive' : 'active' }
+//           : mentor
+//       )
+//     );
+//   } catch (err) {
+//     console.error('Error toggling status:', err);
+//     toast.error('Failed to update status');
+//   }
+// };
+const toggleStatus = async (mentor) => {
+  // If user is not verified (user_status=0), show toast and return
+  if (mentor.user_status === 0) {
+    toast.error("❌ User email is not verified!", {
+      position: "top-right",
+      autoClose: 3000,
+    });
+    return;
+  }
+
   try {
     const token = localStorage.getItem('adminToken');
-    const user_status = status === 'active' ? 2 : 1;
+    const newStatus = mentor.accountStatus === 'active' ? 'inactive' : 'active';
+    const user_status = newStatus === 'active' ? 1 : 2;
 
     await axios.patch(
-      `http://18.209.91.97:5010/api/admin/editUserStatus/${id}`,
+      `http://18.209.91.97:5010/api/admin/editUserStatus/${mentor._id}`,
       { user_status },
       {
         headers: {
@@ -87,14 +125,14 @@ const toggleStatus = async (id, status) => {
       }
     );
 
-   
     setMentors((prevMentors) =>
-      prevMentors.map((mentor) =>
-        mentor._id === id
-          ? { ...mentor, accountStatus: status === 'active' ? 'inactive' : 'active' }
-          : mentor
+      prevMentors.map((m) =>
+        m._id === mentor._id
+          ? { ...m, accountStatus: newStatus }
+          : m
       )
     );
+    toast.success(`Status updated to ${newStatus}`);
   } catch (err) {
     console.error('Error toggling status:', err);
     toast.error('Failed to update status');
@@ -130,7 +168,7 @@ const handleResetPassword = async (formData) => {
     );
 
     toast.success('Password updated successfully!');
-    reset(); // <-- clear fields
+    reset(); 
     setShowResetModal(false);
   } catch (err) {
     console.error('Password reset failed:', err.response?.data || err.message);
@@ -264,7 +302,7 @@ const filteredMentors = mentors.filter((mentor) => {
 
                     <ButtonGroup>
   {/* Status Toggle Button */}
-  <Button
+  {/* <Button
     size="sm"
     onClick={() => toggleStatus(mentor._id, mentor.accountStatus)}
     style={{
@@ -276,8 +314,29 @@ const filteredMentors = mentors.filter((mentor) => {
     title={mentor.accountStatus === 'active' ? 'Block' : 'Activate'}
   >
     {mentor.accountStatus === 'active' ? <XCircleFill size={20} /> : <CheckCircleFill size={20} />}
-  </Button>
-
+  </Button> */}
+<Button
+  size="sm"
+  onClick={() => toggleStatus(mentor)}
+  style={{
+    backgroundColor: 'transparent',
+    border: 'none',
+    padding: '0 5px',
+    color: mentor.user_status === 0 ? 'gray' : 
+           mentor.accountStatus === 'active' ? 'var(--danger)' : 'var(--success)',
+    cursor: 'pointer',
+  }}
+  title={mentor.user_status === 0 ? "Not verified" : 
+         mentor.accountStatus === 'active' ? 'Deactivate' : 'Activate'}
+>
+  {mentor.user_status === 0 ? (
+    <XCircleFill size={20} /> // Show ❌ for unverified users
+  ) : mentor.accountStatus === 'active' ? (
+    <XCircleFill size={20} /> // Show ❌ for active users
+  ) : (
+    <CheckCircleFill size={20} /> // Show ✅ for inactive users
+  )}
+</Button>
   {/* Edit Button */}
   <Button
     size="sm"

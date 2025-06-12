@@ -118,32 +118,52 @@ const Users = () => {
     }
   };
 
-  const toggleStatus = async (user) => {
-    const token = localStorage.getItem('adminToken');
-    const newStatus = user.user_status === 1 ? 2 : 1;
 
-    setUsers((prev) =>
-      prev.map((u) => (u._id === user._id ? { ...u, user_status: newStatus } : u))
+
+
+
+const toggleStatus = async (user) => {
+ 
+  if (user.user_status === 0) {
+    toast.error("❌ User email is not verified. Please verify first!", {
+      position: "top-right",
+      autoClose: 3000,
+    });
+    return; 
+  }
+
+  
+  const token = localStorage.getItem('adminToken');
+  const newStatus = user.user_status === 1 ? 2 : 1;
+
+  setUsers(prevUsers =>
+    prevUsers.map(u => 
+      u._id === user._id ? { ...u, user_status: newStatus } : u
+    )
+  );
+
+  try {
+    await axios.patch(
+      `http://18.209.91.97:5010/api/admin/editUserStatus/${user._id}`,
+      { user_status: newStatus },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
-
-    try {
-      await axios.patch(
-        `http://18.209.91.97:5010/api/admin/editUserStatus/${user._id}`,
-        { user_status: newStatus },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-    } catch (err) {
-      toast.error('Failed to update status!');
-      setUsers((prev) =>
-        prev.map((u) => (u._id === user._id ? { ...u, user_status: user.user_status } : u))
-      );
-    }
-  };
+    toast.success(`✅ User status updated to ${newStatus === 1 ? 'Active' : 'Inactive'}`);
+  } catch (err) {
+    console.error("Error updating status:", err);
+    toast.error("❌ Failed to update status!");
+    // Revert on error
+    setUsers(prevUsers =>
+      prevUsers.map(u => 
+        u._id === user._id ? { ...u, user_status: user.user_status } : u
+      )
+    );
+  }
+};
 
   useEffect(() => {
     fetchUsers();
@@ -274,22 +294,30 @@ const Users = () => {
                  
                     <td>
   <ButtonGroup>
-    <Button
-      size="sm"
-      onClick={() => toggleStatus(user)}
-      style={{
-        backgroundColor: 'transparent',
-        border: 'none',
-        padding: '0 5px',
-        color: user.user_status === 1 ? 'var(--danger)' : 'var(--success)'
-      }}
-    >
-      {user.user_status === 1 ? (
-        <XCircleFill size={20} />
-      ) : (
-        <CheckCircleFill size={20} />
-      )}
-    </Button>
+ 
+
+
+ <Button
+  size="sm"
+  onClick={() => toggleStatus(user)}
+  style={{
+    backgroundColor: 'transparent',
+    border: 'none',
+    padding: '0 5px',
+    color: 
+      user.user_status === 1 ? 'var(--danger)' : 
+      user.user_status === 2 ? 'var(--success)' : 'gray',
+    cursor: 'pointer', 
+  }}
+>
+  {user.user_status === 1 ? (
+    <XCircleFill size={20} />
+  ) : user.user_status === 2 ? (
+    <CheckCircleFill size={20} /> 
+  ) : (
+    <XCircleFill size={20} /> 
+  )}
+</Button>
 
     <Button
       size="sm"
