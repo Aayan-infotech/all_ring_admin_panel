@@ -1,6 +1,3 @@
-
-
-
 import React, { useEffect, useState } from 'react';
 import { Table, Button, ButtonGroup, InputGroup, Form, Spinner, Badge } from 'react-bootstrap';
 import { PencilSquare, PlusCircle, XCircleFill, CheckCircleFill, Film, FileEarmarkText, Trash } from 'react-bootstrap-icons';
@@ -43,17 +40,29 @@ const fetchClasses = async () => {
 };
 
 
+
+
+
 const toggleStatus = async (id) => {
   try {
     const token = localStorage.getItem('adminToken');
     await axios.patch(`http://18.209.91.97:5010/api/AdminClasses/blockClass/${id}`, {}, {
       headers: { Authorization: `Bearer ${token}` }
     });
-    fetchClasses();
+
+    // ✅ Instead of refetching, update state locally
+    setClasses(prev =>
+      prev.map(cls =>
+        cls._id === id
+          ? { ...cls, status: cls.status === 'active' ? 'inactive' : 'active' }
+          : cls
+      )
+    );
   } catch (err) {
     console.error('Status toggle failed:', err);
   }
 };
+
 
 const handleDelete = async (id) => {
   if (!window.confirm('Are you sure you want to delete this class?')) return;

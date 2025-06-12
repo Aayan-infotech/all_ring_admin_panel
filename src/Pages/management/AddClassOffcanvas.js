@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Offcanvas, Form, Button, Spinner } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
-import { toast } from 'react-toastify'; // ⬅️ Add this import
+import { toast } from 'react-toastify'; 
 
 const AddClassOffcanvas = ({ show, handleClose, onSave }) => {
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm();
@@ -11,9 +11,9 @@ const AddClassOffcanvas = ({ show, handleClose, onSave }) => {
   const [locations, setLocations] = useState([]);
 
 useEffect(() => {
-  const token = localStorage.getItem('adminToken'); // Replace with your token retrieval logic
+  const token = localStorage.getItem('adminToken'); 
 
-  // Fetch instructors with token
+  
 axios.get('http://18.209.91.97:5010/api/admin/getRegister/instructor', {
   headers: {
     Authorization: `Bearer ${token}`
@@ -23,7 +23,7 @@ axios.get('http://18.209.91.97:5010/api/admin/getRegister/instructor', {
   .catch(err => console.error('Error fetching instructors:', err));
 
 
-  // Fetch locations (no auth needed)
+ 
   axios.get('http://18.209.91.97:5010/api/location/getAllLocations')
     .then(res => setLocations(res.data?.data || []))
     .catch(err => console.error('Error fetching locations:', err));
