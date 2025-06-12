@@ -109,17 +109,7 @@ const AddMentorOffcanvas = ({ show, handleClose, onMentorAdded }) => {
             {errors.confirmPassword && <span className="text-danger small">{errors.confirmPassword.message}</span>}
           </Form.Group>
 
-          {/* Date of Birth */}
-          {/* <Form.Group className="mb-3" controlId="dateofbirth">
-            <Form.Label>Date of Birth</Form.Label>
-            <Form.Control
-              type="date"
-              {...register('dateofbirth', { required: 'Date of Birth is required' })}
-            />
-            {errors.dateofbirth && <span className="text-danger small">{errors.dateofbirth.message}</span>}
-          </Form.Group> */}
-
-          <Form.Group className="mb-3" controlId="dateofbirth">
+         <Form.Group className="mb-3" controlId="dateofbirth">
   <Form.Label>Date of Birth (DD-MM-YYYY or DD/MM/YYYY)</Form.Label>
   <Form.Control
     type="text"

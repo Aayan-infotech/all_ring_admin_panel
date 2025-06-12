@@ -1,7 +1,3 @@
-
-
-
-
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import {
@@ -11,6 +7,7 @@ import {
   PencilSquare, EyeFill, LockFill, CheckCircleFill, XCircleFill
 } from 'react-bootstrap-icons';
 
+import AddPrisonerOffcanvas from './AddPrisonerOffcanvas';
 
 import AddInstructorOffcanvas from './AddInstructorOffcanvas';
 import { toast, ToastContainer } from 'react-toastify';
@@ -23,6 +20,9 @@ const InstructorManagement = () => {
   const [locationFilter, setLocationFilter] = useState('');
   const [uniqueLocations, setUniqueLocations] = useState([]);
 const [showAddCanvas, setShowAddCanvas] = useState(false);
+const [showPrisonerCanvas, setShowPrisonerCanvas] = useState(false);
+const [selectedInstructorId, setSelectedInstructorId] = useState('');
+const [locationObjects, setLocationObjects] = useState([]); // for _id and name
 
   const [loading, setLoading] = useState(false);
   const [selectedInstructor, setSelectedInstructor] = useState(null);
@@ -73,10 +73,10 @@ const fetchInstructors = async () => {
 const fetchLocations = async () => {
   try {
     const res = await axios.get('http://18.209.91.97:5010/api/location/getAllLocations');
-    const locations = res.data?.data || []; // use .data.data as per your API response
+    const locations = res.data?.data || [];
     const activeLocationNames = locations
-      .filter(loc => loc.status === 'Active')  // filter only active locations
-      .map(loc => loc.location);              // extract location names
+      .filter(loc => loc.status === 'Active') 
+      .map(loc => loc.location);            
     setLocationList(activeLocationNames);
   } catch (err) {
     console.error("Failed to fetch locations:", err);
@@ -131,6 +131,19 @@ const fetchLocations = async () => {
 
 <div className="d-flex justify-content-end mb-3">
   <Button
+  onClick={() => window.location.href = "/prisoners"}
+  style={{
+    backgroundColor: 'var(--info)',
+    border: 'none',
+    borderRadius: '8px',
+    fontWeight: 'bold',
+    marginRight: '10px',
+  }}
+>
+  👁 View Prisoners
+</Button>
+
+  <Button
     onClick={() => setShowAddCanvas(true)}
     style={{
       backgroundColor: 'var(--primary)',
@@ -164,17 +177,7 @@ const fetchLocations = async () => {
     </Form.Select>
   </Col>
   <Col md={4}>
-    {/* <Form.Select
-      value={selectedLocation}
-      onChange={(e) => setSelectedLocation(e.target.value)}
-    >
-      <option value="">Filter by Location</option>
-      {locationList.map((loc, idx) => (
-        <option key={idx} value={loc}>
-          {loc}
-        </option>
-      ))}
-    </Form.Select> */}
+   
 <Form.Select
   value={selectedLocation}
   onChange={(e) => setSelectedLocation(e.target.value)}
@@ -220,7 +223,7 @@ const fetchLocations = async () => {
                     {instructor.status}
                   </Badge>
                 </td>
-                <td>
+                {/* <td>
                   <ButtonGroup>
                     <Button variant="info" onClick={() => { setSelectedInstructor(instructor); setViewModal(true); }}><EyeFill /></Button>
                     <Button variant="warning" onClick={() => { setSelectedInstructor(instructor); setEditForm(instructor); setEditModal(true); }}><PencilSquare /></Button>
@@ -229,7 +232,28 @@ const fetchLocations = async () => {
                       {instructor.status === 'active' ? <XCircleFill /> : <CheckCircleFill />}
                     </Button>
                   </ButtonGroup>
-                </td>
+                </td> */}
+
+                <td>
+  <ButtonGroup>
+    <Button variant="info" onClick={() => { setSelectedInstructor(instructor); setViewModal(true); }}><EyeFill /></Button>
+    <Button variant="warning" onClick={() => { setSelectedInstructor(instructor); setEditForm(instructor); setEditModal(true); }}><PencilSquare /></Button>
+    <Button variant="secondary" onClick={() => { setSelectedInstructor(instructor); setResetModal(true); }}><LockFill /></Button>
+    <Button variant={instructor.status === 'active' ? 'danger' : 'success'} onClick={() => toggleStatus(instructor._id, instructor.status)}>
+      {instructor.status === 'active' ? <XCircleFill /> : <CheckCircleFill />}
+    </Button>
+    <Button
+      variant="dark"
+      onClick={() => {
+        setSelectedInstructorId(instructor._id);
+        setShowPrisonerCanvas(true);
+      }}
+    >
+      + Prisoner
+    </Button>
+  </ButtonGroup>
+</td>
+
               </tr>
             ))}
           </tbody>
@@ -244,6 +268,12 @@ const fetchLocations = async () => {
   onInstructorAdded={fetchInstructors}
 />
 
+<AddPrisonerOffcanvas
+  show={showPrisonerCanvas}
+  handleClose={() => setShowPrisonerCanvas(false)}
+  instructorId={selectedInstructorId}
+  locations={locationObjects}
+/>
 
 
       {/* View Modal */}

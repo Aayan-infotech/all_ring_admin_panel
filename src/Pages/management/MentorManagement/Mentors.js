@@ -168,25 +168,7 @@ const filteredMentors = mentors.filter((mentor) => {
           Add New Mentor
         </Button>
       </div>
-
-      {/* <div className="mb-4">
-        <InputGroup style={{ maxWidth: '400px' }}>
-          <Form.Control
-            placeholder="Search mentors..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            style={{ border: '2px solid var(--accent)', borderRadius: '8px 0 0 8px' }}
-          />
-          <Button
-            variant="primary"
-            style={{ backgroundColor: 'var(--primary)', border: 'none', borderRadius: '0 8px 8px 0' }}
-          >
-            <Search />
-          </Button>
-        </InputGroup>
-      </div> */}
-
-      <div className="row mb-4">
+  <div className="row mb-4">
   <div className="col-md-4 mb-2">
     <InputGroup>
       <Form.Control
