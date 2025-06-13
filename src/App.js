@@ -23,6 +23,7 @@ import AddInstructorOffcanvas from './Pages/management/InstructorManagement/AddI
 import ClassesWorkshops from './Pages/management/DataManagement/ClassesWorkshops';
 import ClassAttendance from './Pages/management/DataManagement/ClassAttendance';
 import PrisonerList from './Pages/management/InstructorManagement/PrisonerList';
+import ClassMediaPage from './Pages/management/DataManagement/ClassMediaPage';
 function App() {
   return (
     <Router>
@@ -41,6 +42,7 @@ function App() {
           <Route path="/data" element={<Data />} />
           <Route path="data/classses" element={<ClassesWorkshops />} />
           <Route path="data/attendance" element={<ClassAttendance />} />
+             <Route path="data/media" element={<ClassMediaPage />} />
           <Route path="*" element={<NotFound />} />
 <Route path="/prisoners" element={<PrisonerList />} />
 

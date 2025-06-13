@@ -9,6 +9,7 @@ import {
   JournalBookmarkFill ,
   HouseFill,
   ChevronLeft,
+  FileEarmarkPlayFill,
   ChevronRight
 } from 'react-bootstrap-icons';
 
@@ -65,7 +66,8 @@ const Sidebar = ({ collapsed, mobileVisible, onMobileClose,setSidebarCollapsed  
     data: [
       { path: "/data", icon: <DatabaseFill />, label: "Location" },
       { path: "/data/classses", icon: <JournalBookmarkFill  />, label: "Classes & Workshops" },
-       { path: "/data/attendance", icon: <ClipboardCheckFill />, label: "Class Attendance" }
+       { path: "/data/attendance", icon: <ClipboardCheckFill />, label: "Class Attendance" },
+           { path: "/data/media", icon: <FileEarmarkPlayFill  />, label: "Class Media" }
 
     ]
   };
