@@ -65,7 +65,7 @@ useEffect(() => {
 
     try {
       await axios.post(
-        `http://18.209.91.97:5010/api/auth/register/user`,
+        `http://18.209.91.97:5010/api/auth/adminRegister/user`,
         formData,
         {
           headers: {

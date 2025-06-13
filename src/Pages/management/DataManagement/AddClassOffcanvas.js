@@ -3,33 +3,26 @@ import React, { useEffect, useState } from 'react';
 import { Offcanvas, Form, Button, Spinner } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
-import { toast } from 'react-toastify'; 
+import { toast } from 'react-toastify';
 
-const AddClassOffcanvas = ({ show, handleClose, onSave }) => {
+const AddClassOffcanvas = ({ show, handleClose, onSaved }) => {
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm();
   const [instructors, setInstructors] = useState([]);
   const [locations, setLocations] = useState([]);
 
-useEffect(() => {
-  const token = localStorage.getItem('adminToken'); 
+  // Fetch instructors & locations
+  useEffect(() => {
+    const token = localStorage.getItem('adminToken');
 
-  
-axios.get('http://18.209.91.97:5010/api/admin/getRegister/instructor', {
-  headers: {
-    Authorization: `Bearer ${token}`
-  }
-})
-  .then(res => setInstructors(res.data?.users || []))  // ✅ fix here
-  .catch(err => console.error('Error fetching instructors:', err));
+    axios.get('http://18.209.91.97:5010/api/admin/getRegister/instructor', {
+      headers: { Authorization: `Bearer ${token}` }
+    }).then(res => setInstructors(res.data?.users || []));
 
+    axios.get('http://18.209.91.97:5010/api/location/getAllLocations')
+      .then(res => setLocations(res.data?.data || []));
+  }, []);
 
- 
-  axios.get('http://18.209.91.97:5010/api/location/getAllLocations')
-    .then(res => setLocations(res.data?.data || []))
-    .catch(err => console.error('Error fetching locations:', err));
-}, []);
-
-
+  // Submit handler
   const onSubmit = async (data) => {
     const formData = new FormData();
     formData.append('title', data.title);
@@ -39,23 +32,30 @@ axios.get('http://18.209.91.97:5010/api/admin/getRegister/instructor', {
     formData.append('endTime', data.endtime);
     formData.append('location', data.location);
     formData.append('Instructor', data.instructor);
-    formData.append('Image', data.image[0]);
     formData.append('Type', data.type);
+    formData.append('Image', data.image[0]);
 
     try {
+      const token = localStorage.getItem('adminToken');
       await axios.post('http://18.209.91.97:5010/api/AdminClasses/addClass', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+        headers: { 
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`
+        }
       });
-      onSave();
-      reset();
+
+      toast.success('Class added successfully');
       handleClose();
-    } catch (error) {
-      console.error('Error posting class:', error);
+      reset();
+      onSaved();
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to add class');
     }
   };
 
   return (
-    <Offcanvas show={show} onHide={handleClose} placement="end">
+    <Offcanvas show={show} onHide={() => { handleClose(); reset(); }} placement="end">
       <Offcanvas.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
         <Offcanvas.Title>Add New Class / Workshop</Offcanvas.Title>
       </Offcanvas.Header>
@@ -69,7 +69,11 @@ axios.get('http://18.209.91.97:5010/api/admin/getRegister/instructor', {
 
           <Form.Group className="mb-3">
             <Form.Label>Image</Form.Label>
-            <Form.Control type="file" accept="image/*" {...register('image', { required: 'Image is required' })} />
+            <Form.Control 
+              type="file" 
+              accept="image/*" 
+              {...register('image', { required: 'Image is required' })} 
+            />
             {errors.image && <span className="text-danger small">{errors.image.message}</span>}
           </Form.Group>
 
@@ -98,41 +102,41 @@ axios.get('http://18.209.91.97:5010/api/admin/getRegister/instructor', {
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label>Select Instructor</Form.Label>
-            <Form.Control as="select" {...register('instructor', { required: 'Instructor is required' })}>
+            <Form.Label>Instructor</Form.Label>
+            <Form.Select {...register('instructor', { required: 'Instructor is required' })}>
               <option value="">-- Select Instructor --</option>
               {instructors.map(inst => (
                 <option key={inst._id} value={inst._id}>{inst.name}</option>
               ))}
-            </Form.Control>
+            </Form.Select>
             {errors.instructor && <span className="text-danger small">{errors.instructor.message}</span>}
           </Form.Group>
 
           <Form.Group className="mb-3">
             <Form.Label>Type</Form.Label>
-            <Form.Control as="select" {...register('type', { required: 'Type is required' })}>
+            <Form.Select {...register('type', { required: 'Type is required' })}>
               <option value="">-- Select Type --</option>
               <option value="Regular Class">Regular Class</option>
               <option value="Workshop">Workshop</option>
               <option value="Special Event">Special Event</option>
-            </Form.Control>
+            </Form.Select>
             {errors.type && <span className="text-danger small">{errors.type.message}</span>}
           </Form.Group>
 
           <Form.Group className="mb-4">
-            <Form.Label>Select Location</Form.Label>
-            <Form.Control as="select" {...register('location', { required: 'Location is required' })}>
+            <Form.Label>Location</Form.Label>
+            <Form.Select {...register('location', { required: 'Location is required' })}>
               <option value="">-- Select Location --</option>
               {locations.map(loc => (
                 <option key={loc._id} value={loc._id}>{loc.location}</option>
               ))}
-            </Form.Control>
+            </Form.Select>
             {errors.location && <span className="text-danger small">{errors.location.message}</span>}
           </Form.Group>
 
           <div className="d-grid">
             <Button type="submit" disabled={isSubmitting} style={{ backgroundColor: 'var(--primary)', border: 'none' }}>
-              {isSubmitting ? <Spinner animation="border" size="sm" /> : 'Save'}
+              {isSubmitting ? <Spinner size="sm" animation="border" /> : 'Save'}
             </Button>
           </div>
         </Form>

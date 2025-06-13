@@ -72,34 +72,6 @@ const fetchLocations = async () => {
 };
 
 
-// const toggleStatus = async (id, status) => {
-//   try {
-//     const token = localStorage.getItem('adminToken');
-//     const user_status = status === 'active' ? 2 : 1;
-
-//     await axios.patch(
-//       `http://18.209.91.97:5010/api/admin/editUserStatus/${id}`,
-//       { user_status },
-//       {
-//         headers: {
-//           Authorization: `Bearer ${token}`,
-//         },
-//       }
-//     );
-
-   
-//     setMentors((prevMentors) =>
-//       prevMentors.map((mentor) =>
-//         mentor._id === id
-//           ? { ...mentor, accountStatus: status === 'active' ? 'inactive' : 'active' }
-//           : mentor
-//       )
-//     );
-//   } catch (err) {
-//     console.error('Error toggling status:', err);
-//     toast.error('Failed to update status');
-//   }
-// };
 const toggleStatus = async (mentor) => {
   // If user is not verified (user_status=0), show toast and return
   if (mentor.user_status === 0) {
@@ -291,30 +263,19 @@ const filteredMentors = mentors.filter((mentor) => {
                       style={{
                         padding: '8px 12px',
                         fontWeight: '500',
+                        
                         backgroundColor: mentor.accountStatus === 'active' ? 'var(--success)' : 'var(--danger)',
                       }}
                     >
                       {mentor.accountStatus === 'active' ? 'Active' : 'Inactive'}
                     </Badge>
                   </td>
+                  
                   <td>
                  
 
                     <ButtonGroup>
-  {/* Status Toggle Button */}
-  {/* <Button
-    size="sm"
-    onClick={() => toggleStatus(mentor._id, mentor.accountStatus)}
-    style={{
-      backgroundColor: 'transparent',
-      border: 'none',
-      padding: '0 5px',
-      color: mentor.accountStatus === 'active' ? 'var(--danger)' : 'var(--success)'
-    }}
-    title={mentor.accountStatus === 'active' ? 'Block' : 'Activate'}
-  >
-    {mentor.accountStatus === 'active' ? <XCircleFill size={20} /> : <CheckCircleFill size={20} />}
-  </Button> */}
+ 
 <Button
   size="sm"
   onClick={() => toggleStatus(mentor)}
@@ -498,10 +459,7 @@ const filteredMentors = mentors.filter((mentor) => {
                 <Form.Label>Expertise</Form.Label>
                 <Form.Control defaultValue={selectedUser.expertise} />
               </Form.Group>
-              {/* <Form.Group className="mb-3">
-                <Form.Label>Location</Form.Label>
-                <Form.Control defaultValue={selectedUser.location} />
-              </Form.Group> */}
+            
               <Form.Group className="mb-3">
   <Form.Label>Location</Form.Label>
   <Form.Select defaultValue={selectedUser.location}>
