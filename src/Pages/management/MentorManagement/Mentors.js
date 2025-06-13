@@ -498,10 +498,21 @@ const filteredMentors = mentors.filter((mentor) => {
                 <Form.Label>Expertise</Form.Label>
                 <Form.Control defaultValue={selectedUser.expertise} />
               </Form.Group>
-              <Form.Group className="mb-3">
+              {/* <Form.Group className="mb-3">
                 <Form.Label>Location</Form.Label>
                 <Form.Control defaultValue={selectedUser.location} />
-              </Form.Group>
+              </Form.Group> */}
+              <Form.Group className="mb-3">
+  <Form.Label>Location</Form.Label>
+  <Form.Select defaultValue={selectedUser.location}>
+    <option value="">Select a location</option>
+    {locationList.map((location, index) => (
+      <option key={index} value={location}>
+        {location}
+      </option>
+    ))}
+  </Form.Select>
+</Form.Group>
               <Button variant="primary">Save Changes</Button>
             </Form>
           )}

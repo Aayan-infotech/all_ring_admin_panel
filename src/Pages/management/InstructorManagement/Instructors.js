@@ -328,10 +328,24 @@ const toggleStatus = async (instructor) => {
               <Form.Label>Email</Form.Label>
               <Form.Control value={editForm.email || ''} onChange={e => setEditForm({ ...editForm, email: e.target.value })} />
             </Form.Group>
-            <Form.Group className="mb-3">
+            {/* <Form.Group className="mb-3">
               <Form.Label>Location</Form.Label>
               <Form.Control value={editForm.location || ''} onChange={e => setEditForm({ ...editForm, location: e.target.value })} />
-            </Form.Group>
+            </Form.Group> */}
+            <Form.Group className="mb-3">
+  <Form.Label>Location</Form.Label>
+  <Form.Select 
+    value={editForm.location || ''} 
+    onChange={e => setEditForm({ ...editForm, location: e.target.value })}
+  >
+    <option value="">Select a location</option>
+    {locationList.map((location, index) => (
+      <option key={index} value={location}>
+        {location}
+      </option>
+    ))}
+  </Form.Select>
+</Form.Group>
             <Button variant="primary" onClick={() => setEditModal(false)}>Save Changes</Button>
           </Form>
         </Modal.Body>
