@@ -98,7 +98,7 @@ const handleToggleStatus = async (id) => {
     <div className="p-4" style={{ background: '#f8f9fa', minHeight: '100vh' }}>
       {/* Header */}
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h4 style={{ color: 'var(--secondary)' }}>Location Management</h4>
+        <h4 style={{ color: 'var(--secondary)' }}>Location Mssssanagement</h4>
         <div className="d-flex gap-2">
           {/* <Form.Control type="text" placeholder="Search by location..." /> */}
           <Button onClick={handleShow} style={{ background: 'var(--primary)', border: 'none' }}>
