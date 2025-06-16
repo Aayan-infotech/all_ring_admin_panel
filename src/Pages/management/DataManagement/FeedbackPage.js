@@ -1,4 +1,4 @@
-// src/Pages/FeedbackPage.js
+
 import React, { useEffect, useState } from 'react';
 import { Table, Spinner, Alert } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
@@ -50,7 +50,7 @@ const res = await axios.get(`http://18.209.91.97:5010/api/feedback/getAllFeedbac
               <tr key={fb._id || idx}>
                 <td>{idx + 1}</td>
                 <td>{fb.user?.name || 'N/A'}</td>
-                <td>{fb.comment || 'No comment'}</td>
+                <td>{fb.feedback || 'No comment'}</td>
                 <td>{fb.rating || 'N/A'}</td>
                 <td>{new Date(fb.createdAt).toLocaleDateString()}</td>
               </tr>

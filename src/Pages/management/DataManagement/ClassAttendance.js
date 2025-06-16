@@ -14,10 +14,17 @@ import {
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 
+// const statusVariant = {
+//   upcoming: 'warning',
+//   live: 'success',
+//   passed: 'secondary',
+// };
+
+
 const statusVariant = {
   upcoming: 'warning',
   live: 'success',
-  passed: 'secondary',
+  ended: 'secondary',
 };
 
 const ClassAttendance = () => {
@@ -76,45 +83,45 @@ const ClassAttendance = () => {
                 <th>More</th>
               </tr>
             </thead>
-          
+
 
             <tbody>
-  {filteredData.map((cls, idx) => {
-    const rawStatus = cls.status?.toLowerCase() || 'upcoming';
-    const badgeColor = statusVariant[rawStatus] || 'dark';
+              {filteredData.map((cls, idx) => {
+const rawStatus = cls.classStatus?.toLowerCase() || 'upcoming';
+                const badgeColor = statusVariant[rawStatus] || 'dark';
 
-    return (
-      <tr key={cls._id || idx}>
-        <td>{idx + 1}</td>
-        {/* <td>{cls.title}</td> */}
-        <td>
-  <Link to={`/feedback/${cls._id}`} style={{ color: '#e83561', textDecoration: 'underline' }}>
-    {cls.title}
-  </Link>
-</td>
+                return (
+                  <tr key={cls._id || idx}>
+                    <td>{idx + 1}</td>
+                    {/* <td>{cls.title}</td> */}
+                    <td>
+                      <Link to={`/feedback/${cls._id}`} style={{ color: '#e83561', textDecoration: 'underline' }}>
+                        {cls.title}
+                      </Link>
+                    </td>
 
-        <td>{cls.location?.location || 'N/A'}</td>
+                    <td>{cls.location?.location || 'N/A'}</td>
 
-        {/* ✅ FIXED: Properly extract instructor name */}
-        <td>{cls.Instructor?.name || 'N/A'}</td>
+                    {/* ✅ FIXED: Properly extract instructor name */}
+                    <td>{cls.Instructor?.name || 'N/A'}</td>
 
-        <td>
-          <Badge bg={badgeColor}>{rawStatus.toUpperCase()}</Badge>
-        </td>
-        <td>
-          <ButtonGroup>
-            <Button variant="outline-danger" size="sm" className="me-2">
-              Details
-            </Button>
-            <Button variant="outline-danger" size="sm">
-              Attendance
-            </Button>
-          </ButtonGroup>
-        </td>
-      </tr>
-    );
-  })}
-</tbody>
+                    <td>
+                      <Badge bg={badgeColor}>{rawStatus.toUpperCase()}</Badge>
+                    </td>
+                    <td>
+                      <ButtonGroup>
+                        <Button variant="outline-danger" size="sm" className="me-2">
+                          Details
+                        </Button>
+                        <Button variant="outline-danger" size="sm">
+                          Attendance
+                        </Button>
+                      </ButtonGroup>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
 
           </Table>
         </div>
