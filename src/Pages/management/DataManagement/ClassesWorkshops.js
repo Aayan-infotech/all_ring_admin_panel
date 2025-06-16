@@ -142,7 +142,9 @@ const ClassesWorkshops = () => {
                   <td>{item.Type}</td>
                   {/* <td>{item.date}</td>
                   <td>{item.time}</td> */}
-                  <td>{item.location}</td>
+                  {/* <td>{item.location}</td> */}
+                  <td>{item.location?.location || 'N/A'}</td>
+
                   <td>
                     <Badge bg={item.status === 'active' ? 'success' : 'danger'}>{item.status}</Badge>
                   </td>
