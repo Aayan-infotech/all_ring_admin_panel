@@ -1,7 +1,3 @@
-
-
-
-
 import { Offcanvas, Form, Button, Spinner } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
