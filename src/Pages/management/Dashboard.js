@@ -66,7 +66,7 @@ const [participationLoading, setParticipationLoading] = useState(true);
           // Assuming API returns: { success: true, data: { totalClasses: 100, totalRegistered: 80, totalPresent: 60 } }
           const data = res.data.data;
           setParticipationData([
-            { label: 'Total Classes', value: data.totalClasses || 0, color: '#1976d2' },
+            { label: 'Total Classes', value: data.totalActiveClasses || 0, color: '#1976d2' },
             { label: 'Total Registered', value: data.totalRegistered || 0, color: '#f9a825' },
             { label: 'Total Present', value: data.totalPresent || 0, color: '#43a047' },
           ]);
