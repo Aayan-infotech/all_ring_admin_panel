@@ -10,7 +10,6 @@ const AddClassOffcanvas = ({ show, handleClose, onSaved }) => {
   const [instructors, setInstructors] = useState([]);
   const [locations, setLocations] = useState([]);
 
-  // Fetch instructors & locations
   useEffect(() => {
     const token = localStorage.getItem('adminToken');
 
@@ -22,7 +21,6 @@ const AddClassOffcanvas = ({ show, handleClose, onSaved }) => {
       .then(res => setLocations(res.data?.data || []));
   }, []);
 
-  // Submit handler
   const onSubmit = async (data) => {
     const formData = new FormData();
     formData.append('title', data.title);

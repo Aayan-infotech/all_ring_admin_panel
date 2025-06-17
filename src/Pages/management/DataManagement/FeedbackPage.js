@@ -27,16 +27,17 @@ const res = await axios.get(`http://18.209.91.97:5010/api/feedback/getAllFeedbac
   }, [classId]);
 
   return (
-    <div className="p-4">
-      <h3 style={{ fontWeight: '600', color: 'var(--secondary)' }}>Class Feedback</h3>
-
+<div className="p-4" style={{ background: '#f9f9f9' }}>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h3 style={{ fontWeight: '600', color: 'var(--secondary)' }}>Class Feedback</h3>
+      </div>
       {loading ? (
         <div className="text-center mt-4"><Spinner animation="border" /></div>
       ) : error ? (
         <Alert variant="danger">{error}</Alert>
       ) : (
-        <Table striped bordered hover>
-          <thead className="table-dark">
+        <Table bordered hover className="align-middle">
+          <thead className="text-white" style={{ backgroundColor: '#003865' }}>
             <tr>
               <th>#</th>
               <th>User</th>

@@ -20,7 +20,7 @@ const AddMediaOffcanvas = ({ show, handleClose, classId }) => {
     const token = localStorage.getItem('adminToken');
     const formData = new FormData();
         formData.append('title', data.title);
-    formData.append('Description', data.description); // Note capital D
+    formData.append('Description', data.description); 
     
     if (data.uploadVideo?.[0]) {
       formData.append('uploadVideo', data.uploadVideo[0]);
