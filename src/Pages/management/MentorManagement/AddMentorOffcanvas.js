@@ -143,7 +143,7 @@ const AddMentorOffcanvas = ({ show, handleClose, onMentorAdded }) => {
 </Form.Group>
 
 
-          <Form.Group className="mb-3" controlId="location">
+          {/* <Form.Group className="mb-3" controlId="location">
            
             <Form.Select
   {...register('location', { required: 'Location is required' })}
@@ -158,7 +158,25 @@ const AddMentorOffcanvas = ({ show, handleClose, onMentorAdded }) => {
   ))}
 </Form.Select>
 
-          </Form.Group>
+          </Form.Group> */}
+
+          <Form.Group className="mb-3" controlId="location">
+  <Form.Label>Location</Form.Label>
+  <Form.Select
+    {...register('location', { required: 'Location is required' })}
+    isInvalid={!!errors.location}
+    style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
+  >
+    <option value="">Select location</option>
+    {locations.map((loc) => (
+      <option key={loc._id} value={loc._id}>
+        {loc.location}
+      </option>
+    ))}
+  </Form.Select>
+  {errors.location && <span className="text-danger small">{errors.location.message}</span>}
+</Form.Group>
+
 
           {/* Expertise */}
           <Form.Group className="mb-3" controlId="expertise">

@@ -34,18 +34,17 @@ const [locationObjects, setLocationObjects] = useState([]); // for _id and name
 const [selectedStatus, setSelectedStatus] = useState('');
 const [selectedLocation, setSelectedLocation] = useState('');
 const [locationList, setLocationList] = useState([]);
-const filteredInstructors = instructors.filter(i => {
-  const nameMatch = i.name?.toLowerCase().includes(searchTerm.toLowerCase());
-  const statusMatch = selectedStatus ? i.status === selectedStatus : true;
-  const locationMatch = selectedLocation ? i.location === selectedLocation : true;
-  return nameMatch && statusMatch && locationMatch;
-});
 
  useEffect(() => {
   fetchInstructors();
     fetchLocations();
 
 }, []);
+
+const getLocationString = (location) => {
+  if (!location) return '-';
+  return typeof location === 'object' ? location.location : location;
+};
 
 const fetchInstructors = async () => {
   try {
@@ -84,17 +83,25 @@ const fetchLocations = async () => {
   }
 };
 
+
+const filteredInstructors = instructors.filter(i => {
+  const nameMatch = i.name?.toLowerCase().includes(searchTerm.toLowerCase());
+  const statusMatch = selectedStatus ? i.status === selectedStatus : true;
+  const locationMatch = selectedLocation 
+    ? getLocationString(i.location) === selectedLocation 
+    : true;
+  return nameMatch && statusMatch && locationMatch;
+});
 const toggleStatus = async (instructor) => {
-  // Block toggle if user_status === 0 and show toast
+
   if (instructor.user_status === 0) {
     toast.error("❌ User email is not verified!", {
       position: "top-right",
       autoClose: 3000,
     });
-    return; // Exit early
+    return; 
   }
 
-  // Proceed with status toggle for verified users (status 1 or 2)
   const token = localStorage.getItem('adminToken');
   const newStatus = instructor.user_status === 1 ? 2 : 1;
 
@@ -230,7 +237,8 @@ const toggleStatus = async (instructor) => {
                 <td>{index + 1}</td>
                 <td>{instructor.name}</td>
                 <td>{instructor.email}</td>
-                <td>{instructor.location}</td>
+                {/* <td>{instructor.location}</td> */}
+                <td>{getLocationString(instructor.location)}</td>
                 <td>
                   <Badge bg={instructor.status === 'active' ? 'success' : 'danger'}>
                     {instructor.status}
@@ -309,7 +317,8 @@ const toggleStatus = async (instructor) => {
               <p><strong>Name:</strong> {selectedInstructor.name}</p>
               <p><strong>Email:</strong> {selectedInstructor.email}</p>
               <p><strong>Phone:</strong> {selectedInstructor.number}</p>
-              <p><strong>Location:</strong> {selectedInstructor.location}</p>
+              {/* <p><strong>Location:</strong> {selectedInstructor.location}</p> */}
+              <p><strong>Location:</strong> {getLocationString(selectedInstructor.location)}</p>
             </div>
           )}
         </Modal.Body>
@@ -334,7 +343,7 @@ const toggleStatus = async (instructor) => {
             </Form.Group> */}
             <Form.Group className="mb-3">
   <Form.Label>Location</Form.Label>
-  <Form.Select 
+  {/* <Form.Select 
     value={editForm.location || ''} 
     onChange={e => setEditForm({ ...editForm, location: e.target.value })}
   >
@@ -344,7 +353,18 @@ const toggleStatus = async (instructor) => {
         {location}
       </option>
     ))}
-  </Form.Select>
+  </Form.Select> */}
+  <Form.Select 
+  value={getLocationString(editForm.location) || ''} 
+  onChange={e => setEditForm({ ...editForm, location: e.target.value })}
+>
+  <option value="">Select a location</option>
+  {locationList.map((location, index) => (
+    <option key={index} value={location}>
+      {location}
+    </option>
+  ))}
+</Form.Select>
 </Form.Group>
             <Button variant="primary" onClick={() => setEditModal(false)}>Save Changes</Button>
           </Form>

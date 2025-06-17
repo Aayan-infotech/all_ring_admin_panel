@@ -123,7 +123,7 @@ useEffect(() => {
 
           <Form.Group className="mb-4" controlId="location">
             <Form.Label style={{ color: 'var(--secondary)', fontWeight: 'bold' }}>Location</Form.Label>
-      <Form.Select
+      {/* <Form.Select
   {...register('location', { required: 'Location is required' })}
   isInvalid={!!errors.location}
   style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
@@ -134,7 +134,22 @@ useEffect(() => {
       {loc.location}
     </option>
   ))}
+</Form.Select> */}
+
+
+<Form.Select
+  {...register('location', { required: 'Location is required' })}
+  isInvalid={!!errors.location}
+  style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
+>
+  <option value="">Select location</option>
+  {locations.map((loc) => (
+    <option key={loc._id} value={loc._id}>
+      {loc.location}
+    </option>
+  ))}
 </Form.Select>
+
 
             <Form.Control.Feedback type="invalid">{errors.location?.message}</Form.Control.Feedback>
           </Form.Group>

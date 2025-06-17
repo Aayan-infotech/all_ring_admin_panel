@@ -16,8 +16,33 @@ import {
 const Dashboard = () => {
   const [statsData, setStatsData] = useState(null);
   const [loading, setLoading] = useState(true);
+const [participationData, setParticipationData] = useState([]);
+const [participationLoading, setParticipationLoading] = useState(true);
 
-  useEffect(() => {
+  // useEffect(() => {
+  //   const fetchStats = async () => {
+  //     try {
+  //       const token = localStorage.getItem('adminToken');
+  //       const res = await axios.get('http://18.209.91.97:5010/api/admin/stats/overview', {
+  //         headers: { Authorization: `Bearer ${token}` },
+  //       });
+  //       if (res.data.success) {
+  //         setStatsData(res.data.data);
+  //       }
+  //     } catch (error) {
+  //       console.error('Error fetching dashboard stats:', error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchStats();
+  // }, []);
+
+
+
+
+    useEffect(() => {
     const fetchStats = async () => {
       try {
         const token = localStorage.getItem('adminToken');
@@ -34,9 +59,28 @@ const Dashboard = () => {
       }
     };
 
-    fetchStats();
-  }, []);
+    const fetchParticipationData = async () => {
+      try {
+        const res = await axios.get('http://18.209.91.97:5010/api/register/getParticipationOverview');
+        if (res.data.success) {
+          // Assuming API returns: { success: true, data: { totalClasses: 100, totalRegistered: 80, totalPresent: 60 } }
+          const data = res.data.data;
+          setParticipationData([
+            { label: 'Total Classes', value: data.totalClasses || 0, color: '#1976d2' },
+            { label: 'Total Registered', value: data.totalRegistered || 0, color: '#f9a825' },
+            { label: 'Total Present', value: data.totalPresent || 0, color: '#43a047' },
+          ]);
+        }
+      } catch (error) {
+        console.error('Error fetching participation overview:', error);
+      } finally {
+        setParticipationLoading(false);
+      }
+    };
 
+    fetchStats();
+    fetchParticipationData();
+  }, [])
   const stats = statsData
     ? [
         {
@@ -80,11 +124,11 @@ const Dashboard = () => {
     { name: 'Amit Singh', location: 'Hyderabad', sessions: 16 },
   ];
 
-  const participationData = [
-    { label: 'Total Classes', value: 100, color: '#1976d2' },
-    { label: 'Total Registered', value: 80, color: '#f9a825' },
-    { label: 'Total Present', value: 60, color: '#43a047' },
-  ];
+  // const participationData = [
+  //   { label: 'Total Classes', value: 100, color: '#1976d2' },
+  //   { label: 'Total Registered', value: 80, color: '#f9a825' },
+  //   { label: 'Total Present', value: 60, color: '#43a047' },
+  // ];
 
   return (
     <div className="dashboard-container">
@@ -149,7 +193,7 @@ const Dashboard = () => {
           <Card className="participation-card">
             <Card.Body>
               <h5 className="widget-title">Participation Overview</h5>
-              {participationData.map((item, idx) => (
+              {/* {participationData.map((item, idx) => (
                 <Box key={idx} sx={{ mb: 2 }}>
                   <Typography variant="subtitle2" gutterBottom>
                     {item.label}
@@ -167,7 +211,32 @@ const Dashboard = () => {
                     }}
                   />
                 </Box>
-              ))}
+              ))} */}
+
+              {participationLoading ? (
+  <Spinner animation="border" variant="primary" />
+) : (
+  participationData.map((item, idx) => (
+    <Box key={idx} sx={{ mb: 2 }}>
+      <Typography variant="subtitle2" gutterBottom>
+        {item.label}
+      </Typography>
+      <LinearProgress
+        variant="determinate"
+        value={item.value}
+        sx={{
+          height: 12,
+          borderRadius: 6,
+          '& .MuiLinearProgress-bar': {
+            backgroundColor: item.color,
+          },
+          backgroundColor: '#e0e0e0',
+        }}
+      />
+    </Box>
+  ))
+)}
+
             </Card.Body>
           </Card>
         </Col>

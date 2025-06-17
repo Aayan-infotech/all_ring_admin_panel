@@ -115,14 +115,8 @@ useEffect(() => {
             {errors.confirmPassword && <span className="text-danger small">{errors.confirmPassword.message}</span>}
           </Form.Group>
 
-          <Form.Group className="mb-3">
-            {/* <Form.Label>Location</Form.Label>
-            <Form.Control
-              type="text"
-              {...register('location', { required: 'Location is required' })}
-              placeholder="Enter location"
-            />
-            {errors.location && <span className="text-danger small">{errors.location.message}</span>} */}
+          {/* <Form.Group className="mb-3">
+           
             <Form.Select
   {...register('location', { required: 'Location is required' })}
   isInvalid={!!errors.location}
@@ -136,7 +130,23 @@ useEffect(() => {
   ))}
 </Form.Select>
 
-          </Form.Group>
+          </Form.Group> */}
+<Form.Group className="mb-3">
+  <Form.Label>Location</Form.Label>
+  <Form.Select
+    {...register('location', { required: 'Location is required' })}
+    isInvalid={!!errors.location}
+    style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
+  >
+    <option value="">Select location</option>
+    {locations.map((loc) => (
+      <option key={loc._id} value={loc._id}>
+        {loc.location}
+      </option>
+    ))}
+  </Form.Select>
+  {errors.location && <span className="text-danger small">{errors.location.message}</span>}
+</Form.Group>
 
           <Form.Group className="mb-4">
             <Form.Label>Profile Image</Form.Label>
