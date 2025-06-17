@@ -1,4 +1,6 @@
 
+
+
 import React, { useEffect, useState } from 'react';
 import {
   Table,
@@ -8,8 +10,9 @@ import {
   Spinner,
   Badge,
   Row,       
-  Col   ,      
+  Col,      
   Modal,
+  ListGroup
 } from 'react-bootstrap';
 import {
   PencilSquare,
@@ -19,6 +22,7 @@ import {
   Film,
   FileEarmarkText,
   Trash,
+  QuestionCircle
 } from 'react-bootstrap-icons';
 import axios from 'axios';
 import AddClassOffcanvas from './AddClassOffcanvas';
@@ -38,6 +42,12 @@ const ClassesWorkshops = () => {
   const [showNotesForm, setShowNotesForm] = useState(false);
   const [selectedClass, setSelectedClass] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  
+  const [showAddQuestionModal, setShowAddQuestionModal] = useState(false);
+  const [showViewQuestionsModal, setShowViewQuestionsModal] = useState(false);
+  const [questionText, setQuestionText] = useState('');
+  const [questions, setQuestions] = useState([]);
+  const [editingQuestion, setEditingQuestion] = useState(null);
 
   const fetchClasses = async () => {
     try {
@@ -65,6 +75,27 @@ const ClassesWorkshops = () => {
     }
   };
 
+const fetchQuestions = async (classId) => {
+  try {
+    const token = localStorage.getItem('adminToken');
+    const res = await axios.get(
+      `http://18.209.91.97:5010/api/questionaire/getQuestions/${classId}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    
+    // Check if response has questions array
+    if (res.data.success && res.data.questions) {
+      setQuestions(res.data.questions);
+    } else {
+      setQuestions([]);
+      toast.warning('No questions found for this class');
+    }
+  } catch (err) {
+    console.error('Error fetching questions:', err);
+    toast.error('Failed to fetch questions');
+    setQuestions([]);
+  }
+};
   useEffect(() => {
     fetchClasses();
     fetchLocations();
@@ -102,26 +133,65 @@ const ClassesWorkshops = () => {
     }
   };
 
-const filtered = classes.filter(cls => {
-  const matchesTitle = cls.title?.toLowerCase().includes(search.toLowerCase());
-  const matchesLocation = filterLocation ? cls.location?.location === filterLocation : true;
-  const matchesStatus = filterStatus ? cls.status?.toLowerCase() === filterStatus.toLowerCase() : true;
-  return matchesTitle && matchesLocation && matchesStatus;
-});
+  const handleAddQuestion = async (classId) => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      await axios.post(
+        `http://18.209.91.97:5010/api/questionaire/addQuestions/${classId}`,
+        { questionText },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      toast.success('Question added successfully!');
+      setQuestionText('');
+      setShowAddQuestionModal(false);
+      fetchQuestions(classId);
+    } catch (err) {
+      console.error('Error adding question:', err);
+      toast.error('Failed to add question');
+    }
+  };
 
+  const handleEditQuestion = async (classId, questionId) => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      await axios.put(
+        `http://18.209.91.97:5010/api/questionaire/editQuestion/${classId}/${questionId}`,
+        { questionText },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      toast.success('Question updated successfully!');
+      setQuestionText('');
+      setEditingQuestion(null);
+      fetchQuestions(classId);
+    } catch (err) {
+      console.error('Error editing question:', err);
+      toast.error('Failed to update question');
+    }
+  };
+
+  const filtered = classes.filter(cls => {
+    const matchesTitle = cls.title?.toLowerCase().includes(search.toLowerCase());
+    const matchesLocation = filterLocation ? cls.location?.location === filterLocation : true;
+    const matchesStatus = filterStatus ? cls.status?.toLowerCase() === filterStatus.toLowerCase() : true;
+    return matchesTitle && matchesLocation && matchesStatus;
+  });
 
   return (
     <div className="p-4" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 style={{ color: 'var(--secondary)', fontWeight: 600 }}>Classes & Workshops</h2>
-        <Button onClick={() => setShowAddForm(true)} style={{ backgroundColor: 'var(--primary)', border: 'none' }}>
-          <PlusCircle className="me-2" /> Add New
-        </Button>
+        <div>
+          <Button 
+            onClick={() => setShowAddForm(true)} 
+            style={{ backgroundColor: 'var(--primary)', border: 'none', marginRight: '10px' }}
+          >
+            <PlusCircle className="me-2" /> Add New
+          </Button>
+        </div>
       </div>
 
-
-<Row className="mb-4 g-3">
-  <Col md={3}>
+      <Row className="mb-4 g-3">
+  <Col md={4}>
     <Form.Control
       placeholder="Search by title"
       value={search}
@@ -130,7 +200,7 @@ const filtered = classes.filter(cls => {
     />
   </Col>
 
-  <Col md={3}>
+  <Col md={4}>
     <Form.Select
       value={filterLocation}
       onChange={(e) => setFilterLocation(e.target.value)}
@@ -145,7 +215,7 @@ const filtered = classes.filter(cls => {
     </Form.Select>
   </Col>
 
-  <Col md={3}>
+  <Col md={4}>
     <Form.Select
       value={filterStatus}
       onChange={(e) => setFilterStatus(e.target.value)}
@@ -220,17 +290,6 @@ const filtered = classes.filter(cls => {
                       </Button>
                       <Button
                         variant="light"
-                        className="icon-btn border-info text-info"
-                        size="sm"
-                        onClick={() => {
-                          setSelectedClass(item);
-                          setShowMediaForm(true);
-                        }}
-                      >
-                        <Film size={16} />
-                      </Button>
-                      <Button
-                        variant="light"
                         className="icon-btn border-dark text-dark"
                         size="sm"
                         onClick={() => {
@@ -240,6 +299,30 @@ const filtered = classes.filter(cls => {
                       >
                         <FileEarmarkText size={16} />
                       </Button>
+                      <Button
+                        variant="light"
+                        className="icon-btn border-primary text-primary"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedClass(item);
+                          setShowAddQuestionModal(true);
+                          setQuestionText('');
+                        }}
+                      >
+                        <PlusCircle size={16} />
+                      </Button>
+                      {/* <Button
+                        variant="light"
+                        className="icon-btn border-info text-info"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedClass(item);
+                          fetchQuestions(item._id);
+                          setShowViewQuestionsModal(true);
+                        }}
+                      >
+                        <QuestionCircle size={16} />
+                      </Button> */}
                     </div>
                   </td>
                 </tr>
@@ -254,7 +337,7 @@ const filtered = classes.filter(cls => {
       <AddMediaOffcanvas show={showMediaForm} handleClose={() => setShowMediaForm(false)} classId={selectedClass?._id} />
       <AddNotesOffcanvas show={showNotesForm} handleClose={() => setShowNotesForm(false)} classId={selectedClass?._id} />
 
-      {/* Edit Modal */}
+      {/* Edit Class Modal */}
       <Modal show={showEditModal} onHide={() => { setShowEditModal(false); setSelectedClass(null); }} centered>
         <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
           <Modal.Title>Edit Class</Modal.Title>
@@ -319,6 +402,170 @@ const filtered = classes.filter(cls => {
           )}
         </Modal.Body>
       </Modal>
+
+      {/* Add Question Modal */}
+      {/* <Modal show={showAddQuestionModal} onHide={() => { setShowAddQuestionModal(false); setQuestionText(''); setEditingQuestion(null); }} centered>
+        <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
+          <Modal.Title>{editingQuestion ? 'Edit Question' : 'Add New Question'}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body style={{ backgroundColor: 'var(--accent)' }}>
+          <Form onSubmit={(e) => {
+            e.preventDefault();
+            if (editingQuestion) {
+              handleEditQuestion(selectedClass._id, editingQuestion._id);
+            } else {
+              handleAddQuestion(selectedClass._id);
+            }
+          }}>
+            <Form.Group className="mb-3">
+              <Form.Label>Question Text</Form.Label>
+              <Form.Control 
+                as="textarea" 
+                rows={3} 
+                value={questionText} 
+                onChange={(e) => setQuestionText(e.target.value)} 
+                required 
+              />
+            </Form.Group>
+            <div className="d-flex justify-content-end">
+              <Button variant="secondary" onClick={() => { setShowAddQuestionModal(false); setQuestionText(''); }} className="me-2">
+                Cancel
+              </Button>
+              <Button type="submit" variant="primary">
+                {editingQuestion ? 'Update Question' : 'Add Question'}
+              </Button>
+            </div>
+          </Form>
+        </Modal.Body>
+      </Modal> */}
+
+ <Modal show={showAddQuestionModal} onHide={() => { setShowAddQuestionModal(false); setQuestionText(''); setEditingQuestion(null); }} centered size="lg">
+        <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
+          <Modal.Title>
+            {editingQuestion ? 'Edit Question' : `Add Questions for ${selectedClass?.title}`}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body style={{ backgroundColor: 'var(--accent)' }}>
+          <Form onSubmit={(e) => {
+            e.preventDefault();
+            if (editingQuestion) {
+              handleEditQuestion(selectedClass._id, editingQuestion._id);
+            } else {
+              handleAddQuestion(selectedClass._id);
+            }
+          }}>
+            <Form.Group className="mb-3">
+              <Form.Label>Question Text</Form.Label>
+              <Form.Control 
+                as="textarea" 
+                rows={3} 
+                value={questionText} 
+                onChange={(e) => setQuestionText(e.target.value)} 
+                required 
+              />
+            </Form.Group>
+            <div className="d-flex justify-content-end mb-3">
+              <Button variant="secondary" onClick={() => { 
+                setQuestionText(''); 
+                setEditingQuestion(null); 
+              }} className="me-2">
+                Clear
+              </Button>
+              <Button type="submit" variant="primary">
+                {editingQuestion ? 'Update Question' : 'Add Question'}
+              </Button>
+            </div>
+          </Form>
+
+          <hr />
+
+          <h5>Existing Questions</h5>
+          {questions.length === 0 ? (
+            <div className="text-center text-muted">No questions added yet.</div>
+          ) : (
+            <ListGroup>
+              {questions.map((q, index) => (
+                <ListGroup.Item key={q._id} className="d-flex justify-content-between align-items-center">
+                  <div style={{ flex: 1 }}>
+                    <strong>{index + 1}.</strong> {q.questionText}
+                  </div>
+                  <div>
+                    <Button
+                      variant="outline-warning"
+                      size="sm"
+                      className="me-2"
+                      onClick={() => {
+                        setEditingQuestion(q);
+                        setQuestionText(q.questionText);
+                      }}
+                    >
+                      Edit
+                    </Button>
+                  </div>
+                </ListGroup.Item>
+              ))}
+            </ListGroup>
+          )}
+        </Modal.Body>
+        <Modal.Footer style={{ backgroundColor: 'var(--accent)' }}>
+          <Button variant="secondary" onClick={() => setShowAddQuestionModal(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+   
+
+      {/* View Questions Modal */}
+<Modal show={showViewQuestionsModal} onHide={() => setShowViewQuestionsModal(false)} centered size="lg">
+  <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
+    <Modal.Title>Questions for {selectedClass?.title}</Modal.Title>
+  </Modal.Header>
+  <Modal.Body style={{ backgroundColor: 'var(--accent)' }}>
+    {questions.length === 0 ? (
+      <div className="text-center text-muted">No questions added yet.</div>
+    ) : (
+      <ListGroup>
+        {questions.map((q, index) => (
+          <ListGroup.Item key={q._id} className="d-flex justify-content-between align-items-center">
+            <div style={{ flex: 1 }}>
+              <strong>{index + 1}.</strong> {q.questionText}
+            </div>
+            <div>
+              <Button
+                variant="outline-warning"
+                size="sm"
+                className="me-2"
+                onClick={() => {
+                  setEditingQuestion(q);
+                  setQuestionText(q.questionText);
+                  setShowViewQuestionsModal(false);
+                  setShowAddQuestionModal(true);
+                }}
+              >
+                Edit
+              </Button>
+        
+            </div>
+          </ListGroup.Item>
+        ))}
+      </ListGroup>
+    )}
+  </Modal.Body>
+  <Modal.Footer style={{ backgroundColor: 'var(--accent)' }}>
+    <Button variant="secondary" onClick={() => setShowViewQuestionsModal(false)}>
+      Close
+    </Button>
+    <Button variant="primary" onClick={() => {
+      setQuestionText('');
+      setEditingQuestion(null);
+      setShowViewQuestionsModal(false);
+      setShowAddQuestionModal(true);
+    }}>
+      Add New Question
+    </Button>
+  </Modal.Footer>
+</Modal>
     </div>
   );
 };

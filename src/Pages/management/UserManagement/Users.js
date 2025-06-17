@@ -204,7 +204,7 @@ const Users = () => {
         </Button>
       </div>
 
-      <Row className="mb-4 g-3">
+      {/* <Row className="mb-4 g-3">
         <Col md={3}>
           <Form.Control
             placeholder="Search by name or email"
@@ -238,7 +238,45 @@ const Users = () => {
             <option value="inactive">Inactive</option>
           </Form.Select>
         </Col>
-      </Row>
+      </Row> */}
+
+
+      <Row className="mb-4 g-3">
+  <Col md={4}>
+    <Form.Control
+      placeholder="Search by name or email"
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
+      style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
+    />
+  </Col>
+  <Col md={4}>
+    <Form.Select
+      value={filterLocation}
+      onChange={(e) => setFilterLocation(e.target.value)}
+      style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
+    >
+      <option value="">All Locations</option>
+      {locations.map((loc) => (
+        <option key={loc._id} value={loc.location}>
+          {loc.location}
+        </option>
+      ))}
+    </Form.Select>
+  </Col>
+  <Col md={4}>
+    <Form.Select
+      value={filterStatus}
+      onChange={(e) => setFilterStatus(e.target.value)}
+      style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
+    >
+      <option value="all">All Status</option>
+      <option value="active">Active</option>
+      <option value="inactive">Inactive</option>
+    </Form.Select>
+  </Col>
+</Row>
+
 
       {loading ? (
         <div className="text-center">
@@ -436,67 +474,121 @@ const Users = () => {
         </Modal.Body>
       </Modal>
 
+
+
       <Modal
-        show={showViewModal}
-        onHide={() => setShowViewModal(false)}
-        centered
-        className="view-profile-modal"
-      >
-        <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
-          <Modal.Title>👤 User Profile</Modal.Title>
-        </Modal.Header>
-        <Modal.Body style={{ backgroundColor: 'var(--accent)' }}>
-          {viewUser ? (
-            <div>
-              <Row className="mb-3">
-                <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Name:</strong></Col>
-                <Col md={8}>{viewUser.name}</Col>
-              </Row>
-              <Row className="mb-3">
-                <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Email:</strong></Col>
-                <Col md={8}>{viewUser.email}</Col>
-              </Row>
-              <Row className="mb-3">
-                <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Phone:</strong></Col>
-                <Col md={8}>{viewUser.number || 'N/A'}</Col>
-              </Row>
-              <Row className="mb-3">
-                <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Location:</strong></Col>
-                <Col md={8}>{getLocationString(viewUser.location)}</Col>
-              </Row>
-              <Row className="mb-3">
-                <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Status:</strong></Col>
-                <Col md={8}>
-                  <Badge
-                    bg={
-                      viewUser.user_status === 1 ? 'success' : 
-                      viewUser.user_status === 2 ? 'danger' : 
-                      'warning'
-                    }
-                    style={{ 
-                      backgroundColor: 
-                        viewUser.user_status === 1 ? 'var(--success)' : 
-                        viewUser.user_status === 2 ? 'var(--danger)' :
-                        'var(--warning)'
-                    }}
-                  >
-                    {viewUser.user_status === 1 ? 'Active' : 
-                     viewUser.user_status === 2 ? 'Inactive' : 
-                     'Unverified'}
-                  </Badge>
-                </Col>
-              </Row>
-            </div>
-          ) : (
-            <p>Loading user data...</p>
-          )}
-        </Modal.Body>
-        <Modal.Footer style={{ backgroundColor: 'var(--accent)' }}>
-          <Button variant="secondary" onClick={() => setShowViewModal(false)} style={{ borderRadius: '6px' }}>
-            Close
-          </Button>
-        </Modal.Footer>
-      </Modal>
+  show={showViewModal}
+  onHide={() => setShowViewModal(false)}
+  centered
+  className="view-profile-modal"
+>
+  <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
+    <Modal.Title>👤 User Profile</Modal.Title>
+  </Modal.Header>
+  <Modal.Body style={{ backgroundColor: 'var(--accent)' }}>
+    {viewUser ? (
+      <div>
+        <div className="text-center mb-4">
+          <img
+            src={viewUser.profilePicture}
+            alt="Profile"
+            className="img-thumbnail"
+            style={{ width: '120px', height: '120px', objectFit: 'cover', borderRadius: '50%' }}
+          />
+        </div>
+
+        <Row className="mb-2">
+          <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Name:</strong></Col>
+          <Col md={8}>{viewUser.name}</Col>
+        </Row>
+
+        <Row className="mb-2">
+          <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Email:</strong></Col>
+          <Col md={8}>{viewUser.email}</Col>
+        </Row>
+
+        <Row className="mb-2">
+          <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Phone:</strong></Col>
+          <Col md={8}>{viewUser.number || 'N/A'}</Col>
+        </Row>
+
+        <Row className="mb-2">
+          <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Role:</strong></Col>
+          <Col md={8}>{viewUser.role}</Col>
+        </Row>
+
+        <Row className="mb-2">
+          <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Location:</strong></Col>
+          <Col md={8}>{getLocationString(viewUser.location) || 'N/A'}</Col>
+        </Row>
+
+        <Row className="mb-2">
+          <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Date of Birth:</strong></Col>
+          <Col md={8}>{viewUser.dateofbirth || 'N/A'}</Col>
+        </Row>
+
+        {/* <Row className="mb-2">
+          <Col md={4}><strong style={{ color: 'var(--secondary)' }}>IP Address:</strong></Col>
+          <Col md={8}>{viewUser.ins_ip}</Col>
+        </Row> */}
+
+        <Row className="mb-2">
+          <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Inserted Date:</strong></Col>
+          <Col md={8}>{new Date(viewUser.ins_date).toLocaleString()}</Col>
+        </Row>
+
+        <Row className="mb-2">
+          <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Status:</strong></Col>
+          <Col md={8}>
+            <Badge
+              style={{
+                backgroundColor:
+                  viewUser.user_status === 1
+                    ? 'var(--success)'
+                    : viewUser.user_status === 2
+                    ? 'var(--danger)'
+                    : 'var(--warning)',
+              }}
+            >
+              {viewUser.user_status === 1
+                ? 'Active'
+                : viewUser.user_status === 2
+                ? 'Inactive'
+                : 'Unverified'}
+            </Badge>
+          </Col>
+        </Row>
+
+        <Row className="mb-2">
+          <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Verification:</strong></Col>
+          <Col md={8}>{viewUser.verificationStatus || 'N/A'}</Col>
+        </Row>
+
+        <Row className="mb-2">
+          <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Account Status:</strong></Col>
+          <Col md={8}>
+            <Badge
+              bg={viewUser.accountStatus === 'active' ? 'success' : 'danger'}
+              style={{
+                backgroundColor:
+                  viewUser.accountStatus === 'active'
+                    ? 'var(--success)'
+                    : 'var(--danger)',
+              }}
+            >
+              {viewUser.accountStatus}
+            </Badge>
+          </Col>
+        </Row>
+
+      
+      </div>
+    ) : (
+      <p>Loading user data...</p>
+    )}
+  </Modal.Body>
+</Modal>
+
 
       <Modal
         show={showEditModal}
