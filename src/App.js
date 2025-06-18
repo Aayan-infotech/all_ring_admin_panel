@@ -26,6 +26,7 @@ import PrisonerList from './Pages/management/InstructorManagement/PrisonerList';
 import ClassMediaPage from './Pages/management/DataManagement/ClassMediaPage';
 import FeedbackPage from './Pages/management/DataManagement/FeedbackPage';
 import AssignTeam from './Pages/management/InstructorManagement/AssignTeam';
+import AssignMentorTeam from './Pages/management/MentorManagement/AssignMentorTeam';
 function App() {
   return (
     <Router>
@@ -54,6 +55,7 @@ function App() {
 
           <Route path="/adduser" element={<AddUserOffcanvas />} />
           <Route path="/addmentor" element={<AddMentorOffcanvas />} />
+              <Route path="/assignmentorteam" element={<AssignMentorTeam />} />
           <Route path="/addinstructor" element={<AddInstructorOffcanvas />} />
         </Route>
       </Routes>

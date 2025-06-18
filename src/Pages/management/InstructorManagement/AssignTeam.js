@@ -120,20 +120,7 @@ const AssignTeam = () => {
     }
   };
 
-  const updatePassword = async () => {
-    if (passwords.newPassword !== passwords.confirmPassword) return toast.error('Passwords do not match');
-    try {
-      const token = localStorage.getItem('adminToken');
-      await axios.put(`http://18.209.91.97:5010/api/admin/changeUserPassword/${selectedInstructor._id}`, passwords, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
 
-      toast.success('Password updated successfully');
-      setResetModal(false);
-    } catch (err) {
-      toast.error('Failed to reset password');
-    }
-  };
 
 
 const handleAssignClick = async (instructorId) => {
@@ -207,7 +194,7 @@ const handleAssignClick = async (instructorId) => {
     <div className="p-4">
       <ToastContainer />
       <div className="mb-3">
-        <h3>Instructor Management</h3>
+        <h3>Assign Team</h3>
       </div>
 
       <Row className="mb-3">
@@ -255,7 +242,7 @@ const handleAssignClick = async (instructorId) => {
               <th>Name</th>
               <th>Email</th>
               <th>Location</th>
-              <th>Status</th>
+              {/* <th>Status</th> */}
               <th>Actions</th>
             </tr>
           </thead>
@@ -266,11 +253,11 @@ const handleAssignClick = async (instructorId) => {
                 <td>{instructor.name}</td>
                 <td>{instructor.email}</td>
                 <td>{getLocationString(instructor.location)}</td>
-                <td>
+                {/* <td>
                   <Badge bg={instructor.user_status === 1 ? 'success' : 'danger'}>
                     {instructor.user_status === 1 ? 'Active' : 'Inactive'}
                   </Badge>
-                </td>
+                </td> */}
                 <td>
                   <ButtonGroup>
                     <Button 

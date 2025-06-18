@@ -67,31 +67,86 @@ const fetchInstructors = async () => {
     setLoading(false);
   }
 };
-
-
 const fetchLocations = async () => {
   try {
     const res = await axios.get('http://18.209.91.97:5010/api/location/getAllLocations');
     const locations = res.data?.data || [];
-    const activeLocationNames = locations
-      .filter(loc => loc.status === 'Active') 
-      .map(loc => loc.location);            
-    setLocationList(activeLocationNames);
+    const activeLocations = locations
+      .filter(loc => loc.status === 'Active')
+      .map(loc => ({
+        id: loc._id,
+        name: loc.location
+      }));
+    setLocationList(activeLocations);
   } catch (err) {
     console.error("Failed to fetch locations:", err);
     toast.error("Failed to load locations");
   }
 };
 
+// const fetchLocations = async () => {
+//   try {
+//     const res = await axios.get('http://18.209.91.97:5010/api/location/getAllLocations');
+//     const locations = res.data?.data || [];
+//     const activeLocationNames = locations
+//       .filter(loc => loc.status === 'Active') 
+//       .map(loc => loc.location);            
+//     setLocationList(activeLocationNames);
+//   } catch (err) {
+//     console.error("Failed to fetch locations:", err);
+//     toast.error("Failed to load locations");
+//   }
+// };
+const handleSaveChanges = async () => {
+  if (!selectedInstructor || !selectedInstructor._id) {
+    toast.error("No instructor selected");
+    return;
+  }
 
+  try {
+    const token = localStorage.getItem('adminToken');
+    const formDataToSend = new FormData();
+    
+    // Append all fields to the FormData object
+    formDataToSend.append('name', editForm.name);
+    formDataToSend.append('email', editForm.email);
+    formDataToSend.append('location', editForm.location); // This should be the location ID
+
+    const response = await axios.put(
+      `http://18.209.91.97:5010/api/auth/update-user/${selectedInstructor._id}`,
+      formDataToSend,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      }
+    );
+
+    toast.success("Instructor updated successfully!");
+    setEditModal(false);
+    fetchInstructors(); // Refresh the list
+  } catch (err) {
+    console.error('Error updating instructor:', err);
+    toast.error('Failed to update instructor');
+  }
+};
 const filteredInstructors = instructors.filter(i => {
   const nameMatch = i.name?.toLowerCase().includes(searchTerm.toLowerCase());
   const statusMatch = selectedStatus ? i.status === selectedStatus : true;
   const locationMatch = selectedLocation 
-    ? getLocationString(i.location) === selectedLocation 
+    ? (i.location?._id === selectedLocation || i.location === selectedLocation)
     : true;
   return nameMatch && statusMatch && locationMatch;
 });
+// const filteredInstructors = instructors.filter(i => {
+//   const nameMatch = i.name?.toLowerCase().includes(searchTerm.toLowerCase());
+//   const statusMatch = selectedStatus ? i.status === selectedStatus : true;
+//   const locationMatch = selectedLocation 
+//     ? getLocationString(i.location) === selectedLocation 
+//     : true;
+//   return nameMatch && statusMatch && locationMatch;
+// });
 const toggleStatus = async (instructor) => {
 
   if (instructor.user_status === 0) {
@@ -204,12 +259,11 @@ const toggleStatus = async (instructor) => {
 >
   <option value="">Filter by Location</option>
   {locationList.map((loc, idx) => (
-    <option key={idx} value={loc}>
-      {loc}
+    <option key={idx} value={loc.id}>
+      {loc.name}
     </option>
   ))}
 </Form.Select>
-
 
   </Col>
 </Row>
@@ -248,7 +302,21 @@ const toggleStatus = async (instructor) => {
               <td>
   <ButtonGroup>
     <Button variant="info" onClick={() => { setSelectedInstructor(instructor); setViewModal(true); }}><EyeFill /></Button>
-    <Button variant="warning" onClick={() => { setSelectedInstructor(instructor); setEditForm(instructor); setEditModal(true); }}><PencilSquare /></Button>
+    {/* <Button variant="warning" onClick={() => { setSelectedInstructor(instructor); setEditForm(instructor); setEditModal(true); }}><PencilSquare /></Button> */}
+    <Button 
+  variant="warning" 
+  onClick={() => { 
+    setSelectedInstructor(instructor); 
+    setEditForm({
+      name: instructor.name,
+      email: instructor.email,
+      location: instructor.location?._id || instructor.location || ''
+    }); 
+    setEditModal(true); 
+  }}
+>
+  <PencilSquare />
+</Button>
     <Button variant="secondary" onClick={() => { setSelectedInstructor(instructor); setResetModal(true); }}><LockFill /></Button>
    
 
@@ -325,52 +393,48 @@ const toggleStatus = async (instructor) => {
       </Modal>
 
       {/* Edit Modal */}
-      <Modal show={editModal} onHide={() => setEditModal(false)} centered className="custom-modal">
-        <Modal.Header closeButton><Modal.Title>Edit Instructor</Modal.Title></Modal.Header>
-        <Modal.Body>
-          <Form>
-            <Form.Group className="mb-3">
-              <Form.Label>Name</Form.Label>
-              <Form.Control value={editForm.name || ''} onChange={e => setEditForm({ ...editForm, name: e.target.value })} />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Email</Form.Label>
-              <Form.Control value={editForm.email || ''} onChange={e => setEditForm({ ...editForm, email: e.target.value })} />
-            </Form.Group>
-            {/* <Form.Group className="mb-3">
-              <Form.Label>Location</Form.Label>
-              <Form.Control value={editForm.location || ''} onChange={e => setEditForm({ ...editForm, location: e.target.value })} />
-            </Form.Group> */}
-            <Form.Group className="mb-3">
-  <Form.Label>Location</Form.Label>
-  {/* <Form.Select 
-    value={editForm.location || ''} 
-    onChange={e => setEditForm({ ...editForm, location: e.target.value })}
-  >
-    <option value="">Select a location</option>
-    {locationList.map((location, index) => (
-      <option key={index} value={location}>
-        {location}
-      </option>
-    ))}
-  </Form.Select> */}
-  <Form.Select 
-  value={getLocationString(editForm.location) || ''} 
-  onChange={e => setEditForm({ ...editForm, location: e.target.value })}
->
-  <option value="">Select a location</option>
-  {locationList.map((location, index) => (
-    <option key={index} value={location}>
-      {location}
-    </option>
-  ))}
-</Form.Select>
-</Form.Group>
-            <Button variant="primary" onClick={() => setEditModal(false)}>Save Changes</Button>
-          </Form>
-        </Modal.Body>
-      </Modal>
-
+{/* Edit Modal */}
+<Modal show={editModal} onHide={() => setEditModal(false)} centered className="custom-modal">
+  <Modal.Header closeButton><Modal.Title>Edit Instructor</Modal.Title></Modal.Header>
+  <Modal.Body>
+    <Form>
+      <Form.Group className="mb-3">
+        <Form.Label>Name</Form.Label>
+        <Form.Control 
+          value={editForm.name || ''} 
+          onChange={e => setEditForm({...editForm, name: e.target.value})}
+        />
+      </Form.Group>
+      <Form.Group className="mb-3">
+        <Form.Label>Email</Form.Label>
+        <Form.Control 
+          value={editForm.email || ''} 
+          onChange={e => setEditForm({...editForm, email: e.target.value})}
+        />
+      </Form.Group>
+      <Form.Group className="mb-3">
+        <Form.Label>Location</Form.Label>
+        <Form.Select 
+          value={editForm.location || ''}
+          onChange={e => setEditForm({...editForm, location: e.target.value})}
+        >
+          <option value="">Select a location</option>
+          {locationList.map((location, index) => (
+            <option key={index} value={location.id}>
+              {location.name}
+            </option>
+          ))}
+        </Form.Select>
+      </Form.Group>
+      <Button 
+        variant="primary"
+        onClick={handleSaveChanges}
+      >
+        Save Changes
+      </Button>
+    </Form>
+  </Modal.Body>
+</Modal>
       {/* Reset Password Modal */}
       <Modal show={resetModal} onHide={() => setResetModal(false)} centered className="custom-modal">
         <Modal.Header closeButton><Modal.Title>Reset Password</Modal.Title></Modal.Header>
