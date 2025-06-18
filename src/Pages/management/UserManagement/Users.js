@@ -34,6 +34,8 @@ const Users = () => {
     register,
     handleSubmit,
     watch,
+      getValues, // Add this
+
     formState: { errors }
   } = useForm();
 
@@ -123,6 +125,53 @@ const Users = () => {
     }
   };
 
+const handleSaveChanges = async () => {
+  const formData = getValues(); // Get form values from react-hook-form
+  console.log("Form values:", formData);
+
+  try {
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+      toast.error("Authentication token missing!");
+      return;
+    }
+
+    const formDataToSend = new FormData();
+    formDataToSend.append('name', formData.name);
+    formDataToSend.append('number', formData.number);
+
+    // Convert location name to ID
+    const selectedLocation = locations.find(loc => loc.location === formData.location);
+    formDataToSend.append('location', selectedLocation ? selectedLocation._id : formData.location);
+
+    console.log("FormData being sent:");
+    for (let [key, value] of formDataToSend.entries()) {
+      console.log(`${key}: ${value}`);
+    }
+
+    const response = await axios.put(
+      `http://18.209.91.97:5010/api/auth/update-user/${editingUser._id}`,
+      formDataToSend,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      }
+    );
+
+    console.log("Edit Response:", response.data);
+    toast.success("User updated successfully!");
+    fetchUsers();
+    setShowEditModal(false);
+
+  } catch (error) {
+    console.error("Edit Error:", error.response?.data || error.message);
+    toast.error(error.response?.data?.message || "User update failed");
+  }
+};
+
+
   const toggleStatus = async (user) => {
     if (user.user_status === 0) {
       toast.error("❌ User email is not verified. Please verify first!", {
@@ -185,6 +234,10 @@ const Users = () => {
     return true;
   });
 
+
+
+
+
   return (
     <div className="p-4" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
       <ToastContainer position="top-right" autoClose={3000} />
@@ -203,45 +256,7 @@ const Users = () => {
           <PlusCircle className="me-2" /> Add New User
         </Button>
       </div>
-
-      {/* <Row className="mb-4 g-3">
-        <Col md={3}>
-          <Form.Control
-            placeholder="Search by name or email"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
-          />
-        </Col>
-        <Col md={3}>
-          <Form.Select
-            value={filterLocation}
-            onChange={(e) => setFilterLocation(e.target.value)}
-            style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
-          >
-            <option value="">All Locations</option>
-            {locations.map((loc) => (
-              <option key={loc._id} value={loc.location}>
-                {loc.location}
-              </option>
-            ))}
-          </Form.Select>
-        </Col>
-        <Col md={3}>
-          <Form.Select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
-          >
-            <option value="all">All Status</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </Form.Select>
-        </Col>
-      </Row> */}
-
-
-      <Row className="mb-4 g-3">
+ <Row className="mb-4 g-3">
   <Col md={4}>
     <Form.Control
       placeholder="Search by name or email"
@@ -590,95 +605,84 @@ const Users = () => {
 </Modal>
 
 
-      <Modal
-        show={showEditModal}
-        onHide={() => setShowEditModal(false)}
-        centered
-        className="edit-profile-modal"
-      >
-        <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
-          <Modal.Title>Edit User Profile</Modal.Title>
-        </Modal.Header>
-        <Modal.Body style={{ backgroundColor: 'var(--accent)' }}>
-          {editingUser ? (
-            <Form
-              onSubmit={handleSubmit(async (data) => {
-                try {
-                  const token = localStorage.getItem('adminToken');
-                  await axios.put(
-                    `http://18.209.91.97:5010/api/admin/updateUser/${editingUser._id}`,
-                    data,
-                    {
-                      headers: {
-                        Authorization: `Bearer ${token}`,
-                      },
-                    }
-                  );
-                  toast.success("User updated successfully!");
-                  fetchUsers();
-                  setShowEditModal(false);
-                } catch (error) {
-                  console.error(error);
-                  toast.error("Failed to update user.");
-                }
-              })}
-            >
-              <Form.Group className="mb-3">
-                <Form.Label>Name</Form.Label>
-                <Form.Control
-                  defaultValue={editingUser.name}
-                  {...register('name', { required: true })}
-                  placeholder="Enter name"
-                />
-              </Form.Group>
+<Modal
+  show={showEditModal}
+  onHide={() => setShowEditModal(false)}
+  centered
+  className="edit-profile-modal"
+>
+  <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
+    <Modal.Title>Edit User Profile</Modal.Title>
+  </Modal.Header>
+  <Modal.Body style={{ backgroundColor: 'var(--accent)', color: 'var(--text-primary)' }}>
+    {editingUser && (
+      <Form >
+        <Form.Group className="mb-3">
+          <Form.Label style={{ color: 'var(--text-primary)' }}>Name *</Form.Label>
+          <Form.Control
+            defaultValue={editingUser.name}
+            {...register('name', { required: "Name is required" })}
+            isInvalid={!!errors.name}
+            // style={{ borderColor: 'var(--primary)' }}
+          />
+          <Form.Control.Feedback type="invalid">
+            {errors.name?.message}
+          </Form.Control.Feedback>
+        </Form.Group>
 
-              <Form.Group className="mb-3">
-                <Form.Label>Email</Form.Label>
-                <Form.Control
-                  defaultValue={editingUser.email}
-                  {...register('email', { required: true })}
-                  placeholder="Enter email"
-                />
-              </Form.Group>
+        <Form.Group className="mb-3">
+          <Form.Label style={{ color: 'var(--text-primary)' }}>Phone</Form.Label>
+          <Form.Control
+            defaultValue={editingUser.number}
+            {...register('number')}
+            // style={{ borderColor: 'var(--primary)' }}
+          />
+        </Form.Group>
 
-              <Form.Group className="mb-3">
-                <Form.Label>Phone</Form.Label>
-                <Form.Control
-                  defaultValue={editingUser.number}
-                  {...register('number')}
-                  placeholder="Enter phone number"
-                />
-              </Form.Group>
+        <Form.Group className="mb-3">
+          <Form.Label style={{ color: 'var(--text-primary)' }}>Location</Form.Label>
+          <Form.Select
+            defaultValue={getLocationString(editingUser.location)}
+            {...register('location')}
+            // style={{ borderColor: 'var(--primary)' }}
+          >
+            <option value="">Select Location</option>
+            {locations.map((loc) => (
+              <option key={loc._id} value={loc.location}>
+                {loc.location}
+              </option>
+            ))}
+          </Form.Select>
+        </Form.Group>
 
-              <Form.Group className="mb-3">
-                <Form.Label>Location</Form.Label>
-                <Form.Select
-                  defaultValue={getLocationString(editingUser.location)}
-                  {...register('location')}
-                >
-                  <option value="">Select Location</option>
-                  {locations.map((loc) => (
-                    <option key={loc._id} value={loc.location}>
-                      {loc.location}
-                    </option>
-                  ))}
-                </Form.Select>
-              </Form.Group>
+        <div className="d-flex justify-content-end gap-2 mt-4">
+          <Button
+            style={{
+              backgroundColor: 'var(--secondary)',
+              borderColor: 'var(--secondary)',
+              color: 'white'
+            }}
+            onClick={() => setShowEditModal(false)}
+          >
+            Cancel
+          </Button>
 
-              <div className="d-flex justify-content-end mt-4">
-                <Button variant="secondary" onClick={() => setShowEditModal(false)} className="me-2">
-                  Cancel
-                </Button>
-                <Button type="submit" variant="primary">
-                  Save Changes
-                </Button>
-              </div>
-            </Form>
-          ) : (
-            <p>Loading...</p>
-          )}
-        </Modal.Body>
-      </Modal>
+          <Button
+            style={{
+              backgroundColor: 'var(--primary)',
+              borderColor: 'var(--primary)',
+              color: 'white'
+            }}
+            onClick={handleSaveChanges}
+          >
+            Save Changes
+          </Button>
+        </div>
+      </Form>
+    )}
+  </Modal.Body>
+</Modal>
+
     </div>
   );
 };

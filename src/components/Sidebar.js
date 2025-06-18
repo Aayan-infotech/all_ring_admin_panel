@@ -61,7 +61,7 @@ const Sidebar = ({ collapsed, mobileVisible, onMobileClose,setSidebarCollapsed  
     ],
     instructors: [
       { path: "/instructors", icon: <PersonLinesFill />, label: "All Instructors" },
-      // { path: "/instructors/add", icon: <PersonLinesFill />, label: "Add Instructor" },
+      { path: "/assignteam", icon: <PersonLinesFill />, label: "Assign Team" },
     ],
     data: [
       { path: "/data", icon: <DatabaseFill />, label: "Location" },

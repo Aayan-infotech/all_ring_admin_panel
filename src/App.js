@@ -25,6 +25,7 @@ import ClassAttendance from './Pages/management/DataManagement/ClassAttendance';
 import PrisonerList from './Pages/management/InstructorManagement/PrisonerList';
 import ClassMediaPage from './Pages/management/DataManagement/ClassMediaPage';
 import FeedbackPage from './Pages/management/DataManagement/FeedbackPage';
+import AssignTeam from './Pages/management/InstructorManagement/AssignTeam';
 function App() {
   return (
     <Router>
@@ -40,6 +41,8 @@ function App() {
           <Route path="/users" element={<Users />} />
           <Route path="/mentors" element={<Mentors />} />
           <Route path="/instructors" element={<Instructors />} />
+                    <Route path="/assignteam" element={<AssignTeam />} />
+
           <Route path="/data" element={<Data />} />
           <Route path="data/classses" element={<ClassesWorkshops />} />
           <Route path="data/attendance" element={<ClassAttendance />} />
