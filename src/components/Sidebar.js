@@ -57,7 +57,7 @@ const Sidebar = ({ collapsed, mobileVisible, onMobileClose,setSidebarCollapsed  
     ],
     mentors: [
       { path: "/mentors", icon: <PersonCheckFill />, label: "All Mentors" },
-      // { path: "/mentors/add", icon: <PersonCheckFill />, label: "Add Mentor" },
+      { path: "/assignmentorteam", icon: <PersonCheckFill />, label: "Assign Team" },
     ],
     instructors: [
       { path: "/instructors", icon: <PersonLinesFill />, label: "All Instructors" },

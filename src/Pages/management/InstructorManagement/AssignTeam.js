@@ -135,25 +135,38 @@ const AssignTeam = () => {
     }
   };
 
-  // New functions for assign users functionality
-  const handleAssignClick = async (instructorId) => {
-    setSelectedInstructorId(instructorId);
-    try {
-      setAssignLoading(true);
-      const token = localStorage.getItem('adminToken');
-      const response = await axios.get(
-        `http://18.209.91.97:5010/api/assignUsers/getUsersByLocation/${instructorId}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setAvailableUsers(response.data.users || []);
-      setShowAssignModal(true);
-    } catch (error) {
-      console.error('Error fetching users:', error);
-      toast.error('Failed to fetch users');
-    } finally {
-      setAssignLoading(false);
-    }
-  };
+
+const handleAssignClick = async (instructorId) => {
+  setSelectedInstructorId(instructorId);
+  try {
+    setAssignLoading(true);
+    const token = localStorage.getItem('adminToken');
+    const response = await axios.get(
+      `http://18.209.91.97:5010/api/assignUsers/getUsersByLocation/${instructorId}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    const users = response.data.users || [];
+
+    // Set available users
+    setAvailableUsers(users);
+
+    // Pre-select users that are already assigned
+    const preSelected = users
+      .filter(user => user.status === 'Assigned')
+      .map(user => user._id);
+
+    setSelectedUsers(preSelected);
+
+    setShowAssignModal(true);
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    toast.error('Failed to fetch users');
+  } finally {
+    setAssignLoading(false);
+  }
+};
+
 
   const handleUserSelection = (userId) => {
     setSelectedUsers(prev => {

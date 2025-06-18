@@ -1,4 +1,6 @@
 
+
+
 import React, { useState, useEffect } from 'react';
 import { Table, Button, ButtonGroup, Badge, InputGroup, Form, Spinner, Modal } from 'react-bootstrap';
 import {
@@ -29,6 +31,11 @@ const Mentors = () => {
   const [locationList, setLocationList] = useState([]);
   const [selectedLocation, setSelectedLocation] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
+  const [formData, setFormData] = useState({
+    name: '',
+    expertise: '',
+  locationId: ''  // Change from location to locationId
+  });
 
   // Helper function to get location string
   const getLocationString = (location) => {
@@ -53,19 +60,23 @@ const Mentors = () => {
     }
   };
 
-  const fetchLocations = async () => {
-    try {
-      const res = await axios.get('http://18.209.91.97:5010/api/location/getAllLocations');
-      const locations = res.data?.data || [];
-      const activeLocations = locations
-        .filter(loc => loc.status === 'Active')
-        .map(loc => loc.location);
-      setLocationList(activeLocations);
-    } catch (err) {
-      console.error("Failed to fetch locations:", err);
-      toast.error("Failed to load locations");
-    }
-  };
+
+const fetchLocations = async () => {
+  try {
+    const res = await axios.get('http://18.209.91.97:5010/api/location/getAllLocations');
+    const locations = res.data?.data || [];
+    const activeLocations = locations
+      .filter(loc => loc.status === 'Active')
+      .map(loc => ({
+        id: loc._id,
+        name: loc.location
+      }));
+    setLocationList(activeLocations);
+  } catch (err) {
+    console.error("Failed to fetch locations:", err);
+    toast.error("Failed to load locations");
+  }
+};
 
   const toggleStatus = async (mentor) => {
     if (mentor.user_status === 0) {
@@ -140,26 +151,73 @@ const Mentors = () => {
     }
   };
 
-  const filteredMentors = mentors.filter((mentor) => {
-    const nameMatch =
-      mentor.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      mentor.email?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const locationMatch = selectedLocation 
-      ? getLocationString(mentor.location) === selectedLocation 
-      : true;
 
-    const statusMatch = selectedStatus 
-      ? mentor.accountStatus === selectedStatus 
-      : true;
 
-    return nameMatch && locationMatch && statusMatch;
-  });
+const handleSaveChanges = async () => {
+  if (!selectedUser || !selectedUser._id) {
+    toast.error("No user selected");
+    return;
+  }
 
+  try {
+    const token = localStorage.getItem('adminToken');
+    const formDataToSend = new FormData();
+    
+    // Append all fields to the FormData object
+    formDataToSend.append('name', formData.name);
+    formDataToSend.append('expertise', formData.expertise);
+    formDataToSend.append('location', formData.locationId);  // Send the ID
+
+    const response = await axios.put(
+      `http://18.209.91.97:5010/api/auth/update-user/${selectedUser._id}`,
+      formDataToSend,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      }
+    );
+
+    toast.success("Profile updated successfully!");
+    setShowEditModal(false);
+    fetchMentors(); // Refresh the list
+  } catch (err) {
+    console.error('Error updating profile:', err);
+    toast.error('Failed to update profile');
+  }
+};
+
+const filteredMentors = mentors.filter((mentor) => {
+  const nameMatch =
+    mentor.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    mentor.email?.toLowerCase().includes(searchTerm.toLowerCase());
+
+  const locationMatch = selectedLocation 
+    ? mentor.location?._id === selectedLocation 
+    : true;
+
+  const statusMatch = selectedStatus 
+    ? mentor.accountStatus === selectedStatus 
+    : true;
+
+  return nameMatch && locationMatch && statusMatch;
+});
   useEffect(() => {
     fetchMentors();
     fetchLocations();
   }, []);
+
+  useEffect(() => {
+    if (selectedUser) {
+      setFormData({
+        name: selectedUser.name || '',
+        expertise: selectedUser.expertise || '',
+      locationId: selectedUser.location?._id || ''  // Use the location ID
+      });
+    }
+  }, [selectedUser]);
 
   return (
     <div className="p-4" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
@@ -193,16 +251,18 @@ const Mentors = () => {
         </div>
 
         <div className="col-md-4 mb-2">
-          <Form.Select
-            value={selectedLocation}
-            onChange={(e) => setSelectedLocation(e.target.value)}
-            style={{ borderRadius: '8px' }}
-          >
-            <option value="">Filter by Location</option>
-            {locationList.map((loc, idx) => (
-              <option key={idx} value={loc}>{loc}</option>
-            ))}
-          </Form.Select>
+         
+<Form.Select
+  value={selectedLocation}
+  onChange={(e) => setSelectedLocation(e.target.value)}
+>
+  <option value="">Filter by Location</option>
+  {locationList.map((loc, idx) => (
+    <option key={idx} value={loc.id}>
+      {loc.name}
+    </option>
+  ))}
+</Form.Select>
         </div>
 
         <div className="col-md-4 mb-2">
@@ -432,28 +492,40 @@ const Mentors = () => {
             <Form>
               <Form.Group className="mb-3">
                 <Form.Label>Name</Form.Label>
-                <Form.Control defaultValue={selectedUser.name} />
-              </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label>Email</Form.Label>
-                <Form.Control defaultValue={selectedUser.email} />
+                <Form.Control 
+                  value={formData.name}
+                  onChange={(e) => setFormData({...formData, name: e.target.value})}
+                />
               </Form.Group>
               <Form.Group className="mb-3">
                 <Form.Label>Expertise</Form.Label>
-                <Form.Control defaultValue={selectedUser.expertise} />
+                <Form.Control 
+                  value={formData.expertise}
+                  onChange={(e) => setFormData({...formData, expertise: e.target.value})}
+                />
               </Form.Group>
               <Form.Group className="mb-3">
                 <Form.Label>Location</Form.Label>
-                <Form.Select defaultValue={getLocationString(selectedUser.location)}>
-                  <option value="">Select a location</option>
-                  {locationList.map((location, index) => (
-                    <option key={index} value={location}>
-                      {location}
-                    </option>
-                  ))}
-                </Form.Select>
+                
+
+                <Form.Select 
+  value={formData.locationId}  
+  onChange={(e) => setFormData({...formData, locationId: e.target.value})}
+>
+  <option value="">Select a location</option>
+  {locationList.map((location, index) => (
+    <option key={index} value={location.id}>
+      {location.name}
+    </option>
+  ))}
+</Form.Select>
               </Form.Group>
-              <Button variant="primary">Save Changes</Button>
+              <Button 
+                variant="primary"
+                onClick={handleSaveChanges}
+              >
+                Save Changes
+              </Button>
             </Form>
           )}
         </Modal.Body>
