@@ -331,7 +331,7 @@ const handleAssignTeam = async () => {
                 <th>Email</th>
                 <th>Location</th>
                 <th>Expertise</th>
-                <th>Status</th>
+                {/* <th>Status</th> */}
                 <th>Actions</th>
               </tr>
             </thead>
@@ -356,7 +356,7 @@ const handleAssignTeam = async () => {
                   <td>{mentor.email || '-'}</td>
                   <td>{getLocationString(mentor.location)}</td>
                   <td>{mentor.expertise || '-'}</td>
-                  <td>
+                  {/* <td>
                     <Badge 
                       bg={mentor.accountStatus === 'active' ? 'success' : 'danger'}
                       style={{ 
@@ -365,7 +365,7 @@ const handleAssignTeam = async () => {
                     >
                       {mentor.accountStatus || 'inactive'}
                     </Badge>
-                  </td>
+                  </td> */}
                   <td>
                     <ButtonGroup>
                       <Button 
