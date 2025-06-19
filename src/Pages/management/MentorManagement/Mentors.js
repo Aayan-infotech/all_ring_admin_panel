@@ -315,10 +315,10 @@ const filteredMentors = mentors.filter((mentor) => {
                   <td>
                     <Badge
                       pill
+                      bg={  mentor.accountStatus === 'active' ? 'success' : 'danger'}
                       style={{
                         padding: '8px 12px',
                         fontWeight: '500',
-                        backgroundColor: mentor.accountStatus === 'active' ? 'var(--success)' : 'var(--danger)',
                       }}
                     >
                       {mentor.accountStatus === 'active' ? 'Active' : 'Inactive'}

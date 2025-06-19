@@ -143,7 +143,43 @@ const AssignMentorTeam = () => {
   };
 
   // Handle team assignment
-  const handleAssignTeam = async () => {
+  // const handleAssignTeam = async () => {
+  //   if (selectedInstructors.length === 0 || selectedUsers.length === 0) {
+  //     toast.error('Please select at least one instructor and one user');
+  //     return;
+  //   }
+
+  //   try {
+  //     setLoadingAssignment(true);
+  //     const token = localStorage.getItem('adminToken');
+      
+  //     const payload = {
+  //       instructorIds: selectedInstructors.map(instructor => instructor._id),
+  //       userIds: selectedUsers.map(user => user._id)
+  //     };
+
+  //     await axios.post(
+  //       `http://18.209.91.97:5010/api/assignInstructor/assignInstructorAndUsers/${selectedUser._id}`,
+  //       payload,
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       }
+  //     );
+
+  //     toast.success('Team assigned successfully!');
+  //     setShowAssignModal(false);
+  //     setSelectedInstructors([]);
+  //     setSelectedUsers([]);
+  //     setLoadingAssignment(false);
+  //   } catch (err) {
+  //     console.error('Error assigning team:', err);
+  //     toast.error(err.response?.data?.message || 'Failed to assign team');
+  //     setLoadingAssignment(false);
+  //   }
+  // };
+const handleAssignTeam = async () => {
     if (selectedInstructors.length === 0 || selectedUsers.length === 0) {
       toast.error('Please select at least one instructor and one user');
       return;
@@ -153,9 +189,12 @@ const AssignMentorTeam = () => {
       setLoadingAssignment(true);
       const token = localStorage.getItem('adminToken');
       
+      // Create payload in the required format
       const payload = {
-        instructorIds: selectedInstructors.map(instructor => instructor._id),
-        userIds: selectedUsers.map(user => user._id)
+        instructors: selectedInstructors.map(instructor => ({
+          instructorId: instructor._id,
+          userIds: selectedUsers.map(user => user._id)
+        }))
       };
 
       await axios.post(
@@ -179,7 +218,6 @@ const AssignMentorTeam = () => {
       setLoadingAssignment(false);
     }
   };
-
   // Toggle instructor selection
   const toggleInstructorSelection = (instructor) => {
     setSelectedInstructors(prev => {
