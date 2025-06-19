@@ -89,36 +89,7 @@ const AssignTeam = () => {
     return nameMatch && statusMatch && locationMatch;
   });
 
-  const toggleStatus = async (instructor) => {
-    if (instructor.user_status === 0) {
-      toast.error("❌ User email is not verified!", {
-        position: "top-right",
-        autoClose: 3000,
-      });
-      return; 
-    }
 
-    const token = localStorage.getItem('adminToken');
-    const newStatus = instructor.user_status === 1 ? 2 : 1;
-
-    try {
-      await axios.patch(
-        `http://18.209.91.97:5010/api/admin/editUserStatus/${instructor._id}`,
-        { user_status: newStatus },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      setInstructors(prev => 
-        prev.map(i => 
-          i._id === instructor._id ? { ...i, user_status: newStatus } : i
-        )
-      );
-      toast.success(`Status updated to ${newStatus === 1 ? 'Active' : 'Inactive'}`);
-    } catch (err) {
-      toast.error("Failed to update status!");
-      console.error(err);
-    }
-  };
 
 
 
