@@ -1,11 +1,13 @@
 
+
+
+
 import React, { useState, useEffect } from 'react';
 import { 
   Table, Button, ButtonGroup, Badge, InputGroup, Form, 
   Spinner, Modal, Card, ListGroup, Alert, Row, Col 
 } from 'react-bootstrap';
 import {
-  PencilSquare,
   Search,
   PersonPlus,
   PersonCheck,
@@ -20,36 +22,25 @@ import {
 import axios from 'axios';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import AddMentorOffcanvas from './AddMentorOffcanvas';
 
 const AssignMentorTeam = () => {
-  const { register, handleSubmit, watch, reset, formState: { errors } } = useForm();
-
   // State variables
-  const [showAddMentor, setShowAddMentor] = useState(false);
   const [mentors, setMentors] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
-  const [showResetModal, setShowResetModal] = useState(false);
-  const [showProfileModal, setShowProfileModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [showAssignModal, setShowAssignModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [locationList, setLocationList] = useState([]);
   const [selectedLocation, setSelectedLocation] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
-  const [formData, setFormData] = useState({
-    name: '',
-    expertise: '',
-    locationId: ''
-  });
   const [instructors, setInstructors] = useState([]);
   const [users, setUsers] = useState([]);
-  const [selectedInstructor, setSelectedInstructor] = useState(null);
+  const [selectedInstructors, setSelectedInstructors] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [loadingInstructors, setLoadingInstructors] = useState(false);
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [loadingAssignment, setLoadingAssignment] = useState(false);
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [userSearchTerm, setUserSearchTerm] = useState('');
 
   // Helper function to get location string
   const getLocationString = (location) => {
@@ -106,7 +97,7 @@ const AssignMentorTeam = () => {
           },
         }
       );
-      setInstructors(res.data.Instructors || []);
+      setInstructors(res.data.instructors || []);
       setLoadingInstructors(false);
     } catch (err) {
       console.error('Error fetching instructors:', err);
@@ -115,20 +106,34 @@ const AssignMentorTeam = () => {
     }
   };
 
-  // Fetch users by instructor
-  const fetchUsersByInstructor = async (instructorId) => {
+  // Fetch users by instructors
+  const fetchUsersByInstructors = async (instructorIds) => {
     try {
       setLoadingUsers(true);
       const token = localStorage.getItem('adminToken');
-      const res = await axios.get(
-        `http://18.209.91.97:5010/api/assignInstructor/getUsersByInstructor/${instructorId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      
+      // Fetch users for each instructor and combine
+      const usersPromises = instructorIds.map(async (instructorId) => {
+        const res = await axios.get(
+          `http://18.209.91.97:5010/api/assignInstructor/getUsersByInstructor/${instructorId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        return res.data.users || [];
+      });
+      
+      const usersArrays = await Promise.all(usersPromises);
+      const combinedUsers = usersArrays.flat();
+      
+      // Remove duplicates
+      const uniqueUsers = combinedUsers.filter(
+        (user, index, self) => index === self.findIndex(u => u._id === user._id)
       );
-      setUsers(res.data.users || []);
+      
+      setUsers(uniqueUsers);
       setLoadingUsers(false);
     } catch (err) {
       console.error('Error fetching users:', err);
@@ -139,16 +144,17 @@ const AssignMentorTeam = () => {
 
   // Handle team assignment
   const handleAssignTeam = async () => {
-    if (!selectedUser || !selectedInstructor || selectedUsers.length === 0) {
-      toast.error('Please select an instructor and at least one user');
+    if (selectedInstructors.length === 0 || selectedUsers.length === 0) {
+      toast.error('Please select at least one instructor and one user');
       return;
     }
 
     try {
       setLoadingAssignment(true);
       const token = localStorage.getItem('adminToken');
+      
       const payload = {
-        instructorId: selectedInstructor._id,
+        instructorIds: selectedInstructors.map(instructor => instructor._id),
         userIds: selectedUsers.map(user => user._id)
       };
 
@@ -164,14 +170,26 @@ const AssignMentorTeam = () => {
 
       toast.success('Team assigned successfully!');
       setShowAssignModal(false);
-      setSelectedInstructor(null);
+      setSelectedInstructors([]);
       setSelectedUsers([]);
       setLoadingAssignment(false);
     } catch (err) {
       console.error('Error assigning team:', err);
-      toast.error('Failed to assign team');
+      toast.error(err.response?.data?.message || 'Failed to assign team');
       setLoadingAssignment(false);
     }
+  };
+
+  // Toggle instructor selection
+  const toggleInstructorSelection = (instructor) => {
+    setSelectedInstructors(prev => {
+      const isSelected = prev.some(i => i._id === instructor._id);
+      if (isSelected) {
+        return prev.filter(i => i._id !== instructor._id);
+      } else {
+        return [...prev, instructor];
+      }
+    });
   };
 
   // Toggle user selection
@@ -189,10 +207,11 @@ const AssignMentorTeam = () => {
   // Open assign modal
   const openAssignModal = (mentor) => {
     setSelectedUser(mentor);
+    setSelectedInstructors([]);
+    setSelectedUsers([]);
     fetchInstructorsByLocation(mentor._id);
     setShowAssignModal(true);
   };
-
 
   // Filter mentors based on search and filters
   const filteredMentors = mentors.filter((mentor) => {
@@ -211,28 +230,31 @@ const AssignMentorTeam = () => {
     return nameMatch && locationMatch && statusMatch;
   });
 
+  // Filter users based on search
+  const filteredUsers = users.filter(user => 
+    user.name?.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
+    user.email?.toLowerCase().includes(userSearchTerm.toLowerCase())
+  );
+
   // Initial data fetch
   useEffect(() => {
     fetchMentors();
     fetchLocations();
   }, []);
 
-  // Update form data when selected user changes
+  // Fetch users when selected instructors change
   useEffect(() => {
-    if (selectedUser) {
-      setFormData({
-        name: selectedUser.name || '',
-        expertise: selectedUser.expertise || '',
-        locationId: selectedUser.location?._id || ''
-      });
+    if (selectedInstructors.length > 0) {
+      fetchUsersByInstructors(selectedInstructors.map(i => i._id));
+    } else {
+      setUsers([]);
     }
-  }, [selectedUser]);
+  }, [selectedInstructors]);
 
   return (
     <div className="p-4" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 style={{ color: 'var(--secondary)', fontWeight: '600' }}>Mentor Team Management</h2>
-       
       </div>
 
       {/* Filters Section */}
@@ -344,30 +366,6 @@ const AssignMentorTeam = () => {
                   </td>
                   <td>
                     <ButtonGroup>
-                      {/* <Button 
-                        variant="outline-primary" 
-                        size="sm" 
-                        onClick={() => {
-                          setSelectedUser(mentor);
-                          setShowProfileModal(true);
-                        }}
-                        title="View Profile"
-                        style={{ borderColor: 'var(--secondary)', color: 'var(--secondary)' }}
-                      >
-                        <EyeFill />
-                      </Button>
-                      <Button 
-                        variant="outline-secondary" 
-                        size="sm" 
-                        onClick={() => {
-                          setSelectedUser(mentor);
-                          setShowEditModal(true);
-                        }}
-                        title="Edit"
-                        style={{ borderColor: 'var(--secondary)', color: 'var(--secondary)' }}
-                      >
-                        <PencilSquare />
-                      </Button> */}
                       <Button 
                         variant="outline-success" 
                         size="sm" 
@@ -377,18 +375,6 @@ const AssignMentorTeam = () => {
                       >
                         <PersonPlus />
                       </Button>
-                      {/* <Button 
-                        variant="outline-danger" 
-                        size="sm" 
-                        onClick={() => {
-                          setSelectedUser(mentor);
-                          setShowResetModal(true);
-                        }}
-                        title="Reset Password"
-                        style={{ borderColor: 'var(--danger)', color: 'var(--danger)' }}
-                      >
-                        <LockFill />
-                      </Button> */}
                     </ButtonGroup>
                   </td>
                 </tr>
@@ -403,7 +389,7 @@ const AssignMentorTeam = () => {
         show={showAssignModal} 
         onHide={() => {
           setShowAssignModal(false);
-          setSelectedInstructor(null);
+          setSelectedInstructors([]);
           setSelectedUsers([]);
         }}
         size="xl"
@@ -414,7 +400,7 @@ const AssignMentorTeam = () => {
             <PeopleFill className="me-2" size={24} />
             <div>
               <h5 className="mb-0">Assign Team to {selectedUser?.name || 'Mentor'}</h5>
-              <small className="text-white-50">Select an instructor and their users</small>
+              <small className="text-white-50">Select instructors and their users</small>
             </div>
           </Modal.Title>
         </Modal.Header>
@@ -424,47 +410,55 @@ const AssignMentorTeam = () => {
             {/* Instructors Column */}
             <Col md={5} className="pe-2">
               <Card className="h-100 shadow-sm" style={{ borderColor: 'var(--secondary)' }}>
-                <Card.Header className="d-flex justify-content-between align-items-center" 
-                  style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
+                <Card.Header
+                  className="d-flex justify-content-between align-items-center"
+                  style={{ backgroundColor: 'var(--secondary)', color: 'white' }}
+                >
                   <div className="d-flex align-items-center">
                     <h5 className="mb-0 me-2">Available Instructors</h5>
                     <InfoCircle />
                   </div>
                   {loadingInstructors && <Spinner animation="border" size="sm" variant="light" />}
                 </Card.Header>
-                
+
                 <Card.Body style={{ maxHeight: '400px', overflowY: 'auto' }}>
                   {instructors.length > 0 ? (
                     <ListGroup variant="flush">
                       {instructors.map(instructor => (
-                        <ListGroup.Item 
+                        <ListGroup.Item
                           key={instructor._id}
                           action
-                          active={selectedInstructor?._id === instructor._id}
-                          onClick={() => {
-                            setSelectedInstructor(instructor);
-                            fetchUsersByInstructor(instructor._id);
-                          }}
+                          active={selectedInstructors.some(i => i._id === instructor._id)}
+                          onClick={() => toggleInstructorSelection(instructor)}
                           className="py-3"
-                          style={{ 
-                            backgroundColor: selectedInstructor?._id === instructor._id ? 'var(--accent)' : 'white',
-                            borderLeft: selectedInstructor?._id === instructor._id ? '4px solid var(--primary)' : 'none'
+                          style={{
+                            backgroundColor:
+                              selectedInstructors.some(i => i._id === instructor._id) 
+                                ? 'rgba(13, 110, 253, 0.1)' 
+                                : 'white',
+                            borderLeft:
+                              selectedInstructors.some(i => i._id === instructor._id)
+                                ? '4px solid var(--primary)'
+                                : 'none',
                           }}
                         >
                           <div className="d-flex align-items-center">
                             <div className="position-relative me-3">
                               <img
-                                src={instructor.profilePicture || 'https://via.placeholder.com/50'}
+                                src={
+                                  instructor.profilePicture ||
+                                  'https://via.placeholder.com/50'
+                                }
                                 alt="Profile"
-                                style={{ 
-                                  width: '50px', 
-                                  height: '50px', 
+                                style={{
+                                  width: '50px',
+                                  height: '50px',
                                   borderRadius: '50%',
                                   objectFit: 'cover',
-                                  border: '2px solid var(--accent)'
+                                  border: '2px solid var(--accent)',
                                 }}
                               />
-                              <Badge 
+                              <Badge
                                 bg={instructor.status === 'Assigned' ? 'success' : 'secondary'}
                                 className="position-absolute top-0 start-100 translate-middle"
                                 pill
@@ -476,13 +470,15 @@ const AssignMentorTeam = () => {
                                 )}
                               </Badge>
                             </div>
-                            
+
                             <div className="flex-grow-1">
                               <div className="d-flex justify-content-between align-items-center">
-                                <h6 className="mb-0" style={{ color: 'var(--secondary)' }}>{instructor.name}</h6>
-                                <Badge 
-                                  pill 
-                                  bg={instructor.status === 'Assigned' ? 'success' : 'light'} 
+                                <h6 className="mb-0" style={{ color: 'var(--secondary)' }}>
+                                  {instructor.name}
+                                </h6>
+                                <Badge
+                                  pill
+                                  bg={instructor.status === 'Assigned' ? 'success' : 'light'}
                                   text={instructor.status === 'Assigned' ? 'white' : 'dark'}
                                 >
                                   {instructor.status}
@@ -511,11 +507,13 @@ const AssignMentorTeam = () => {
                   style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
                   <div>
                     <h5 className="mb-0">
-                      {selectedInstructor ? `${selectedInstructor.name}'s Users` : 'Select an Instructor'}
+                      {selectedInstructors.length > 0 
+                        ? `${selectedInstructors.length} Selected Instructor${selectedInstructors.length !== 1 ? 's' : ''}'s Users` 
+                        : 'Select Instructor(s)'}
                     </h5>
-                    {selectedInstructor && (
+                    {selectedInstructors.length > 0 && (
                       <small>
-                        {users.length} user{users.length !== 1 ? 's' : ''} available
+                        Showing {filteredUsers.length} user{filteredUsers.length !== 1 ? 's' : ''}
                       </small>
                     )}
                   </div>
@@ -523,11 +521,24 @@ const AssignMentorTeam = () => {
                 </Card.Header>
                 
                 <Card.Body style={{ maxHeight: '400px', overflowY: 'auto' }}>
-                  {selectedInstructor ? (
-                    users.length > 0 ? (
-                      <>
+                  {selectedInstructors.length > 0 ? (
+                    <>
+                      <div className="mb-3">
+                        <InputGroup>
+                          <InputGroup.Text>
+                            <Search />
+                          </InputGroup.Text>
+                          <Form.Control
+                            placeholder="Search users..."
+                            value={userSearchTerm}
+                            onChange={(e) => setUserSearchTerm(e.target.value)}
+                          />
+                        </InputGroup>
+                      </div>
+                      
+                      {filteredUsers.length > 0 ? (
                         <ListGroup variant="flush">
-                          {users.map(user => (
+                          {filteredUsers.map(user => (
                             <ListGroup.Item 
                               key={user._id}
                               action
@@ -535,8 +546,12 @@ const AssignMentorTeam = () => {
                               onClick={() => toggleUserSelection(user)}
                               className="py-3"
                               style={{ 
-                                backgroundColor: selectedUsers.some(u => u._id === user._id) ? 'var(--accent)' : 'white',
-                                borderLeft: selectedUsers.some(u => u._id === user._id) ? '4px solid var(--primary)' : 'none'
+                                backgroundColor: selectedUsers.some(u => u._id === user._id) 
+                                  ? 'rgba(13, 110, 253, 0.1)' 
+                                  : 'white',
+                                borderLeft: selectedUsers.some(u => u._id === user._id) 
+                                  ? '4px solid var(--primary)' 
+                                  : 'none'
                               }}
                             >
                               <div className="d-flex align-items-center">
@@ -545,8 +560,8 @@ const AssignMentorTeam = () => {
                                     src={user.profilePicture || 'https://via.placeholder.com/50'}
                                     alt="Profile"
                                     style={{ 
-                                      width: '50px', 
-                                      height: '50px', 
+                                      width: '40px', 
+                                      height: '40px', 
                                       borderRadius: '50%',
                                       objectFit: 'cover',
                                       border: '2px solid var(--accent)'
@@ -565,7 +580,18 @@ const AssignMentorTeam = () => {
                                 </div>
                                 
                                 <div className="flex-grow-1">
-                                  <h6 className="mb-0" style={{ color: 'var(--secondary)' }}>{user.name}</h6>
+                                  <div className="d-flex justify-content-between align-items-center">
+                                    <h6 className="mb-0" style={{ color: 'var(--secondary)' }}>
+                                      {user.name}
+                                    </h6>
+                                    <Badge 
+                                      pill 
+                                      bg={user.status === 'Assigned' ? 'success' : 'light'} 
+                                      text={user.status === 'Assigned' ? 'white' : 'dark'}
+                                    >
+                                      {user.status || 'Unassigned'}
+                                    </Badge>
+                                  </div>
                                   <small className="text-muted d-block">{user.email}</small>
                                   <small className="text-muted">{user.number}</small>
                                 </div>
@@ -573,17 +599,17 @@ const AssignMentorTeam = () => {
                             </ListGroup.Item>
                           ))}
                         </ListGroup>
-                      </>
-                    ) : (
-                      <Alert variant="info" className="text-center">
-                        {loadingUsers ? 'Loading users...' : 'No users assigned to this instructor'}
-                      </Alert>
-                    )
+                      ) : (
+                        <Alert variant="info" className="text-center">
+                          {loadingUsers ? 'Loading users...' : 'No users found matching your search'}
+                        </Alert>
+                      )}
+                    </>
                   ) : (
                     <div className="text-center py-5">
                       <PeopleFill size={48} className="mb-3" style={{ color: 'var(--secondary)' }} />
-                      <h5 style={{ color: 'var(--secondary)' }}>Please select an instructor</h5>
-                      <p className="text-muted">Users will appear here once you select an instructor</p>
+                      <h5 style={{ color: 'var(--secondary)' }}>Select Instructor(s)</h5>
+                      <p className="text-muted">Choose one or more instructors to view their users</p>
                     </div>
                   )}
                 </Card.Body>
@@ -591,51 +617,100 @@ const AssignMentorTeam = () => {
             </Col>
           </Row>
 
-          {/* Selected Users Summary */}
-          {selectedUsers.length > 0 && (
-            <Card className="mt-3" style={{ borderColor: 'var(--primary)' }}>
-              <Card.Header style={{ backgroundColor: 'var(--primary)', color: 'white' }}>
-                <strong>Selected Users ({selectedUsers.length})</strong>
-              </Card.Header>
-              <Card.Body className="p-3">
-                <div className="d-flex flex-wrap gap-2">
-                  {selectedUsers.map(user => (
-                    <Badge 
-                      key={user._id} 
-                      pill
-                      className="d-flex align-items-center p-2"
-                      style={{ 
-                        backgroundColor: 'var(--primary)',
-                        borderRadius: '20px'
-                      }}
-                    >
-                      <img
-                        src={user.profilePicture || 'https://via.placeholder.com/30'}
-                        alt="Profile"
+          {/* Selected Summary Section */}
+          <div className="mt-3">
+            {/* Selected Instructors */}
+            {selectedInstructors.length > 0 && (
+              <Card className="mb-3" style={{ borderColor: 'var(--primary)' }}>
+                <Card.Header style={{ backgroundColor: 'var(--primary)', color: 'white' }}>
+                  <strong>Selected Instructors ({selectedInstructors.length})</strong>
+                </Card.Header>
+                <Card.Body className="p-3">
+                  <div className="d-flex flex-wrap gap-2">
+                    {selectedInstructors.map(instructor => (
+                      <Badge 
+                        key={instructor._id} 
+                        pill
+                        className="d-flex align-items-center p-2"
                         style={{ 
-                          width: '20px', 
-                          height: '20px', 
-                          borderRadius: '50%',
-                          marginRight: '8px'
+                          backgroundColor: 'var(--primary)',
+                          borderRadius: '20px'
                         }}
-                      />
-                      {user.name}
-                      <button 
-                        type="button" 
-                        className="btn-close btn-close-white ms-2" 
-                        style={{ fontSize: '0.5rem' }} 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleUserSelection(user);
+                      >
+                        <img
+                          src={instructor.profilePicture || 'https://via.placeholder.com/30'}
+                          alt="Profile"
+                          style={{ 
+                            width: '20px', 
+                            height: '20px', 
+                            borderRadius: '50%',
+                            marginRight: '8px'
+                          }}
+                        />
+                        {instructor.name}
+                        <button 
+                          type="button" 
+                          className="btn-close btn-close-white ms-2" 
+                          style={{ fontSize: '0.5rem' }} 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleInstructorSelection(instructor);
+                          }}
+                          aria-label="Remove"
+                        />
+                      </Badge>
+                    ))}
+                  </div>
+                </Card.Body>
+              </Card>
+            )}
+
+            {/* Selected Users */}
+            {selectedUsers.length > 0 && (
+              <Card style={{ borderColor: 'var(--success)' }}>
+                <Card.Header style={{ backgroundColor: 'var(--success)', color: 'white' }}>
+                  <strong>Selected Users ({selectedUsers.length})</strong>
+                </Card.Header>
+                <Card.Body className="p-3">
+                  <div className="d-flex flex-wrap gap-2">
+                    {selectedUsers.map(user => (
+                      <Badge 
+                        key={user._id} 
+                        pill
+                        className="d-flex align-items-center p-2"
+                        style={{ 
+                          backgroundColor: 'var(--success)',
+                          borderRadius: '20px'
                         }}
-                        aria-label="Remove"
-                      />
-                    </Badge>
-                  ))}
-                </div>
-              </Card.Body>
-            </Card>
-          )}
+                      >
+                        <img
+                          src={user.profilePicture || 'https://via.placeholder.com/30'}
+                          alt="Profile"
+                          style={{ 
+                            width: '20px', 
+                            height: '20px', 
+                            borderRadius: '50%',
+                            marginRight: '8px'
+                          }}
+                        />
+                        {user.name}
+                        <button 
+                          type="button" 
+                          className="btn-close btn-close-white ms-2" 
+                          style={{ fontSize: '0.5rem' }} 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleUserSelection(user);
+                          }}
+                          aria-label="Remove"
+                        />
+                      </Badge>
+                    ))}
+                  </div>
+                </Card.Body>
+              </Card>
+            )}
+          </div>
         </Modal.Body>
         
         <Modal.Footer style={{ backgroundColor: 'var(--accent)' }}>
@@ -643,7 +718,7 @@ const AssignMentorTeam = () => {
             variant="outline-secondary" 
             onClick={() => {
               setShowAssignModal(false);
-              setSelectedInstructor(null);
+              setSelectedInstructors([]);
               setSelectedUsers([]);
             }}
             style={{ borderColor: 'var(--secondary)', color: 'var(--secondary)' }}
@@ -653,7 +728,7 @@ const AssignMentorTeam = () => {
           <Button 
             variant="primary" 
             onClick={handleAssignTeam}
-            disabled={!selectedInstructor || selectedUsers.length === 0 || loadingAssignment}
+            disabled={selectedInstructors.length === 0 || selectedUsers.length === 0 || loadingAssignment}
             className="d-flex align-items-center"
             style={{ backgroundColor: 'var(--primary)', borderColor: 'var(--primary)' }}
           >
@@ -671,10 +746,6 @@ const AssignMentorTeam = () => {
           </Button>
         </Modal.Footer>
       </Modal>
-
-   
-
-
     </div>
   );
 };
