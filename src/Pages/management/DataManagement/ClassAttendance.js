@@ -44,7 +44,6 @@ const ClassAttendance = () => {
         const res = await axios.get('http://18.209.91.97:5010/api/AdminClasses/getAllClasses');
         setData(res.data.data || []);
         
-        // Extract unique locations
         const locations = [...new Set(res.data.data.map(cls => cls.location?.location).filter(Boolean))];
         setAllLocations(locations.map(location => ({ _id: location, location })));
       } catch (err) {
@@ -97,7 +96,7 @@ const ClassAttendance = () => {
         <h3 style={{ fontWeight: '600', color: 'var(--secondary)' }}>Class Attendance</h3>
       </div>
 
-      {/* Filter Row */}
+     
       <Row className="mb-4 g-3">
         <Col md={4}>
           <Form.Control
@@ -191,7 +190,6 @@ const ClassAttendance = () => {
         </div>
       )}
 
-      {/* ATTENDANCE MODAL */}
       <Modal
         show={showAttendanceModal}
         onHide={() => setShowAttendanceModal(false)}

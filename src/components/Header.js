@@ -25,7 +25,7 @@ const Header = ({ toggleSidebar, sidebarCollapsed, toggleMobileSidebar }) => {
           <List size={20} />
         </button>
 
-        {/* Mobile toggle button */}
+  
         <button onClick={toggleMobileSidebar} className="mobile-toggle" aria-label="Open menu">
           <List size={20} />
         </button>

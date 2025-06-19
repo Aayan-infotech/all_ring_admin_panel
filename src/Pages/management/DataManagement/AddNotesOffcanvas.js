@@ -51,7 +51,7 @@ const AddNotesOffcanvas = ({ show, handleClose, classId }) => {
 
       console.log('Notes added successfully:', response.data);
       reset();
-      fetchNotes(); // refresh notes table
+      fetchNotes(); 
     } catch (error) {
       console.error('Error adding notes:', error);
     }

@@ -1,6 +1,7 @@
 
 
 
+
 // import React, { useState, useEffect } from 'react';
 // import {
 //   Table,
@@ -9,7 +10,9 @@
 //   Badge,
 //   Spinner,
 //   Modal,
-//   Form
+//   Form,
+//   Row,
+//   Col
 // } from 'react-bootstrap';
 // import { PencilSquare, PlusCircle } from 'react-bootstrap-icons';
 // import axios from 'axios';
@@ -26,6 +29,11 @@
 //   const [mediaLoading, setMediaLoading] = useState(false);
 //   const [editingMedia, setEditingMedia] = useState(null);
 //   const [showEditModal, setShowEditModal] = useState(false);
+  
+//   // Filter states
+//   const [search, setSearch] = useState('');
+//   const [filterType, setFilterType] = useState('');
+//   const [filterStatus, setFilterStatus] = useState('');
 
 //   const fetchClasses = async () => {
 //     setLoading(true);
@@ -119,6 +127,17 @@
 //     }
 //   };
 
+//   // Filter classes based on search and filter criteria
+//   const filteredClasses = classes.filter(cls => {
+//     const matchesTitle = cls.title?.toLowerCase().includes(search.toLowerCase());
+//     const matchesType = filterType ? cls.Type?.toLowerCase() === filterType.toLowerCase() : true;
+//     const matchesStatus = filterStatus ? cls.status?.toLowerCase() === filterStatus.toLowerCase() : true;
+//     return matchesTitle && matchesType && matchesStatus;
+//   });
+
+//   // Get unique class types for filter dropdown
+//   const classTypes = [...new Set(classes.map(cls => cls.Type))].filter(Boolean);
+
 //   useEffect(() => {
 //     fetchClasses();
 //   }, []);
@@ -126,6 +145,45 @@
 //   return (
 //     <div className="p-3" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
 //       <h4 style={{ color: 'var(--secondary)' }}>Class Media Management</h4>
+
+//       {/* Filter Controls */}
+//       <Row className="mb-4 g-3">
+//         <Col md={4}>
+//           <Form.Control
+//             placeholder="Search by title"
+//             value={search}
+//             onChange={(e) => setSearch(e.target.value)}
+//             style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
+//           />
+//         </Col>
+
+//         <Col md={4}>
+//           <Form.Select
+//             value={filterType}
+//             onChange={(e) => setFilterType(e.target.value)}
+//             style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
+//           >
+//             <option value="">All Types</option>
+//             {classTypes.map((type, index) => (
+//               <option key={index} value={type}>
+//                 {type}
+//               </option>
+//             ))}
+//           </Form.Select>
+//         </Col>
+
+//         <Col md={4}>
+//           <Form.Select
+//             value={filterStatus}
+//             onChange={(e) => setFilterStatus(e.target.value)}
+//             style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
+//           >
+//             <option value="">All Status</option>
+//             <option value="Active">Active</option>
+//             <option value="Inactive">Inactive</option>
+//           </Form.Select>
+//         </Col>
+//       </Row>
 
 //       {loading ? (
 //         <div className="text-center mt-4">
@@ -147,19 +205,19 @@
 //             </tr>
 //           </thead>
 //           <tbody>
-//             {classes.length === 0 ? (
+//             {filteredClasses.length === 0 ? (
 //               <tr>
 //                 <td colSpan="9" className="text-center">No Classes Found</td>
 //               </tr>
 //             ) : (
-//               classes.map((item, index) => (
+//               filteredClasses.map((item, index) => (
 //                 <tr key={item._id}>
 //                   <td>{index + 1}</td>
 //                   <td>{item.title}</td>
 //                   <td>{item.theme || 'N/A'}</td>
 //                   <td>{item.Type || 'N/A'}</td>
-//                   <td>{new Date(item.Date).toLocaleDateString()}</td>
-//                   <td>{item.startTime} - {item.endTime}</td>
+//                   <td>{item.Date ? new Date(item.Date).toLocaleDateString() : 'N/A'}</td>
+//                   <td>{item.startTime || 'N/A'} - {item.endTime || 'N/A'}</td>
 //                   <td>
 //                     <Badge 
 //                       bg="info" 
@@ -278,14 +336,6 @@
 //                           </Badge>
 //                         </td>
 //                         <td>
-//                           {/* <Button
-//                             variant="outline-primary"
-//                             size="sm"
-//                             className="me-2"
-//                             onClick={() => handleEditMedia(media)}
-//                           >
-//                             Edit
-//                           </Button> */}
 //                           <Button
 //                             variant="outline-danger"
 //                             size="sm"
@@ -360,10 +410,6 @@
 // };
 
 // export default ClassMediaPage;
-
-
-
-
 import React, { useState, useEffect } from 'react';
 import {
   Table,
@@ -376,7 +422,7 @@ import {
   Row,
   Col
 } from 'react-bootstrap';
-import { PencilSquare, PlusCircle } from 'react-bootstrap-icons';
+import { PlusCircle } from 'react-bootstrap-icons'; // Removed PencilSquare import
 import axios from 'axios';
 import AddMediaOffcanvas from './AddMediaOffcanvas';
 import { toast } from 'react-toastify';
@@ -432,7 +478,7 @@ const ClassMediaPage = () => {
     }
   };
 
-  const handleAddEditMedia = (classId) => {
+  const handleAddMedia = (classId) => {
     setSelectedClassId(classId);
     setShowMediaForm(true);
   };
@@ -440,36 +486,6 @@ const ClassMediaPage = () => {
   const handleMediaCountClick = (classId) => {
     setSelectedClassId(classId);
     fetchClassMedia(classId);
-  };
-
-  const handleEditMedia = (media) => {
-    setEditingMedia(media);
-    setShowEditModal(true);
-  };
-
-  const handleSubmitEditMedia = async (e) => {
-    e.preventDefault();
-    try {
-      const token = localStorage.getItem('adminToken');
-      await axios.put(
-        `http://localhost:5010/api/mediaAdmin/updateMedia/${selectedClassId}/${editingMedia._id}`,
-        {
-          title: editingMedia.title,
-          Description: editingMedia.Description,
-          status: editingMedia.status
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      toast.success("Media updated successfully");
-      setShowEditModal(false);
-      fetchClassMedia(selectedClassId);
-    } catch (error) {
-      toast.error("Failed to update media");
-    }
   };
 
   const handleDeleteMedia = async (classId, mediaId) => {
@@ -603,33 +619,18 @@ const ClassMediaPage = () => {
                     </Badge>
                   </td>
                   <td>
-                    <ButtonGroup>
-                      <Button
-                        size="sm"
-                        onClick={() => handleAddEditMedia(item._id)}
-                        style={{
-                          backgroundColor: 'transparent',
-                          border: 'none',
-                          padding: '0 5px',
-                          color: 'var(--warning)',
-                        }}
-                      >
-                        <PencilSquare size={20} />
-                      </Button>
-
-                      <Button
-                        size="sm"
-                        onClick={() => handleAddEditMedia(item._id)}
-                        style={{
-                          backgroundColor: 'transparent',
-                          border: 'none',
-                          padding: '0 5px',
-                          color: '#28a745',
-                        }}
-                      >
-                        <PlusCircle size={20} />
-                      </Button>
-                    </ButtonGroup>
+                    <Button
+                      size="sm"
+                      onClick={() => handleAddMedia(item._id)}
+                      style={{
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        padding: '0 5px',
+                        color: '#28a745',
+                      }}
+                    >
+                      <PlusCircle size={20} />
+                    </Button>
                   </td>
                 </tr>
               ))
@@ -728,44 +729,6 @@ const ClassMediaPage = () => {
             Close
           </Button>
         </Modal.Footer>
-      </Modal>
-
-      {/* Edit Media Modal */}
-      <Modal show={showEditModal} onHide={() => setShowEditModal(false)} centered>
-        <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
-          <Modal.Title>Edit Media</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {editingMedia && (
-            <Form onSubmit={handleSubmitEditMedia}>
-              <Form.Group>
-                <Form.Label>Title</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={editingMedia.title}
-                  onChange={(e) =>
-                    setEditingMedia({ ...editingMedia, title: e.target.value })
-                  }
-                  required
-                />
-              </Form.Group>
-              <Form.Group className="mt-2">
-                <Form.Label>Description</Form.Label>
-                <Form.Control
-                  as="textarea"
-                  rows={3}
-                  value={editingMedia.Description}
-                  onChange={(e) =>
-                    setEditingMedia({ ...editingMedia, Description: e.target.value })
-                  }
-                />
-              </Form.Group>
-              <Button type="submit" className="mt-3" variant="success">
-                Save Changes
-              </Button>
-            </Form>
-          )}
-        </Modal.Body>
       </Modal>
     </div>
   );

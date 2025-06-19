@@ -18,7 +18,6 @@ const Layout = () => {
 
   return (
     <div className="admin-container">
-      {/* Mobile sidebar overlay */}
       {mobileSidebarVisible && (
         <div 
           className="mobile-sidebar-overlay"
@@ -30,7 +29,7 @@ const Layout = () => {
         collapsed={sidebarCollapsed} 
         mobileVisible={mobileSidebarVisible}
         onMobileClose={toggleMobileSidebar}
-        setSidebarCollapsed={setSidebarCollapsed} // Add this prop
+        setSidebarCollapsed={setSidebarCollapsed} 
       />
       
       <div className={`main-content ${sidebarCollapsed ? 'collapsed' : ''}`}>

@@ -142,43 +142,7 @@ const AssignMentorTeam = () => {
     }
   };
 
-  // Handle team assignment
-  // const handleAssignTeam = async () => {
-  //   if (selectedInstructors.length === 0 || selectedUsers.length === 0) {
-  //     toast.error('Please select at least one instructor and one user');
-  //     return;
-  //   }
 
-  //   try {
-  //     setLoadingAssignment(true);
-  //     const token = localStorage.getItem('adminToken');
-      
-  //     const payload = {
-  //       instructorIds: selectedInstructors.map(instructor => instructor._id),
-  //       userIds: selectedUsers.map(user => user._id)
-  //     };
-
-  //     await axios.post(
-  //       `http://18.209.91.97:5010/api/assignInstructor/assignInstructorAndUsers/${selectedUser._id}`,
-  //       payload,
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       }
-  //     );
-
-  //     toast.success('Team assigned successfully!');
-  //     setShowAssignModal(false);
-  //     setSelectedInstructors([]);
-  //     setSelectedUsers([]);
-  //     setLoadingAssignment(false);
-  //   } catch (err) {
-  //     console.error('Error assigning team:', err);
-  //     toast.error(err.response?.data?.message || 'Failed to assign team');
-  //     setLoadingAssignment(false);
-  //   }
-  // };
 const handleAssignTeam = async () => {
     if (selectedInstructors.length === 0 || selectedUsers.length === 0) {
       toast.error('Please select at least one instructor and one user');
@@ -575,68 +539,132 @@ const handleAssignTeam = async () => {
                       </div>
                       
                       {filteredUsers.length > 0 ? (
-                        <ListGroup variant="flush">
-                          {filteredUsers.map(user => (
-                            <ListGroup.Item 
-                              key={user._id}
-                              action
-                              active={selectedUsers.some(u => u._id === user._id)}
-                              onClick={() => toggleUserSelection(user)}
-                              className="py-3"
-                              style={{ 
-                                backgroundColor: selectedUsers.some(u => u._id === user._id) 
-                                  ? 'rgba(13, 110, 253, 0.1)' 
-                                  : 'white',
-                                borderLeft: selectedUsers.some(u => u._id === user._id) 
-                                  ? '4px solid var(--primary)' 
-                                  : 'none'
-                              }}
-                            >
-                              <div className="d-flex align-items-center">
-                                <div className="position-relative me-3">
-                                  <img
-                                    src={user.profilePicture || 'https://via.placeholder.com/50'}
-                                    alt="Profile"
-                                    style={{ 
-                                      width: '40px', 
-                                      height: '40px', 
-                                      borderRadius: '50%',
-                                      objectFit: 'cover',
-                                      border: '2px solid var(--accent)'
-                                    }}
-                                  />
-                                  {selectedUsers.some(u => u._id === user._id) && (
-                                    <Badge 
-                                      bg="primary"
-                                      className="position-absolute top-0 start-100 translate-middle"
-                                      pill
-                                      style={{ backgroundColor: 'var(--primary)' }}
-                                    >
-                                      <CheckCircle size={12} />
-                                    </Badge>
-                                  )}
-                                </div>
+                        // <ListGroup variant="flush">
+                        //   {filteredUsers.map(user => (
+                        //     <ListGroup.Item 
+                        //       key={user._id}
+                        //       action
+                        //       active={selectedUsers.some(u => u._id === user._id)}
+                        //       onClick={() => toggleUserSelection(user)}
+                        //       className="py-3"
+                        //       style={{ 
+                        //         backgroundColor: selectedUsers.some(u => u._id === user._id) 
+                        //           ? 'rgba(13, 110, 253, 0.1)' 
+                        //           : 'white',
+                        //         borderLeft: selectedUsers.some(u => u._id === user._id) 
+                        //           ? '4px solid var(--primary)' 
+                        //           : 'none'
+                        //       }}
+                        //     >
+                        //       <div className="d-flex align-items-center">
+                        //         <div className="position-relative me-3">
+                        //           <img
+                        //             src={user.profilePicture || 'https://via.placeholder.com/50'}
+                        //             alt="Profile"
+                        //             style={{ 
+                        //               width: '40px', 
+                        //               height: '40px', 
+                        //               borderRadius: '50%',
+                        //               objectFit: 'cover',
+                        //               border: '2px solid var(--accent)'
+                        //             }}
+                        //           />
+                        //           {selectedUsers.some(u => u._id === user._id) && (
+                        //             <Badge 
+                        //               bg="primary"
+                        //               className="position-absolute top-0 start-100 translate-middle"
+                        //               pill
+                        //               style={{ backgroundColor: 'var(--primary)' }}
+                        //             >
+                        //               <CheckCircle size={12} />
+                        //             </Badge>
+                        //           )}
+                        //         </div>
                                 
-                                <div className="flex-grow-1">
-                                  <div className="d-flex justify-content-between align-items-center">
-                                    <h6 className="mb-0" style={{ color: 'var(--secondary)' }}>
-                                      {user.name}
-                                    </h6>
-                                    <Badge 
-                                      pill 
-                                      bg={user.status === 'Assigned' ? 'success' : 'light'} 
-                                      text={user.status === 'Assigned' ? 'white' : 'dark'}
-                                    >
-                                      {user.status || 'Unassigned'}
-                                    </Badge>
-                                  </div>
-                                  <small className="text-muted d-block">{user.email}</small>
-                                  <small className="text-muted">{user.number}</small>
-                                </div>
-                              </div>
-                            </ListGroup.Item>
-                          ))}
-                        </ListGroup>
+                        //         <div className="flex-grow-1">
+                        //           <div className="d-flex justify-content-between align-items-center">
+                        //             <h6 className="mb-0" style={{ color: 'var(--secondary)' }}>
+                        //               {user.name}
+                        //             </h6>
+                        //             <Badge 
+                        //               pill 
+                        //               bg={user.status === 'Assigned' ? 'success' : 'light'} 
+                        //               text={user.status === 'Assigned' ? 'white' : 'dark'}
+                        //             >
+                        //               {user.status || 'Unassigned'}
+                        //             </Badge>
+                        //           </div>
+                        //           <small className="text-muted d-block">{user.email}</small>
+                        //           <small className="text-muted">{user.number}</small>
+                        //         </div>
+                        //       </div>
+                        //     </ListGroup.Item>
+                        //   ))}
+                        // </ListGroup>
+
+                        <ListGroup variant="flush">
+  {filteredUsers.map(user => (
+    <ListGroup.Item 
+      key={user._id}
+      action
+      active={selectedUsers.some(u => u._id === user._id)}
+      onClick={() => toggleUserSelection(user)}
+      className="py-3"
+      style={{ 
+        backgroundColor: selectedUsers.some(u => u._id === user._id) 
+          ? 'rgba(13, 110, 253, 0.1)' 
+          : 'white',
+        borderLeft: selectedUsers.some(u => u._id === user._id) 
+          ? '4px solid var(--primary)' 
+          : 'none'
+      }}
+    >
+      <div className="d-flex align-items-center">
+        <div className="position-relative me-3">
+          <img
+            src={user.profilePicture || 'https://via.placeholder.com/50'}
+            alt="Profile"
+            style={{ 
+              width: '40px', 
+              height: '40px', 
+              borderRadius: '50%',
+              objectFit: 'cover',
+              border: '2px solid var(--accent)'
+            }}
+          />
+          <Badge
+            bg={user.status === 'Assigned' ? 'success' : 'secondary'}
+            className="position-absolute top-0 start-100 translate-middle"
+            pill
+          >
+            {user.status === 'Assigned' ? (
+              <CheckCircle size={12} />
+            ) : (
+              <XCircle size={12} />
+            )}
+          </Badge>
+        </div>
+        
+        <div className="flex-grow-1">
+          <div className="d-flex justify-content-between align-items-center">
+            <h6 className="mb-0" style={{ color: 'var(--secondary)' }}>
+              {user.name}
+            </h6>
+            <Badge 
+              pill 
+              bg={user.status === 'Assigned' ? 'success' : 'light'} 
+              text={user.status === 'Assigned' ? 'white' : 'dark'}
+            >
+              {user.status || 'Unassigned'}
+            </Badge>
+          </div>
+          <small className="text-muted d-block">{user.email}</small>
+          <small className="text-muted">{user.number}</small>
+        </div>
+      </div>
+    </ListGroup.Item>
+  ))}
+</ListGroup>
                       ) : (
                         <Alert variant="info" className="text-center">
                           {loadingUsers ? 'Loading users...' : 'No users found matching your search'}

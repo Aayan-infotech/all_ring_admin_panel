@@ -83,7 +83,6 @@ const fetchQuestions = async (classId) => {
       { headers: { Authorization: `Bearer ${token}` } }
     );
     
-    // Check if response has questions array
     if (res.data.success && res.data.questions) {
       setQuestions(res.data.questions);
     } else {
@@ -311,18 +310,7 @@ const fetchQuestions = async (classId) => {
                       >
                         <PlusCircle size={16} />
                       </Button>
-                      {/* <Button
-                        variant="light"
-                        className="icon-btn border-info text-info"
-                        size="sm"
-                        onClick={() => {
-                          setSelectedClass(item);
-                          fetchQuestions(item._id);
-                          setShowViewQuestionsModal(true);
-                        }}
-                      >
-                        <QuestionCircle size={16} />
-                      </Button> */}
+                    
                     </div>
                   </td>
                 </tr>
@@ -332,12 +320,12 @@ const fetchQuestions = async (classId) => {
         </div>
       )}
 
-      {/* Offcanvas Modals */}
+      
       <AddClassOffcanvas show={showAddForm} handleClose={() => { setShowAddForm(false); setSelectedClass(null); }} onSaved={fetchClasses} selected={selectedClass} />
       <AddMediaOffcanvas show={showMediaForm} handleClose={() => setShowMediaForm(false)} classId={selectedClass?._id} />
       <AddNotesOffcanvas show={showNotesForm} handleClose={() => setShowNotesForm(false)} classId={selectedClass?._id} />
 
-      {/* Edit Class Modal */}
+
       <Modal show={showEditModal} onHide={() => { setShowEditModal(false); setSelectedClass(null); }} centered>
         <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
           <Modal.Title>Edit Class</Modal.Title>
@@ -403,41 +391,7 @@ const fetchQuestions = async (classId) => {
         </Modal.Body>
       </Modal>
 
-      {/* Add Question Modal */}
-      {/* <Modal show={showAddQuestionModal} onHide={() => { setShowAddQuestionModal(false); setQuestionText(''); setEditingQuestion(null); }} centered>
-        <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
-          <Modal.Title>{editingQuestion ? 'Edit Question' : 'Add New Question'}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body style={{ backgroundColor: 'var(--accent)' }}>
-          <Form onSubmit={(e) => {
-            e.preventDefault();
-            if (editingQuestion) {
-              handleEditQuestion(selectedClass._id, editingQuestion._id);
-            } else {
-              handleAddQuestion(selectedClass._id);
-            }
-          }}>
-            <Form.Group className="mb-3">
-              <Form.Label>Question Text</Form.Label>
-              <Form.Control 
-                as="textarea" 
-                rows={3} 
-                value={questionText} 
-                onChange={(e) => setQuestionText(e.target.value)} 
-                required 
-              />
-            </Form.Group>
-            <div className="d-flex justify-content-end">
-              <Button variant="secondary" onClick={() => { setShowAddQuestionModal(false); setQuestionText(''); }} className="me-2">
-                Cancel
-              </Button>
-              <Button type="submit" variant="primary">
-                {editingQuestion ? 'Update Question' : 'Add Question'}
-              </Button>
-            </div>
-          </Form>
-        </Modal.Body>
-      </Modal> */}
+
 
  <Modal show={showAddQuestionModal} onHide={() => { setShowAddQuestionModal(false); setQuestionText(''); setEditingQuestion(null); }} centered size="lg">
         <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>

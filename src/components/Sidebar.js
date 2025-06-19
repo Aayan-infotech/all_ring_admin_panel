@@ -18,7 +18,6 @@ const Sidebar = ({ collapsed, mobileVisible, onMobileClose,setSidebarCollapsed  
   const navigate = useNavigate();
   const [activeModule, setActiveModule] = useState('');
 
-  // On route change, auto-detect module
   useEffect(() => {
     const path = location.pathname;
 
@@ -77,7 +76,7 @@ const Sidebar = ({ collapsed, mobileVisible, onMobileClose,setSidebarCollapsed  
     if (subMenus[module]?.length) {
       navigate(subMenus[module][0].path);
     }
-    onMobileClose(); // Close mobile sidebar when module is selected
+    onMobileClose(); 
   };
 
   const menuItems = [
@@ -125,7 +124,6 @@ const Sidebar = ({ collapsed, mobileVisible, onMobileClose,setSidebarCollapsed  
       </div>
 
       <div className="sidebar-menu">
-        {/* Base Dashboard link */}
         {baseMenu.map((item) => (
           <Link
             key={item.path}
@@ -137,7 +135,6 @@ const Sidebar = ({ collapsed, mobileVisible, onMobileClose,setSidebarCollapsed  
           </Link>
         ))}
 
-        {/* If on Dashboard, show the 4 module cards */}
         {activeModule === 'dashboard' &&
           moduleCards.map((item) => (
             <div
@@ -151,7 +148,6 @@ const Sidebar = ({ collapsed, mobileVisible, onMobileClose,setSidebarCollapsed  
             </div>
           ))}
 
-        {/* If in a module, show its submenu */}
         {activeModule !== 'dashboard' &&
           subMenus[activeModule]?.map((item) => (
             <Link

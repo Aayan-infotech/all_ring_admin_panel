@@ -61,7 +61,6 @@ const AddMediaOffcanvas = ({ show, handleClose, classId }) => {
       </Offcanvas.Header>
       <Offcanvas.Body style={{ backgroundColor: 'var(--accent)' }}>
         <Form onSubmit={handleSubmit(onSubmit)} className="p-3 rounded shadow-sm" style={{ backgroundColor: '#fff' }}>
-          {/* Title Field - Required */}
           <Form.Group className="mb-3">
             <Form.Label>Title</Form.Label>
             <Form.Control 
@@ -70,7 +69,6 @@ const AddMediaOffcanvas = ({ show, handleClose, classId }) => {
             {errors.title && <span className="text-danger small">{errors.title.message}</span>}
           </Form.Group>
 
-          {/* Description Field - Required */}
           <Form.Group className="mb-3">
             <Form.Label>Description (Max 100 chars)</Form.Label>
             <Form.Control
@@ -88,7 +86,6 @@ const AddMediaOffcanvas = ({ show, handleClose, classId }) => {
             {errors.description && <span className="text-danger small">{errors.description.message}</span>}
           </Form.Group>
 
-          {/* Video Upload Field */}
           <Form.Group className="mb-3">
             <Form.Label>Upload Video (Max 2 minutes)</Form.Label>
             <Form.Control 
@@ -100,7 +97,6 @@ const AddMediaOffcanvas = ({ show, handleClose, classId }) => {
             />
           </Form.Group>
 
-          {/* YouTube Link Field */}
           <Form.Group className="mb-4">
             <Form.Label>OR YouTube Video Link</Form.Label>
             <Form.Control 
