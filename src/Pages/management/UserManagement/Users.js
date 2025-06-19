@@ -1,8 +1,3 @@
-
-
-
-
-
 import React, { useEffect, useState } from 'react';
 import {
   Table,
@@ -34,7 +29,7 @@ const Users = () => {
     register,
     handleSubmit,
     watch,
-      getValues, // Add this
+      getValues, 
 
     formState: { errors }
   } = useForm();
@@ -53,7 +48,6 @@ const Users = () => {
   const [filterLocation, setFilterLocation] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
 
-  // Helper function to get location string
   const getLocationString = (location) => {
     if (!location) return 'N/A';
     return typeof location === 'object' ? location.location : location;
@@ -126,7 +120,7 @@ const Users = () => {
   };
 
 const handleSaveChanges = async () => {
-  const formData = getValues(); // Get form values from react-hook-form
+  const formData = getValues(); 
   console.log("Form values:", formData);
 
   try {
@@ -140,7 +134,6 @@ const handleSaveChanges = async () => {
     formDataToSend.append('name', formData.name);
     formDataToSend.append('number', formData.number);
 
-    // Convert location name to ID
     const selectedLocation = locations.find(loc => loc.location === formData.location);
     formDataToSend.append('location', selectedLocation ? selectedLocation._id : formData.location);
 
@@ -542,12 +535,7 @@ const handleSaveChanges = async () => {
           <Col md={8}>{viewUser.dateofbirth || 'N/A'}</Col>
         </Row>
 
-        {/* <Row className="mb-2">
-          <Col md={4}><strong style={{ color: 'var(--secondary)' }}>IP Address:</strong></Col>
-          <Col md={8}>{viewUser.ins_ip}</Col>
-        </Row> */}
-
-        <Row className="mb-2">
+   <Row className="mb-2">
           <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Inserted Date:</strong></Col>
           <Col md={8}>{new Date(viewUser.ins_date).toLocaleString()}</Col>
         </Row>
@@ -635,7 +623,6 @@ const handleSaveChanges = async () => {
           <Form.Control
             defaultValue={editingUser.number}
             {...register('number')}
-            // style={{ borderColor: 'var(--primary)' }}
           />
         </Form.Group>
 
@@ -644,7 +631,6 @@ const handleSaveChanges = async () => {
           <Form.Select
             defaultValue={getLocationString(editingUser.location)}
             {...register('location')}
-            // style={{ borderColor: 'var(--primary)' }}
           >
             <option value="">Select Location</option>
             {locations.map((loc) => (

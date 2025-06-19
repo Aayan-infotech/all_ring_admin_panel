@@ -30,7 +30,7 @@ useEffect(() => {
   const fetchLocations = async () => {
     try {
       const response = await axios.get('http://18.209.91.97:5010/api/location/getAllLocations');
-      setLocations(response.data?.data || []); // ✅ fix: use response.data.data instead of response.data.locations
+      setLocations(response.data?.data || []); 
     } catch (error) {
       console.error('Error fetching locations:', error);
       toast.error('Failed to load locations');

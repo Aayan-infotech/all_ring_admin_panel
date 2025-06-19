@@ -96,7 +96,7 @@ const Sidebar = ({ collapsed, mobileVisible, onMobileClose,setSidebarCollapsed  
     >
       <div className="sidebar-logo">
         {collapsed ? (
-          <span className="logo-collapsed">AB</span>
+          <span className="logo-collapsed">AP</span>
         ) : (
           <span className="logo-expanded">Admin Panel</span>
         )}
