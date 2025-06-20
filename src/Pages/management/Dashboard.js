@@ -19,25 +19,6 @@ const Dashboard = () => {
 const [participationData, setParticipationData] = useState([]);
 const [participationLoading, setParticipationLoading] = useState(true);
 
-  // useEffect(() => {
-  //   const fetchStats = async () => {
-  //     try {
-  //       const token = localStorage.getItem('adminToken');
-  //       const res = await axios.get('http://18.209.91.97:5010/api/admin/stats/overview', {
-  //         headers: { Authorization: `Bearer ${token}` },
-  //       });
-  //       if (res.data.success) {
-  //         setStatsData(res.data.data);
-  //       }
-  //     } catch (error) {
-  //       console.error('Error fetching dashboard stats:', error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchStats();
-  // }, []);
 
 
 
@@ -124,11 +105,7 @@ const [participationLoading, setParticipationLoading] = useState(true);
     { name: 'Amit Singh', location: 'Hyderabad', sessions: 16 },
   ];
 
-  // const participationData = [
-  //   { label: 'Total Classes', value: 100, color: '#1976d2' },
-  //   { label: 'Total Registered', value: 80, color: '#f9a825' },
-  //   { label: 'Total Present', value: 60, color: '#43a047' },
-  // ];
+ 
 
   return (
     <div className="dashboard-container">
@@ -193,25 +170,6 @@ const [participationLoading, setParticipationLoading] = useState(true);
           <Card className="participation-card">
             <Card.Body>
               <h5 className="widget-title">Participation Overview</h5>
-              {/* {participationData.map((item, idx) => (
-                <Box key={idx} sx={{ mb: 2 }}>
-                  <Typography variant="subtitle2" gutterBottom>
-                    {item.label}
-                  </Typography>
-                  <LinearProgress
-                    variant="determinate"
-                    value={item.value}
-                    sx={{
-                      height: 12,
-                      borderRadius: 6,
-                      '& .MuiLinearProgress-bar': {
-                        backgroundColor: item.color,
-                      },
-                      backgroundColor: '#e0e0e0',
-                    }}
-                  />
-                </Box>
-              ))} */}
 
               {participationLoading ? (
   <Spinner animation="border" variant="primary" />

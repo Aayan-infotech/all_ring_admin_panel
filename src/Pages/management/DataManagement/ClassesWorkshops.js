@@ -20,6 +20,8 @@ import {
   XCircleFill,
   CheckCircleFill,
   Film,
+
+  InfoCircle,
   FileEarmarkText,
   Trash,
   QuestionCircle
@@ -42,7 +44,8 @@ const ClassesWorkshops = () => {
   const [showNotesForm, setShowNotesForm] = useState(false);
   const [selectedClass, setSelectedClass] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
-  
+    const [showDetailsModal, setShowDetailsModal] = useState(false);
+
   const [showAddQuestionModal, setShowAddQuestionModal] = useState(false);
   const [showViewQuestionsModal, setShowViewQuestionsModal] = useState(false);
   const [questionText, setQuestionText] = useState('');
@@ -310,7 +313,18 @@ const fetchQuestions = async (classId) => {
                       >
                         <PlusCircle size={16} />
                       </Button>
-                    
+                          <Button
+        variant="light"
+        className="icon-btn border-info text-info"
+        size="sm"
+        onClick={() => {
+          setSelectedClass(item);
+          setShowDetailsModal(true);
+        }}
+      >
+        <InfoCircle size={16} />
+      </Button>
+
                     </div>
                   </td>
                 </tr>
@@ -324,8 +338,72 @@ const fetchQuestions = async (classId) => {
       <AddClassOffcanvas show={showAddForm} handleClose={() => { setShowAddForm(false); setSelectedClass(null); }} onSaved={fetchClasses} selected={selectedClass} />
       <AddMediaOffcanvas show={showMediaForm} handleClose={() => setShowMediaForm(false)} classId={selectedClass?._id} />
       <AddNotesOffcanvas show={showNotesForm} handleClose={() => setShowNotesForm(false)} classId={selectedClass?._id} />
-
-
+<Modal show={showDetailsModal} onHide={() => setShowDetailsModal(false)} size="md" centered>
+  <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white', padding: '0.75rem 1rem' }}>
+    <Modal.Title style={{ fontSize: '1.1rem' }}>Class Details</Modal.Title>
+  </Modal.Header>
+  <Modal.Body style={{ padding: '1rem' }}>
+    {selectedClass && (
+      <div className="row g-2">
+        {/* Image Preview */}
+        {selectedClass.Image && (
+          <div className="col-12 text-center mb-2">
+            <img 
+              src={selectedClass.Image} 
+              alt="Class" 
+              style={{ 
+                maxWidth: '100%', 
+                maxHeight: '150px', 
+                borderRadius: '6px',
+                objectFit: 'cover'
+              }} 
+            />
+          </div>
+        )}
+        
+        <div className="col-12">
+          <div className="d-flex justify-content-between align-items-center mb-2">
+            <h5 style={{ fontSize: '1rem', margin: 0 }}>{selectedClass.title}</h5>
+            <Badge bg={selectedClass.status === 'active' ? 'success' : 'danger'} pill>
+              {selectedClass.status}
+            </Badge>
+          </div>
+          
+          <div className="small text-muted mb-3" style={{ fontSize: '0.85rem' }}>
+            {selectedClass.Type} • {selectedClass.location?.location || 'N/A'}
+          </div>
+        </div>
+        
+        <div className="col-12">
+          <ListGroup variant="flush">
+            <ListGroup.Item className="d-flex justify-content-between py-2 px-0">
+              <span className="text-muted">Theme:</span>
+              <span>{selectedClass.theme || '-'}</span>
+            </ListGroup.Item>
+            <ListGroup.Item className="d-flex justify-content-between py-2 px-0">
+              <span className="text-muted">Created:</span>
+              <span>{new Date(selectedClass.createdAt).toLocaleDateString()}</span>
+            </ListGroup.Item>
+            <ListGroup.Item className="d-flex justify-content-between py-2 px-0">
+              <span className="text-muted">Last Updated:</span>
+              <span>{new Date(selectedClass.updatedAt).toLocaleDateString()}</span>
+            </ListGroup.Item>
+          </ListGroup>
+        </div>
+      </div>
+    )}
+  </Modal.Body>
+  <Modal.Footer style={{ padding: '0.75rem 1rem', justifyContent: 'flex-start' }}>
+    <Button 
+      variant="outline-secondary" 
+      size="sm" 
+      onClick={() => setShowDetailsModal(false)}
+      style={{ padding: '0.25rem 0.75rem', fontSize: '0.85rem' }}
+    >
+      Close
+    </Button>
+  </Modal.Footer>
+</Modal>
       <Modal show={showEditModal} onHide={() => { setShowEditModal(false); setSelectedClass(null); }} centered>
         <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
           <Modal.Title>Edit Class</Modal.Title>
