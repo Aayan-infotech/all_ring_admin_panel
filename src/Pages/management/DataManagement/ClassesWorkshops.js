@@ -375,10 +375,21 @@ const fetchQuestions = async (classId) => {
                 </Form.Select>
               </Form.Group>
 
-              <Form.Group className="mb-3">
-                <Form.Label>Location</Form.Label>
-                <Form.Control name="location" defaultValue={selectedClass.location?.location || ''} required />
-              </Form.Group>
+          <Form.Group className="mb-3">
+  <Form.Label>Location</Form.Label>
+  <Form.Select 
+    name="location" 
+    defaultValue={selectedClass.location?.location || ''} 
+    required
+  >
+    <option value="">Select a location</option>
+    {allLocations.map((location) => (
+      <option key={location._id} value={location.location}>
+        {location.location}
+      </option>
+    ))}
+  </Form.Select>
+</Form.Group>
 
               <div className="d-flex justify-content-end">
                 <Button variant="secondary" onClick={() => setShowEditModal(false)} className="me-2">Cancel</Button>
