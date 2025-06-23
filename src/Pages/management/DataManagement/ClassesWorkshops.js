@@ -51,7 +51,21 @@ const ClassesWorkshops = () => {
   const [questionText, setQuestionText] = useState('');
   const [questions, setQuestions] = useState([]);
   const [editingQuestion, setEditingQuestion] = useState(null);
+const [instructors, setInstructors] = useState([]);
 
+// 2. Add a function to fetch instructors
+const fetchInstructors = async () => {
+  try {
+    const token = localStorage.getItem('adminToken');
+    const res = await axios.get('http://18.209.91.97:5010/api/admin/getRegister/instructor', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    setInstructors(res.data?.users || []);
+  } catch (error) {
+    console.error('Error fetching instructors:', error);
+    setInstructors([]);
+  }
+};
   const fetchClasses = async () => {
     try {
       setLoading(true);
@@ -68,6 +82,77 @@ const ClassesWorkshops = () => {
       setLoading(false);
     }
   };
+const handleUpdateClass = async () => {
+  const form = document.getElementById('editClassForm');
+  const formData = new FormData();
+
+  // Append all fields exactly as in the curl example
+  formData.append('title', form.title.value);
+  formData.append('theme', form.theme.value);
+  
+  // Handle tags - you'll need to add tags input to your form
+  // For now, I'll add empty tags array since your form doesn't have tags input
+  formData.append('tags', JSON.stringify([]));
+  
+  // Date fields - you'll need to add these to your form
+  formData.append('startDate', form.startDate.value || new Date().toISOString().split('T')[0]);
+  formData.append('endDate', form.endDate.value || new Date().toISOString().split('T')[0]);
+  
+  // Session type - you'll need to add this to your form
+  formData.append('sessionType', form.sessionType.value || 'weekly');
+  
+  // Time fields - format them as "HH:MM AM/PM"
+  const formatTime = (time) => {
+    const [hours, minutes] = time.split(':');
+    const hourInt = parseInt(hours, 10);
+    const period = hourInt >= 12 ? 'PM' : 'AM';
+    const displayHour = hourInt % 12 || 12;
+    return `${displayHour}:${minutes} ${period}`;
+  };
+  
+  formData.append('startTime', formatTime(form.time.value || '12:00'));
+  formData.append('endTime', formatTime(form.endTime.value || '13:00')); // You'll need to add endTime field
+  
+  formData.append('location', form.location.value);
+  formData.append('Instructor', form.instructor.value);
+  formData.append('Type', form.Type.value); // You'll need to add Type field
+  
+  // Handle image upload
+  if (form.image.files[0]) {
+    formData.append('Image', form.image.files[0]);
+  } else if (selectedClass.Image) {
+    // If no new image, include the existing image URL
+    formData.append('Image', selectedClass.Image);
+  }
+
+  // Debug: Log form data before sending
+  for (let [key, value] of formData.entries()) {
+    console.log(key, value);
+  }
+
+  try {
+    const token = localStorage.getItem('adminToken');
+    const response = await axios.put(
+      `http://18.209.91.97:5010/api/AdminClasses/updateClass/${selectedClass._id}`,
+      formData,
+      {
+        headers: { 
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+    
+    toast.success('Class updated successfully!');
+    setShowEditModal(false);
+    fetchClasses();
+  } catch (err) {
+    console.error('Update error:', err);
+    toast.error(err.response?.data?.message || 'Failed to update class');
+  }
+};
+
+
 
   const fetchLocations = async () => {
     try {
@@ -101,6 +186,8 @@ const fetchQuestions = async (classId) => {
   useEffect(() => {
     fetchClasses();
     fetchLocations();
+      fetchInstructors(); // Add this line
+
   }, []);
 
   const toggleStatus = async (id) => {
@@ -338,147 +425,341 @@ const fetchQuestions = async (classId) => {
       <AddClassOffcanvas show={showAddForm} handleClose={() => { setShowAddForm(false); setSelectedClass(null); }} onSaved={fetchClasses} selected={selectedClass} />
       <AddMediaOffcanvas show={showMediaForm} handleClose={() => setShowMediaForm(false)} classId={selectedClass?._id} />
       <AddNotesOffcanvas show={showNotesForm} handleClose={() => setShowNotesForm(false)} classId={selectedClass?._id} />
-<Modal show={showDetailsModal} onHide={() => setShowDetailsModal(false)} size="md" centered>
-  <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white', padding: '0.75rem 1rem' }}>
-    <Modal.Title style={{ fontSize: '1.1rem' }}>Class Details</Modal.Title>
+<Modal show={showDetailsModal} onHide={() => setShowDetailsModal(false)} size="lg" centered>
+  <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white', padding: '1rem' }}>
+    <Modal.Title style={{ fontSize: '1.25rem' }}>Class Details</Modal.Title>
   </Modal.Header>
-  <Modal.Body style={{ padding: '1rem' }}>
+  <Modal.Body style={{ padding: '1.5rem' }}>
     {selectedClass && (
-      <div className="row g-2">
-        {/* Image Preview */}
-        {selectedClass.Image && (
-          <div className="col-12 text-center mb-2">
-            <img 
-              src={selectedClass.Image} 
-              alt="Class" 
-              style={{ 
-                maxWidth: '100%', 
-                maxHeight: '150px', 
-                borderRadius: '6px',
-                objectFit: 'cover'
-              }} 
-            />
-          </div>
-        )}
-        
-        <div className="col-12">
-          <div className="d-flex justify-content-between align-items-center mb-2">
-            <h5 style={{ fontSize: '1rem', margin: 0 }}>{selectedClass.title}</h5>
-            <Badge bg={selectedClass.status === 'active' ? 'success' : 'danger'} pill>
-              {selectedClass.status}
-            </Badge>
-          </div>
+      <div className="row g-3">
+        {/* Header Section with Image and Basic Info */}
+        <div className="col-md-4">
+          {selectedClass.Image && (
+            <div className="text-center mb-3">
+              <img 
+                src={selectedClass.Image} 
+                alt="Class" 
+                style={{ 
+                  width: '100%',
+                  maxHeight: '200px',
+                  borderRadius: '8px',
+                  objectFit: 'cover',
+                  border: '1px solid #eee'
+                }} 
+              />
+            </div>
+          )}
           
-          <div className="small text-muted mb-3" style={{ fontSize: '0.85rem' }}>
-            {selectedClass.Type} • {selectedClass.location?.location || 'N/A'}
+          <div className="card p-3" style={{ backgroundColor: 'var(--accent)' }}>
+            <div className="d-flex justify-content-between align-items-center mb-2">
+              <h5 style={{ fontSize: '1.1rem', margin: 0, fontWeight: '600' }}>{selectedClass.title}</h5>
+              <Badge 
+                bg={selectedClass.status === 'active' ? 'success' : 'danger'} 
+                pill
+                style={{ fontSize: '0.75rem' }}
+              >
+                {selectedClass.status}
+              </Badge>
+            </div>
+            
+            <div className="mb-2">
+              <span className="badge bg-primary me-2" style={{ fontSize: '0.75rem' }}>
+                {selectedClass.Type}
+              </span>
+              <span className="badge bg-info text-dark" style={{ fontSize: '0.75rem' }}>
+                {selectedClass.sessionType}
+              </span>
+            </div>
+            
+            <div className="small mb-2">
+              <div className="d-flex align-items-center mb-1">
+                <i className="bi bi-geo-alt me-2"></i>
+                <span>{selectedClass.location?.location || 'N/A'}</span>
+              </div>
+              <div className="d-flex align-items-center">
+                <i className="bi bi-person me-2"></i>
+                <span>{selectedClass.Instructor?.name || 'N/A'}</span>
+              </div>
+            </div>
+            
+            {selectedClass.tags?.length > 0 && (
+              <div className="mt-2">
+                <div className="text-muted small mb-1">Tags:</div>
+                <div className="d-flex flex-wrap gap-1">
+                  {selectedClass.tags.map(tag => (
+                    <span key={tag} className="badge bg-secondary" style={{ fontSize: '0.7rem' }}>
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
         
-        <div className="col-12">
-          <ListGroup variant="flush">
-            <ListGroup.Item className="d-flex justify-content-between py-2 px-0">
-              <span className="text-muted">Theme:</span>
-              <span>{selectedClass.theme || '-'}</span>
-            </ListGroup.Item>
-            <ListGroup.Item className="d-flex justify-content-between py-2 px-0">
-              <span className="text-muted">Created:</span>
-              <span>{new Date(selectedClass.createdAt).toLocaleDateString()}</span>
-            </ListGroup.Item>
-            <ListGroup.Item className="d-flex justify-content-between py-2 px-0">
-              <span className="text-muted">Last Updated:</span>
-              <span>{new Date(selectedClass.updatedAt).toLocaleDateString()}</span>
-            </ListGroup.Item>
-          </ListGroup>
+        {/* Main Details Section */}
+        <div className="col-md-8">
+          <div className="card p-3 h-100">
+            {/* Theme and Description */}
+            <div className="mb-3">
+              <h6 className="text-muted mb-2">Theme</h6>
+              <p style={{ fontSize: '0.95rem' }}>{selectedClass.theme || '-'}</p>
+            </div>
+            
+            {/* Date and Time Information */}
+            <div className="row mb-3">
+              <div className="col-md-6">
+                <h6 className="text-muted mb-2">Start Date</h6>
+                <p>{new Date(selectedClass.startDate || selectedClass.Date).toLocaleDateString()}</p>
+              </div>
+              <div className="col-md-6">
+                <h6 className="text-muted mb-2">End Date</h6>
+                <p>{new Date(selectedClass.endDate || selectedClass.Date).toLocaleDateString()}</p>
+              </div>
+            </div>
+            
+            {/* Class Status */}
+            <div className="mb-3">
+              <h6 className="text-muted mb-2">Class Status</h6>
+              <Badge bg={selectedClass.classStatus === 'Live' ? 'success' : 'warning'} className="text-capitalize">
+                {selectedClass.classStatus || 'N/A'}
+              </Badge>
+            </div>
+            
+            {/* Sessions Section */}
+            {selectedClass.sessions?.length > 0 && (
+              <div className="mb-3">
+                <h6 className="text-muted mb-2">Sessions</h6>
+                <div className="table-responsive">
+                  <table className="table table-sm table-hover">
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {selectedClass.sessions.map((session, index) => (
+                        <tr key={index}>
+                          <td>{new Date(session.date).toLocaleDateString()}</td>
+                          <td>{session.startTime}</td>
+                          <td>{session.endTime}</td>
+                          <td>
+                            <Badge bg={session.status === 'Active' ? 'success' : 'secondary'} pill>
+                              {session.status}
+                            </Badge>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+            
+            {/* Additional Information */}
+            <div className="row">
+              <div className="col-md-6">
+                <h6 className="text-muted mb-2">Created</h6>
+                <p>{new Date(selectedClass.createdAt).toLocaleString()}</p>
+              </div>
+              <div className="col-md-6">
+                <h6 className="text-muted mb-2">Last Updated</h6>
+                <p>{new Date(selectedClass.updatedAt).toLocaleString()}</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     )}
   </Modal.Body>
-  <Modal.Footer style={{ padding: '0.75rem 1rem', justifyContent: 'flex-start' }}>
+  <Modal.Footer style={{ padding: '1rem', justifyContent: 'flex-end' }}>
     <Button 
       variant="outline-secondary" 
-      size="sm" 
       onClick={() => setShowDetailsModal(false)}
-      style={{ padding: '0.25rem 0.75rem', fontSize: '0.85rem' }}
+      style={{ padding: '0.375rem 0.75rem' }}
     >
       Close
     </Button>
   </Modal.Footer>
 </Modal>
-      <Modal show={showEditModal} onHide={() => { setShowEditModal(false); setSelectedClass(null); }} centered>
-        <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
-          <Modal.Title>Edit Class</Modal.Title>
-        </Modal.Header>
-        <Modal.Body style={{ backgroundColor: 'var(--accent)' }}>
-          {selectedClass ? (
-            <Form
-              onSubmit={async (e) => {
-                e.preventDefault();
-                const form = e.target;
-                const formData = {
-                  title: form.title.value,
-                  theme: form.theme.value,
-                  Type: form.Type.value,
-                  location: form.location.value,
-                };
-                try {
-                  const token = localStorage.getItem('adminToken');
-                  await axios.put(`http://18.209.91.97:5010/api/AdminClasses/updateClass/${selectedClass._id}`, formData, {
-                    headers: { Authorization: `Bearer ${token}` },
-                  });
-                  toast.success('Class updated successfully!');
-                  setShowEditModal(false);
-                  fetchClasses();
-                } catch (err) {
-                  console.error(err);
-                }
-              }}
-            >
-              <Form.Group className="mb-3">
-                <Form.Label>Title</Form.Label>
-                <Form.Control name="title" defaultValue={selectedClass.title} required />
-              </Form.Group>
+<Modal show={showEditModal} onHide={() => { setShowEditModal(false); setSelectedClass(null); }} centered>
+  <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
+    <Modal.Title>Edit Class</Modal.Title>
+  </Modal.Header>
+  <Modal.Body style={{ backgroundColor: 'var(--accent)' }}>
+    {selectedClass ? (
+      <Form id="editClassForm">
+        <Form.Group className="mb-3">
+    <Form.Label>Title</Form.Label>
+    <Form.Control 
+      name="title" 
+      defaultValue={selectedClass.title} 
+      required 
+    />
+  </Form.Group>
 
-              <Form.Group className="mb-3">
-                <Form.Label>Theme</Form.Label>
-                <Form.Control name="theme" defaultValue={selectedClass.theme} required />
-              </Form.Group>
+  {/* Theme Field */}
+  <Form.Group className="mb-3">
+    <Form.Label>Theme</Form.Label>
+    <Form.Control 
+      name="theme" 
+      defaultValue={selectedClass.theme} 
+      required 
+    />
+  </Form.Group>
 
-              <Form.Group className="mb-3">
-                <Form.Label>Type</Form.Label>
-                <Form.Select name="Type" defaultValue={selectedClass.Type} required>
-                  <option value="">-- Select Type --</option>
-                  <option value="Regular Class">Regular Class</option>
-                  <option value="Workshop">Workshop</option>
-                  <option value="Special Event">Special Event</option>
-                </Form.Select>
-              </Form.Group>
+   <Form.Group className="mb-3">
+    <Form.Label>Start Date</Form.Label>
+    <Form.Control
+      type="date"
+      name="startDate"
+      defaultValue={selectedClass.startDate ? selectedClass.startDate.split('T')[0] : ''}
+      required
+    />
+  </Form.Group>
 
-          <Form.Group className="mb-3">
-  <Form.Label>Location</Form.Label>
-  <Form.Select 
-    name="location" 
-    defaultValue={selectedClass.location?.location || ''} 
-    required
-  >
-    <option value="">Select a location</option>
-    {allLocations.map((location) => (
-      <option key={location._id} value={location.location}>
-        {location.location}
-      </option>
-    ))}
-  </Form.Select>
-</Form.Group>
+  <Form.Group className="mb-3">
+    <Form.Label>End Date</Form.Label>
+    <Form.Control
+      type="date"
+      name="endDate"
+      defaultValue={selectedClass.endDate ? selectedClass.endDate.split('T')[0] : ''}
+      required
+    />
+  </Form.Group>
 
-              <div className="d-flex justify-content-end">
-                <Button variant="secondary" onClick={() => setShowEditModal(false)} className="me-2">Cancel</Button>
-                <Button type="submit" variant="primary">Save Changes</Button>
-              </div>
-            </Form>
-          ) : (
-            <div className="text-center">Loading...</div>
-          )}
-        </Modal.Body>
-      </Modal>
+  <Form.Group className="mb-3">
+    <Form.Label>Session Type</Form.Label>
+    <Form.Select 
+      name="sessionType" 
+      defaultValue={selectedClass.sessionType || 'weekly'}
+      required
+    >
+      <option value="weekly">Weekly</option>
+      <option value="daily">Daily</option>
+      <option value="monthly">Monthly</option>
+    </Form.Select>
+  </Form.Group>
+
+  <Form.Group className="mb-3">
+    <Form.Label>End Time</Form.Label>
+    <Form.Control
+      type="time"
+      name="endTime"
+      defaultValue={selectedClass.endTime || ''}
+      required
+    />
+  </Form.Group>
+
+  <Form.Group className="mb-3">
+    <Form.Label>Type</Form.Label>
+    <Form.Select 
+      name="Type" 
+      defaultValue={selectedClass.Type || 'Workshop'}
+      required
+    >
+      <option value="Regular Class">Regular Class</option>
+      <option value="Workshop">Workshop</option>
+      <option value="Special Event">Special Event</option>
+    </Form.Select>
+  </Form.Group>
+
+  {/* Time Field */}
+  <Form.Group className="mb-3">
+    <Form.Label>Time</Form.Label>
+    <Form.Control
+      type="time"
+      name="time"
+      defaultValue={selectedClass.time}
+      required
+    />
+  </Form.Group>
+
+  {/* Location Field */}
+  <Form.Group className="mb-3">
+    <Form.Label>Location</Form.Label>
+    <Form.Select 
+      name="location" 
+      defaultValue={selectedClass.location?._id} 
+      required
+    >
+      <option value="">Select a location</option>
+      {allLocations.map((location) => (
+        <option key={location._id} value={location._id}>
+          {location.location}
+        </option>
+      ))}
+    </Form.Select>
+  </Form.Group>
+
+  {/* Instructor Field */}
+  <Form.Group className="mb-3">
+    <Form.Label>Instructor</Form.Label>
+    <Form.Select 
+      name="instructor" 
+      defaultValue={selectedClass.Instructor?._id} 
+      required
+    >
+      <option value="">Select an instructor</option>
+      {instructors.map((instructor) => (
+        <option key={instructor._id} value={instructor._id}>
+          {instructor.name}
+        </option>
+      ))}
+    </Form.Select>
+  </Form.Group>
+
+  {/* Image Field */}
+  <Form.Group className="mb-3">
+    <Form.Label>Image</Form.Label>
+    <Form.Control 
+      type="file" 
+      name="image" 
+      accept="image/*" 
+    />
+    {selectedClass.Image && (
+      <div className="mt-2">
+        <small>Current Image:</small>
+        <img 
+          src={selectedClass.Image} 
+          alt="Current class" 
+          style={{ 
+            maxWidth: '100px',
+            maxHeight: '100px',
+            display: 'block',
+            marginTop: '5px'
+          }} 
+        />
+      </div>
+    )}
+  </Form.Group>
+
+        <div className="d-flex justify-content-end">
+          <Button 
+            variant="secondary" 
+            onClick={() => setShowEditModal(false)} 
+            className="me-2"
+          >
+            Cancel
+          </Button>
+     <Button
+  type="button"
+  variant="primary"
+  onClick={handleUpdateClass}
+  style={{ backgroundColor: 'var(--primary)', borderColor: 'var(--primary)' }}
+>
+  Save Changes
+</Button>
+        </div>
+      </Form>
+    ) : (
+      <div className="text-center">Loading...</div>
+    )}
+  </Modal.Body>
+</Modal>
 
 
 
