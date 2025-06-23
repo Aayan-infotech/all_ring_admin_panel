@@ -2,7 +2,7 @@
 
 
 import React, { useState, useEffect } from 'react';
-import { Table, Button, ButtonGroup, Badge, InputGroup, Form, Spinner, Modal } from 'react-bootstrap';
+import { Table, Button,Row,Col, ButtonGroup, Badge, InputGroup, Form, Spinner, Modal } from 'react-bootstrap';
 import {
   PencilSquare,
   CheckCircleFill,
@@ -464,24 +464,105 @@ const filteredMentors = mentors.filter((mentor) => {
           </Form>
         </Modal.Body>
       </Modal>
+<Modal
+  show={showProfileModal}
+  onHide={() => setShowProfileModal(false)}
+  centered
+  className="mentor-profile-modal"
 
-      <Modal show={showProfileModal} onHide={() => setShowProfileModal(false)} centered>
-        <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: '#fff' }}>
-          <Modal.Title>Mentor Profile</Modal.Title>
-        </Modal.Header>
-        <Modal.Body style={{ backgroundColor: 'var(--accent)' }}>
-          {selectedUser && (
-            <div>
-              <p><strong>Name:</strong> {selectedUser.name}</p>
-              <p><strong>Email:</strong> {selectedUser.email}</p>
-              <p><strong>Phone:</strong> {selectedUser.number}</p>
-              <p><strong>DOB:</strong> {selectedUser.dateofbirth}</p>
-              <p><strong>Expertise:</strong> {selectedUser.expertise}</p>
-              <p><strong>Location:</strong> {getLocationString(selectedUser.location)}</p>
-            </div>
-          )}
-        </Modal.Body>
-      </Modal>
+>
+  <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
+    <Modal.Title>👨‍🏫 Mentor Profile</Modal.Title>
+  </Modal.Header>
+  <Modal.Body style={{ backgroundColor: 'var(--accent)' }}>
+    {selectedUser ? (
+      <div>
+        <div className="text-center mb-4">
+          <img
+            src={selectedUser.profilePicture || 'https://via.placeholder.com/150'}
+            alt="Profile"
+            className="img-thumbnail"
+            style={{ width: '120px', height: '120px', objectFit: 'cover', borderRadius: '50%' }}
+          />
+          <div className="mt-2">
+      
+          </div>
+        </div>
+
+        <Row className="mb-2">
+          <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Name:</strong></Col>
+          <Col md={8}>{selectedUser.name}</Col>
+        </Row>
+
+        <Row className="mb-2">
+          <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Email:</strong></Col>
+          <Col md={8}>{selectedUser.email}</Col>
+        </Row>
+
+        <Row className="mb-2">
+          <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Phone:</strong></Col>
+          <Col md={8}>{selectedUser.number || 'N/A'}</Col>
+        </Row>
+
+        <Row className="mb-2">
+          <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Expertise:</strong></Col>
+          <Col md={8}>{selectedUser.expertise || 'N/A'}</Col>
+        </Row>
+
+        <Row className="mb-2">
+          <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Location:</strong></Col>
+          <Col md={8}>{selectedUser.location?.location || 'N/A'}</Col>
+        </Row>
+
+        <Row className="mb-2">
+          <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Date of Birth:</strong></Col>
+          <Col md={8}>{selectedUser.dateofbirth || 'N/A'}</Col>
+        </Row>
+
+  
+
+        <Row className="mb-2">
+          <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Status:</strong></Col>
+          <Col md={8}>
+            <Badge
+              style={{
+                backgroundColor:
+                  selectedUser.user_status === 1
+                    ? 'var(--success)'
+                    : selectedUser.user_status === 2
+                    ? 'var(--danger)'
+                    : 'var(--warning)',
+              }}
+            >
+              {selectedUser.user_status === 1
+                ? 'Active'
+                : selectedUser.user_status === 2
+                ? 'Inactive'
+                : 'Unverified'}
+            </Badge>
+          </Col>
+        </Row>
+
+
+        {selectedUser.tags && selectedUser.tags.length > 0 && (
+          <Row className="mb-2">
+            <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Tags:</strong></Col>
+            <Col md={8}>
+              <div className="d-flex flex-wrap gap-1">
+                {selectedUser.tags.map((tag, index) => (
+                  <Badge key={index} bg="info">{tag}</Badge>
+                ))}
+              </div>
+            </Col>
+          </Row>
+        )}
+      </div>
+    ) : (
+      <p>Loading mentor data...</p>
+    )}
+  </Modal.Body>
+</Modal>
+
 
       <Modal show={showEditModal} onHide={() => setShowEditModal(false)} centered>
         <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: '#fff' }}>

@@ -562,27 +562,6 @@ const handleSaveChanges = async () => {
           </Col>
         </Row>
 
-        <Row className="mb-2">
-          <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Verification:</strong></Col>
-          <Col md={8}>{viewUser.verificationStatus || 'N/A'}</Col>
-        </Row>
-
-        <Row className="mb-2">
-          <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Account Status:</strong></Col>
-          <Col md={8}>
-            <Badge
-              bg={viewUser.accountStatus === 'active' ? 'success' : 'danger'}
-              style={{
-                backgroundColor:
-                  viewUser.accountStatus === 'active'
-                    ? 'var(--success)'
-                    : 'var(--danger)',
-              }}
-            >
-              {viewUser.accountStatus}
-            </Badge>
-          </Col>
-        </Row>
 
       
       </div>

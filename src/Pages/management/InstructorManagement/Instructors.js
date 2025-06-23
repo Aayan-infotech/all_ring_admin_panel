@@ -84,19 +84,7 @@ const fetchLocations = async () => {
   }
 };
 
-// const fetchLocations = async () => {
-//   try {
-//     const res = await axios.get('http://18.209.91.97:5010/api/location/getAllLocations');
-//     const locations = res.data?.data || [];
-//     const activeLocationNames = locations
-//       .filter(loc => loc.status === 'Active') 
-//       .map(loc => loc.location);            
-//     setLocationList(activeLocationNames);
-//   } catch (err) {
-//     console.error("Failed to fetch locations:", err);
-//     toast.error("Failed to load locations");
-//   }
-// };
+
 const handleSaveChanges = async () => {
   if (!selectedInstructor || !selectedInstructor._id) {
     toast.error("No instructor selected");
@@ -139,22 +127,15 @@ const filteredInstructors = instructors.filter(i => {
     : true;
   return nameMatch && statusMatch && locationMatch;
 });
-// const filteredInstructors = instructors.filter(i => {
-//   const nameMatch = i.name?.toLowerCase().includes(searchTerm.toLowerCase());
-//   const statusMatch = selectedStatus ? i.status === selectedStatus : true;
-//   const locationMatch = selectedLocation 
-//     ? getLocationString(i.location) === selectedLocation 
-//     : true;
-//   return nameMatch && statusMatch && locationMatch;
-// });
-const toggleStatus = async (instructor) => {
 
+
+const toggleStatus = async (instructor) => {
   if (instructor.user_status === 0) {
     toast.error("❌ User email is not verified!", {
       position: "top-right",
       autoClose: 3000,
     });
-    return; 
+    return;
   }
 
   const token = localStorage.getItem('adminToken');
@@ -167,18 +148,24 @@ const toggleStatus = async (instructor) => {
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
-    // Update UI optimistically
+    // Update UI optimistically - this is the key fix
     setInstructors(prev => 
       prev.map(i => 
-        i._id === instructor._id ? { ...i, user_status: newStatus } : i
+        i._id === instructor._id ? { 
+          ...i, 
+          user_status: newStatus,
+          status: newStatus === 1 ? 'active' : 'inactive' // Also update the derived status field
+        } : i
       )
     );
+    
     toast.success(`Status updated to ${newStatus === 1 ? 'Active' : 'Inactive'}`);
   } catch (err) {
     toast.error("Failed to update status!");
     console.error(err);
   }
 };
+
 
   const updatePassword = async () => {
     if (passwords.newPassword !== passwords.confirmPassword) return toast.error('Passwords do not match');
@@ -294,9 +281,10 @@ const toggleStatus = async (instructor) => {
                 {/* <td>{instructor.location}</td> */}
                 <td>{getLocationString(instructor.location)}</td>
                 <td>
-                  <Badge bg={instructor.status === 'active' ? 'success' : 'danger'}>
-                    {instructor.status}
-                  </Badge>
+                
+                  <Badge bg={instructor.user_status === 1 ? 'success' : 'danger'}>
+  {instructor.user_status === 1 ? 'active' : 'inactive'}
+</Badge>
                 </td>
              
               <td>
@@ -377,22 +365,91 @@ const toggleStatus = async (instructor) => {
 
 
       {/* View Modal */}
-      <Modal show={viewModal} onHide={() => setViewModal(false)} centered className="custom-modal">
-        <Modal.Header closeButton><Modal.Title>Instructor Profile</Modal.Title></Modal.Header>
-        <Modal.Body>
-          {selectedInstructor && (
-            <div>
-              <p><strong>Name:</strong> {selectedInstructor.name}</p>
-              <p><strong>Email:</strong> {selectedInstructor.email}</p>
-              <p><strong>Phone:</strong> {selectedInstructor.number}</p>
-              {/* <p><strong>Location:</strong> {selectedInstructor.location}</p> */}
-              <p><strong>Location:</strong> {getLocationString(selectedInstructor.location)}</p>
-            </div>
-          )}
-        </Modal.Body>
-      </Modal>
+<Modal
+  show={viewModal}
+  onHide={() => setViewModal(false)}
+  centered
+  className="instructor-profile-modal"
+  size="lg"
+>
+  <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
+    <Modal.Title>👨‍🏫 Instructor Profile</Modal.Title>
+  </Modal.Header>
+  <Modal.Body style={{ backgroundColor: 'var(--accent)' }}>
+    {selectedInstructor ? (
+      <div>
+        <div className="text-center mb-4">
+          <img
+            src={selectedInstructor.profilePicture || 'https://via.placeholder.com/150'}
+            alt="Profile"
+            className="img-thumbnail"
+            style={{ width: '120px', height: '120px', objectFit: 'cover', borderRadius: '50%' }}
+          />
+          <div className="mt-2">
+          
+          </div>
+        </div>
 
-      {/* Edit Modal */}
+        <Row className="mb-2">
+          <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Name:</strong></Col>
+          <Col md={8}>{selectedInstructor.name}</Col>
+        </Row>
+
+        <Row className="mb-2">
+          <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Email:</strong></Col>
+          <Col md={8}>{selectedInstructor.email}</Col>
+        </Row>
+
+        <Row className="mb-2">
+          <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Phone:</strong></Col>
+          <Col md={8}>{selectedInstructor.number || 'N/A'}</Col>
+        </Row>
+
+
+        <Row className="mb-2">
+          <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Location:</strong></Col>
+          <Col md={8}>{getLocationString(selectedInstructor.location) || 'N/A'}</Col>
+        </Row>
+
+        <Row className="mb-2">
+          <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Registered On:</strong></Col>
+          <Col md={8}>{new Date(selectedInstructor.createdAt).toLocaleString()}</Col>
+        </Row>
+
+        <Row className="mb-2">
+          <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Last Updated:</strong></Col>
+          <Col md={8}>{new Date(selectedInstructor.updatedAt).toLocaleString()}</Col>
+        </Row>
+
+        <Row className="mb-2">
+          <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Status:</strong></Col>
+          <Col md={8}>
+            <Badge
+              style={{
+                backgroundColor:
+                  selectedInstructor.user_status === 1
+                    ? 'var(--success)'
+                    : selectedInstructor.user_status === 2
+                    ? 'var(--danger)'
+                    : 'var(--warning)',
+              }}
+            >
+              {selectedInstructor.user_status === 1
+                ? 'Active'
+                : selectedInstructor.user_status === 2
+                ? 'Inactive'
+                : 'Unverified'}
+            </Badge>
+          </Col>
+        </Row>
+      </div>
+    ) : (
+      <p>Loading instructor data...</p>
+    )}
+  </Modal.Body>
+</Modal>
+
+     
 {/* Edit Modal */}
 <Modal show={editModal} onHide={() => setEditModal(false)} centered className="custom-modal">
   <Modal.Header closeButton><Modal.Title>Edit Instructor</Modal.Title></Modal.Header>
