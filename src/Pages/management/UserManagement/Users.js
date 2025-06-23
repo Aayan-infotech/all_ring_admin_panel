@@ -9,6 +9,7 @@ import {
   Row,
   Col,
   Modal,
+  Breadcrumb  ,
 } from 'react-bootstrap';
 import {
   PencilSquare,
@@ -234,6 +235,20 @@ const handleSaveChanges = async () => {
   return (
     <div className="p-4" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
       <ToastContainer position="top-right" autoClose={3000} />
+
+ {/* Add Breadcrumb Navigation */}
+      <div className="mb-4">
+        <Breadcrumb>
+          <Breadcrumb.Item href="/dashboard" style={{ textDecoration: 'none', color: 'var(--secondary)' }}>
+            <i className="fas fa-home me-1"></i> Dashboard
+          </Breadcrumb.Item>
+          <Breadcrumb.Item active style={{ color: 'var(--primary)' }}>
+            <i className="fas fa-users me-1"></i> User Management
+          </Breadcrumb.Item>
+        </Breadcrumb>
+      </div>
+
+
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 style={{ color: 'var(--secondary)' }}>User Management</h2>
         <Button

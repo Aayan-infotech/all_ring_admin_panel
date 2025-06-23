@@ -2,7 +2,7 @@
 
 
 import React, { useState, useEffect } from 'react';
-import { Table, Button,Row,Col, ButtonGroup, Badge, InputGroup, Form, Spinner, Modal } from 'react-bootstrap';
+import { Table, Button,Row,Col, ButtonGroup, Badge, InputGroup, Form, Spinner, Modal,Breadcrumb  } from 'react-bootstrap';
 import {
   PencilSquare,
   CheckCircleFill,
@@ -221,6 +221,34 @@ const filteredMentors = mentors.filter((mentor) => {
 
   return (
     <div className="p-4" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
+
+ <div className="mb-4">
+        <Breadcrumb style={{ backgroundColor: 'var(--light)', padding: '10px', borderRadius: '5px' }}>
+          <Breadcrumb.Item 
+            href="/dashboard" 
+            style={{ 
+              color: 'var(--secondary)', 
+              textDecoration: 'none',
+              display: 'flex',
+              alignItems: 'center'
+            }}
+          >
+            <i className="fas fa-home me-2"></i> Dashboard
+          </Breadcrumb.Item>
+          <Breadcrumb.Item 
+            active 
+            style={{ 
+              color: 'var(--primary)', 
+              fontWeight: 'bold',
+              display: 'flex',
+              alignItems: 'center'
+            }}
+          >
+            <i className="fas fa-chalkboard-teacher me-2"></i> Mentor Management
+          </Breadcrumb.Item>
+        </Breadcrumb>
+      </div>
+
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 style={{ color: 'var(--secondary)', fontWeight: '600' }}>Mentor Management</h2>
         <Button

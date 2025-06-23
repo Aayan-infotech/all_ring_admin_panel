@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import {
-  Table, Button, ButtonGroup, Badge, Modal, Form, InputGroup, Spinner, Row, Col
+  Table, Button, ButtonGroup, Badge, Modal, Form, InputGroup, Spinner, Row, Col,Breadcrumb 
 } from 'react-bootstrap';
 import {
   PencilSquare, EyeFill, LockFill, CheckCircleFill, XCircleFill
@@ -187,6 +187,39 @@ const toggleStatus = async (instructor) => {
   return (
     <div className="p-4">
       <ToastContainer />
+
+      <div className="mb-3">
+        <Breadcrumb style={{ 
+          backgroundColor: 'var(--light)', 
+          padding: '0.75rem 1rem',
+          borderRadius: '0.375rem',
+          marginBottom: '1rem'
+        }}>
+          <Breadcrumb.Item 
+            href="/dashboard" 
+            style={{ 
+              color: 'var(--secondary)',
+              textDecoration: 'none',
+              display: 'flex',
+              alignItems: 'center'
+            }}
+          >
+            <i className="fas fa-home me-2"></i> Dashboard
+          </Breadcrumb.Item>
+          <Breadcrumb.Item 
+            active 
+            style={{ 
+              color: 'var(--primary)',
+              fontWeight: '500',
+              display: 'flex',
+              alignItems: 'center'
+            }}
+          >
+            <i className="fas fa-chalkboard-teacher me-2"></i> Instructor Management
+          </Breadcrumb.Item>
+        </Breadcrumb>
+     
+      </div>
     <div className="mb-3">
   <h3>Instructor Management</h3>
 </div>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Form, Offcanvas, Table, Spinner, Modal } from 'react-bootstrap';
+import { Button, Form, Offcanvas, Table, Spinner, Modal,Breadcrumb  } from 'react-bootstrap';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { XCircleFill, CheckCircleFill } from 'react-bootstrap-icons';
@@ -102,6 +102,37 @@ const Data = () => {
 
   return (
     <div className="p-4" style={{ background: '#f8f9fa', minHeight: '100vh' }}>
+
+       <div className="mb-4">
+        <Breadcrumb style={{ 
+          backgroundColor: 'var(--light)', 
+          padding: '0.75rem 1rem',
+          borderRadius: '0.375rem'
+        }}>
+          <Breadcrumb.Item 
+            href="/dashboard" 
+            style={{ 
+              color: 'var(--secondary)',
+              textDecoration: 'none',
+              display: 'flex',
+              alignItems: 'center'
+            }}
+          >
+            <i className="fas fa-home me-2"></i> Dashboard
+          </Breadcrumb.Item>
+          <Breadcrumb.Item 
+            active 
+            style={{ 
+              color: 'var(--primary)',
+              fontWeight: '500',
+              display: 'flex',
+              alignItems: 'center'
+            }}
+          >
+            <i className="fas fa-map-marker-alt me-2"></i> Location Management
+          </Breadcrumb.Item>
+        </Breadcrumb>
+      </div>
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h4 style={{ color: 'var(--secondary)' }}>Location Management</h4>
         <div className="d-flex gap-2">
