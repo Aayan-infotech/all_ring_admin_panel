@@ -240,20 +240,7 @@ const handleDelete = async () => {
   }
 };
 
-  // const handleDelete = async (id) => {
-  //   if (!window.confirm('Are you sure you want to delete this class?')) return;
 
-  //   try {
-  //     const token = localStorage.getItem('adminToken');
-  //     await axios.delete(`http://18.209.91.97:5010/api/AdminClasses/deleteClass/${id}`, {
-  //       headers: { Authorization: `Bearer ${token}` },
-  //     });
-
-  //     setClasses(prev => prev.filter(cls => cls._id !== id));
-  //   } catch (err) {
-  //     console.error('Delete failed:', err);
-  //   }
-  // };
 
   const handleAddQuestion = async (classId) => {
     try {
@@ -296,12 +283,7 @@ const filtered = classes.filter(cls => {
   const matchesStatus = filterStatus ? cls.status?.toLowerCase() === filterStatus.toLowerCase() : true;
   return matchesTitle && matchesLocation && matchesStatus;
 });
-  // const filtered = classes.filter(cls => {
-  //   const matchesTitle = cls.title?.toLowerCase().includes(search.toLowerCase());
-  //   const matchesLocation = filterLocation ? cls.location?.location === filterLocation : true;
-  //   const matchesStatus = filterStatus ? cls.status?.toLowerCase() === filterStatus.toLowerCase() : true;
-  //   return matchesTitle && matchesLocation && matchesStatus;
-  // });
+
 
   return (
     <div className="p-4" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
@@ -396,14 +378,7 @@ const filtered = classes.filter(cls => {
 </td>
                   <td>
                     <div className="d-flex flex-wrap gap-2 justify-content-center">
-                      {/* <Button
-                        variant="light"
-                        className={`icon-btn border-0 ${item.status === 'active' ? 'bg-light border-danger text-danger' : 'bg-light border-success text-success'}`}
-                        size="sm"
-                        onClick={() => toggleStatus(item._id)}
-                      >
-                        {item.status === 'active' ? <XCircleFill size={16} /> : <CheckCircleFill size={16} />}
-                      </Button> */}
+                     
                       <Button
   variant="light"
   className={`icon-btn border-0 ${item.status === 'Active' ? 'bg-light border-danger text-danger' : 'bg-light border-success text-success'}`}
@@ -424,14 +399,7 @@ const filtered = classes.filter(cls => {
                       >
                         <PencilSquare size={16} />
                       </Button>
-                      {/* <Button
-                        variant="light"
-                        className="icon-btn border-danger text-danger"
-                        size="sm"
-                        onClick={() => handleDelete(item._id)}
-                      >
-                        <Trash size={16} />
-                      </Button> */}
+                     
                       <Button
   variant="light"
   className="icon-btn border-danger text-danger"
@@ -484,22 +452,42 @@ const filtered = classes.filter(cls => {
         </div>
       )}
 
+  
+
+
+     {/* Delete Confirmation Modal */}
+
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
-  <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
-    <Modal.Title>Confirm Delete</Modal.Title>
-  </Modal.Header>
-  <Modal.Body style={{ backgroundColor: 'var(--accent)' }}>
-    Are you sure you want to delete this class? This action cannot be undone.
-  </Modal.Body>
-  <Modal.Footer style={{ backgroundColor: 'var(--accent)' }}>
-    <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-      Cancel
-    </Button>
-    <Button variant="danger" onClick={handleDelete}>
-      Delete
-    </Button>
-  </Modal.Footer>
-</Modal>
+
+        <Modal.Header closeButton>
+
+          <Modal.Title>Confirm Delete</Modal.Title>
+
+        </Modal.Header>
+
+        <Modal.Body>
+
+          Are you sure you want to delete this location? This action cannot be undone.
+
+        </Modal.Body>
+
+        <Modal.Footer>
+
+          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+
+            Cancel
+
+          </Button>
+
+          <Button variant="danger" onClick={handleDelete}>
+
+            Delete
+
+          </Button>
+
+        </Modal.Footer>
+
+      </Modal>
       <AddClassOffcanvas show={showAddForm} handleClose={() => { setShowAddForm(false); setSelectedClass(null); }} onSaved={fetchClasses} selected={selectedClass} />
       <AddMediaOffcanvas show={showMediaForm} handleClose={() => setShowMediaForm(false)} classId={selectedClass?._id} />
       <AddNotesOffcanvas show={showNotesForm} handleClose={() => setShowNotesForm(false)} classId={selectedClass?._id} />
