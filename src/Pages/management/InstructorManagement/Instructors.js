@@ -127,8 +127,6 @@ const filteredInstructors = instructors.filter(i => {
     : true;
   return nameMatch && statusMatch && locationMatch;
 });
-
-
 const toggleStatus = async (instructor) => {
   if (instructor.user_status === 0) {
     toast.error("❌ User email is not verified!", {
@@ -148,13 +146,12 @@ const toggleStatus = async (instructor) => {
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
-    // Update UI optimistically - this is the key fix
     setInstructors(prev => 
       prev.map(i => 
         i._id === instructor._id ? { 
           ...i, 
           user_status: newStatus,
-          status: newStatus === 1 ? 'active' : 'inactive' // Also update the derived status field
+          status: newStatus === 1 ? 'active' : 'inactive'
         } : i
       )
     );
@@ -165,6 +162,43 @@ const toggleStatus = async (instructor) => {
     console.error(err);
   }
 };
+
+// const toggleStatus = async (instructor) => {
+//   if (instructor.user_status === 0) {
+//     toast.error("❌ User email is not verified!", {
+//       position: "top-right",
+//       autoClose: 3000,
+//     });
+//     return;
+//   }
+
+//   const token = localStorage.getItem('adminToken');
+//   const newStatus = instructor.user_status === 1 ? 2 : 1;
+
+//   try {
+//     await axios.patch(
+//       `http://18.209.91.97:5010/api/admin/editUserStatus/${instructor._id}`,
+//       { user_status: newStatus },
+//       { headers: { Authorization: `Bearer ${token}` } }
+//     );
+
+//     // Update UI optimistically - this is the key fix
+//     setInstructors(prev => 
+//       prev.map(i => 
+//         i._id === instructor._id ? { 
+//           ...i, 
+//           user_status: newStatus,
+//           status: newStatus === 1 ? 'active' : 'inactive' // Also update the derived status field
+//         } : i
+//       )
+//     );
+    
+//     toast.success(`Status updated to ${newStatus === 1 ? 'Active' : 'Inactive'}`);
+//   } catch (err) {
+//     toast.error("Failed to update status!");
+//     console.error(err);
+//   }
+// };
 
 
   const updatePassword = async () => {
@@ -313,12 +347,30 @@ const toggleStatus = async (instructor) => {
                 <td>{instructor.email}</td>
                 {/* <td>{instructor.location}</td> */}
                 <td>{getLocationString(instructor.location)}</td>
-                <td>
+                {/* <td>
                 
                   <Badge bg={instructor.user_status === 1 ? 'success' : 'danger'}>
   {instructor.user_status === 1 ? 'active' : 'inactive'}
 </Badge>
-                </td>
+                </td> */}
+                <td>
+  <Badge 
+    bg={
+      instructor.user_status === 0 
+        ? 'warning' 
+        : instructor.user_status === 1 
+          ? 'success' 
+          : 'danger'
+    }
+  >
+    {instructor.user_status === 0 
+      ? 'Unverified' 
+      : instructor.user_status === 1 
+        ? 'Active' 
+        : 'Inactive'
+    }
+  </Badge>
+</td>
              
               <td>
   <ButtonGroup>
@@ -341,7 +393,7 @@ const toggleStatus = async (instructor) => {
     <Button variant="secondary" onClick={() => { setSelectedInstructor(instructor); setResetModal(true); }}><LockFill /></Button>
    
 
-<Button
+{/* <Button
   size="sm"
   onClick={() => toggleStatus(instructor)}
   style={{
@@ -361,8 +413,38 @@ const toggleStatus = async (instructor) => {
   ) : (
     <XCircleFill size={20} /> // ❌ 
   )}
-</Button>
-      
+</Button> */}
+ <Button
+  size="sm"
+  onClick={() => toggleStatus(instructor)}
+  style={{
+    backgroundColor: 'transparent',
+    border: 'none',
+    padding: '0 5px',
+    color: instructor.user_status === 0 
+      ? 'gray' 
+      : instructor.user_status === 1 
+        ? 'var(--danger)' 
+        : 'var(--success)',
+    cursor: instructor.user_status === 0 ? 'not-allowed' : 'pointer',
+  }}
+  title={
+    instructor.user_status === 0 
+      ? "Not verified - can't toggle" 
+      : instructor.user_status === 1 
+        ? "Deactivate" 
+        : "Activate"
+  }
+  disabled={instructor.user_status === 0}
+>
+  {instructor.user_status === 0 ? (
+    <XCircleFill size={20} />
+  ) : instructor.user_status === 1 ? (
+    <XCircleFill size={20} />
+  ) : (
+    <CheckCircleFill size={20} />
+  )}
+</Button>     
     <Button
       variant="dark"
       onClick={() => {
@@ -453,8 +535,28 @@ const toggleStatus = async (instructor) => {
           <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Last Updated:</strong></Col>
           <Col md={8}>{new Date(selectedInstructor.updatedAt).toLocaleString()}</Col>
         </Row>
-
-        <Row className="mb-2">
+<Row className="mb-2">
+  <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Status:</strong></Col>
+  <Col md={8}>
+    <Badge
+      bg={
+        selectedInstructor.user_status === 0 
+          ? 'warning' 
+          : selectedInstructor.user_status === 1 
+            ? 'success' 
+            : 'danger'
+      }
+    >
+      {selectedInstructor.user_status === 0 
+        ? 'Unverified' 
+        : selectedInstructor.user_status === 1 
+          ? 'Active' 
+          : 'Inactive'
+      }
+    </Badge>
+  </Col>
+</Row>
+        {/* <Row className="mb-2">
           <Col md={4}><strong style={{ color: 'var(--secondary)' }}>Status:</strong></Col>
           <Col md={8}>
             <Badge
@@ -474,7 +576,7 @@ const toggleStatus = async (instructor) => {
                 : 'Unverified'}
             </Badge>
           </Col>
-        </Row>
+        </Row> */}
       </div>
     ) : (
       <p>Loading instructor data...</p>

@@ -340,7 +340,7 @@ const filteredMentors = mentors.filter((mentor) => {
                   <td>{mentor.email || '-'}</td>
                   <td>{getLocationString(mentor.location)}</td>
                   <td>{mentor.expertise || '-'}</td>
-                  <td>
+                  {/* <td>
                     <Badge
                       pill
                       bg={  mentor.accountStatus === 'active' ? 'success' : 'danger'}
@@ -351,7 +351,31 @@ const filteredMentors = mentors.filter((mentor) => {
                     >
                       {mentor.accountStatus === 'active' ? 'Active' : 'Inactive'}
                     </Badge>
-                  </td>
+                  </td> */}
+
+                  <td>
+  <Badge
+    pill
+    bg={
+      mentor.user_status === 0 
+        ? 'warning' 
+        : mentor.accountStatus === 'active' 
+          ? 'success' 
+          : 'danger'
+    }
+    style={{
+      padding: '8px 12px',
+      fontWeight: '500',
+    }}
+  >
+    {mentor.user_status === 0 
+      ? 'Unverified' 
+      : mentor.accountStatus === 'active' 
+        ? 'Active' 
+        : 'Inactive'
+    }
+  </Badge>
+</td>
                   <td>
                     <ButtonGroup>
                       <Button
