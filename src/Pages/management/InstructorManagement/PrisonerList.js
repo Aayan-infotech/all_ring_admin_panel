@@ -61,19 +61,23 @@ const PrisonerList = () => {
       toast.error("Delete failed");
     }
   };
-
-  const toggleStatus = async (prisoner) => {
-    const newStatus = prisoner.status === 1 ? 2 : 1;
-    try {
-      await axios.patch(`http://18.209.91.97:5010/api/prisoner/editPrisonerStatus/${prisoner._id}`, {
-        status: newStatus
-      });
-      toast.success(`Status changed`);
-      fetchPrisoners();
-    } catch (err) {
-      toast.error("Failed to update status");
-    }
-  };
+const toggleStatus = async (prisoner) => {
+  const newStatus = prisoner.status === 1 ? 2 : 1;
+  try {
+    await axios.patch(`http://18.209.91.97:5010/api/prisoner/changePrisonerStatus/${prisoner._id}`, {
+      status: newStatus
+    });
+    
+    setPrisoners(prev => prev.map(p => 
+      p._id === prisoner._id ? { ...p, status: newStatus } : p
+    ));
+    
+    toast.success(`Status changed to ${newStatus === 1 ? 'Active' : 'Inactive'}`);
+  } catch (err) {
+    toast.error("Failed to update status");
+    console.error(err);
+  }
+};
 
   const handleUpdate = async () => {
     try {
@@ -94,28 +98,28 @@ const PrisonerList = () => {
     fetchLocations();
   }, []);
 
-  useEffect(() => {
-    let filtered = prisoners;
 
-    if (searchTerm) {
-      filtered = filtered.filter(p =>
-        p.prisonerName?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
+useEffect(() => {
+  let filtered = prisoners;
 
-    if (filterLocation) {
-      filtered = filtered.filter(p => p.location?._id === filterLocation);
-    }
+  if (searchTerm) {
+    filtered = filtered.filter(p =>
+      p.prisonerName?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }
 
-    if (filterStatus !== 'all') {
-      filtered = filtered.filter(p =>
-        filterStatus === 'active' ? p.status === 1 : p.status === 2
-      );
-    }
+  if (filterLocation) {
+    filtered = filtered.filter(p => p.location?._id === filterLocation);
+  }
 
-    setFilteredPrisoners(filtered);
-  }, [searchTerm, filterLocation, filterStatus, prisoners]);
+  if (filterStatus !== 'all') {
+    filtered = filtered.filter(p =>
+      filterStatus === 'active' ? p.status === 1 : p.status === 2
+    );
+  }
 
+  setFilteredPrisoners(filtered);
+}, [searchTerm, filterLocation, filterStatus, prisoners]);
   return (
     <div className="p-4">
       <ToastContainer />
@@ -176,20 +180,20 @@ const PrisonerList = () => {
               <td>{p.prisonerName}</td>
               <td>{p.location?.location || 'N/A'}</td>
               <td>{p.instructorId?.name || 'N/A'}</td>
+             
               <td>
-                <Badge
-                  pill
-                  bg={p.status === 1 ? 'success' : 'danger'}
-                  style={{
-                    padding: '8px 12px',
-                    fontWeight: '500',
-                    backgroundColor:
-                      p.status === 1 ? 'var(--success)' : 'var(--danger)',
-                  }}
-                >
-                  {p.status === 1 ? 'Active' : 'Inactive'}
-                </Badge>
-              </td>
+  <Badge
+    pill
+    bg={p.status === 1 ? 'success' : 'danger'}
+    style={{
+      padding: '8px 12px',
+      fontWeight: '500',
+      textTransform: 'capitalize'
+    }}
+  >
+    {p.status === 1 ? 'Active' : 'Inactive'}
+  </Badge>
+</td>
               <td>
                 <Button
                   size="sm"
@@ -202,20 +206,21 @@ const PrisonerList = () => {
                   <PencilSquare color="black" />
                 </Button>
 
-                <Button
-                  size="sm"
-                  onClick={() => toggleStatus(p)}
-                  style={{
-                    backgroundColor: 'transparent',
-                    border: 'none',
-                    padding: '0 5px',
-                    color: p.status === 1 ? 'var(--danger)' : 'var(--success)',
-                    cursor: 'pointer',
-                  }}
-                >
-                  {p.status === 1 ? <XCircleFill size={20} /> : <CheckCircleFill size={20} />}
-                </Button>
-
+            
+<Button
+  size="sm"
+  onClick={() => toggleStatus(p)}
+  style={{
+    backgroundColor: 'transparent',
+    border: 'none',
+    padding: '0 5px',
+    color: p.status === 1 ? 'var(--danger)' : 'var(--success)',
+    cursor: 'pointer',
+  }}
+  title={p.status === 1 ? 'Deactivate' : 'Activate'}
+>
+  {p.status === 1 ? <XCircleFill size={20} /> : <CheckCircleFill size={20} />}
+</Button>
                 <Button
                   size="sm"
                   style={{ backgroundColor: 'var(--danger)', border: 'none' }}
