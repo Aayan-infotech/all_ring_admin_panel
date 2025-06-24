@@ -11,7 +11,7 @@ import {
   Row,
   Col
 } from 'react-bootstrap';
-import { PlusCircle } from 'react-bootstrap-icons'; // Removed PencilSquare import
+import { PlusCircle } from 'react-bootstrap-icons'; 
 import axios from 'axios';
 import AddMediaOffcanvas from './AddMediaOffcanvas';
 import { toast } from 'react-toastify';
@@ -26,8 +26,8 @@ const ClassMediaPage = () => {
   const [mediaLoading, setMediaLoading] = useState(false);
   const [editingMedia, setEditingMedia] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
-  
-  // Filter states
+  const [refreshTrigger, setRefreshTrigger] = useState(false);
+
   const [search, setSearch] = useState('');
   const [filterType, setFilterType] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
@@ -76,25 +76,36 @@ const ClassMediaPage = () => {
     setSelectedClassId(classId);
     fetchClassMedia(classId);
   };
-
   const handleDeleteMedia = async (classId, mediaId) => {
-    if (!window.confirm("Are you sure you want to delete this media?")) return;
+  if (!window.confirm("Are you sure you want to delete this media?")) return;
 
-    try {
-      const token = localStorage.getItem("adminToken");
-      await axios.delete(`http://18.209.91.97:5010/api/mediaAdmin/deleteMedia/${classId}/${mediaId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      toast.success("Media deleted successfully");
-      fetchClassMedia(classId);
-    } catch (error) {
-      toast.error("Failed to delete media");
-    }
-  };
+  try {
+    const token = localStorage.getItem("adminToken");
+    await axios.delete(`http://18.209.91.97:5010/api/mediaAdmin/deleteMedia/${classId}/${mediaId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    
+    setClassMedia(prev => prev.filter(media => media._id !== mediaId));
+    
+    setClasses(prev => prev.map(cls => {
+      if (cls._id === classId) {
+        return {
+          ...cls,
+          mediaCount: Math.max(0, (cls.mediaCount || 0) - 1)
+        };
+      }
+      return cls;
+    }));
+    
+    toast.success("Media deleted successfully");
+  } catch (error) {
+    toast.error("Failed to delete media");
+  }
+};
 
-  // Filter classes based on search and filter criteria
+
   const filteredClasses = classes.filter(cls => {
     const matchesTitle = cls.title?.toLowerCase().includes(search.toLowerCase());
     const matchesType = filterType ? cls.Type?.toLowerCase() === filterType.toLowerCase() : true;
@@ -102,18 +113,16 @@ const ClassMediaPage = () => {
     return matchesTitle && matchesType && matchesStatus;
   });
 
-  // Get unique class types for filter dropdown
   const classTypes = [...new Set(classes.map(cls => cls.Type))].filter(Boolean);
 
-  useEffect(() => {
-    fetchClasses();
-  }, []);
 
+useEffect(() => {
+  fetchClasses(); 
+}, [refreshTrigger]);
   return (
     <div className="p-3" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
       <h4 style={{ color: 'var(--secondary)' }}>Class Media Management</h4>
 
-      {/* Filter Controls */}
       <Row className="mb-4 g-3">
         <Col md={4}>
           <Form.Control
@@ -229,10 +238,16 @@ const ClassMediaPage = () => {
       )}
 
       <AddMediaOffcanvas
-        show={showMediaForm}
-        handleClose={() => setShowMediaForm(false)}
-        classId={selectedClassId}
-      />
+  show={showMediaForm}
+  handleClose={() => setShowMediaForm(false)}
+  classId={selectedClassId}
+  onSuccess={() => {
+    setRefreshTrigger(prev => !prev); 
+    if (showMediaModal) {
+      fetchClassMedia(selectedClassId); 
+    }
+  }}
+/>
 
       {/* Media Details Modal */}
       <Modal show={showMediaModal} onHide={() => setShowMediaModal(false)} size="lg" centered>
