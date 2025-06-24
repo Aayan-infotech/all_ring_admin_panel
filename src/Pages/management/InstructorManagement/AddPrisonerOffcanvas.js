@@ -11,22 +11,6 @@ const AddPrisonerOffcanvas = ({ show, handleClose, instructorId }) => {
    const [prisoners, setPrisoners] = useState([]);
 const [prisonerId, setPrisonerId] = useState('');
 
-  // const handleSubmit = async () => {
-  //   try {
-  //     const payload = {
-  //       instructorId,
-  //       prisonerName,
-  //       location,
-  //     };
-  //     await axios.post('http://18.209.91.97:5010/api/prisoner/addPrisoner', payload);
-  //     toast.success('Prisoner added successfully');
-  //     handleClose();
-  //     setPrisonerName('');
-  //     setLocation('');
-  //   } catch (err) {
-  //     toast.error('Failed to add prisoner');
-  //   }
-  // };
 
 
 const handleSubmit = async () => {
