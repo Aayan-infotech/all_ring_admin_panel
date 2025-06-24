@@ -185,7 +185,7 @@ const fetchQuestions = async (classId) => {
   useEffect(() => {
     fetchClasses();
     fetchLocations();
-      fetchInstructors(); // Add this line
+      fetchInstructors(); 
 
   }, []);
 const toggleStatus = async (id) => {
@@ -199,10 +199,8 @@ const toggleStatus = async (id) => {
       }
     );
     
-    // Log the response for debugging
     console.log('Status toggle response:', response.data);
     
-    // Update the UI immediately with the new status from response
     setClasses(prev =>
       prev.map(cls =>
         cls._id === id ? { 
@@ -218,7 +216,6 @@ const toggleStatus = async (id) => {
     toast.error('Failed to update status');
   }
 };
-// Replace your current handleDelete with these two functions:
 const handleDeleteClick = (id) => {
   setItemToDelete(id);
   setShowDeleteModal(true);
@@ -365,12 +362,10 @@ const filtered = classes.filter(cls => {
                   <td>{item.theme}</td>
                   <td>{item.Type}</td>
                   <td>{item.location?.location || 'N/A'}</td>
-                  {/* <td>
-                    <Badge bg={item.status === 'active' ? 'success' : 'danger'}>{item.status}</Badge>
-                  </td> */}
+               
                   <td>
   <Badge 
-    bg={item.status === 'Active' ? 'success' : 'danger'} // Note capitalization
+    bg={item.status === 'Active' ? 'success' : 'danger'} 
     style={{ textTransform: 'capitalize' }}
   >
     {item.status}

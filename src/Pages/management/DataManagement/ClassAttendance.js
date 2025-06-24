@@ -55,32 +55,35 @@ const ClassAttendance = () => {
 
     fetchClasses();
   }, []);
+const handleShowAttendance = async (cls) => {
+  try {
+    setSelectedClass(cls);
+    setShowAttendanceModal(true);
+    setAttLoading(true);
 
-  const handleShowAttendance = async (cls) => {
-    try {
-      setSelectedClass(cls);
-      setShowAttendanceModal(true);
-      setAttLoading(true);
+    const res = await axios.get(
+      `http://18.209.91.97:5010/api/register/getRegistredUserWithAttendence/${cls._id}`
+    );
 
-      const res = await axios.get(
-        `http://18.209.91.97:5010/api/register/getRegistredUserWithAttendence/${cls._id}`
-      );
+    const users = res.data?.data?.users || [];
 
-      const users = res.data?.data?.users;
+    // Transform attendance data if it's an object
+    const transformedUsers = users.map(user => ({
+      ...user,
+      attendanceStatus: typeof user.attendance === 'object' 
+        ? user.attendance.status 
+        : user.attendance
+    }));
 
-      if (Array.isArray(users)) {
-        setAttendanceData(users);
-      } else {
-        setAttendanceData([]);
-        console.warn("No user attendance array found");
-      }
-    } catch (err) {
-      console.error("Error fetching attendance:", err);
-      setAttendanceData([]);
-    } finally {
-      setAttLoading(false);
-    }
-  };
+    setAttendanceData(transformedUsers);
+  } catch (err) {
+    console.error("Error fetching attendance:", err);
+    setAttendanceData([]);
+  } finally {
+    setAttLoading(false);
+  }
+};
+ 
 
   const filteredData = data.filter((cls) => {
     const matchesTitle = cls.title?.toLowerCase().includes(search.toLowerCase());
@@ -205,41 +208,42 @@ const ClassAttendance = () => {
               <Spinner animation="border" variant="secondary" />
             </div>
           ) : attendanceData.length > 0 ? (
+            
             <Table striped bordered hover>
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Name</th>
-                  <th>Enrollment</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {attendanceData.map((user, index) => (
-                  <tr key={user.userId || index}>
-                    <td>{index + 1}</td>
-                    <td>
-                      <Link 
-                        to={`/feedback/${selectedClass?._id}?userId=${user.userId}`}
-                        style={{
-                          color: 'var(--primary)',
-                          textDecoration: 'underline',
-                          fontWeight: '500'
-                        }}
-                      >
-                        {user.name}
-                      </Link>
-                    </td>
-                    <td>{user.email}</td>
-                    <td>
-                      <Badge bg={user.attendance === 'Present' ? 'success' : 'danger'}>
-                        {user.attendance}
-                      </Badge>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    {attendanceData.map((user, index) => (
+      <tr key={user.userId || index}>
+        <td>{index + 1}</td>
+        <td>
+          <Link 
+            to={`/feedback/${selectedClass?._id}?userId=${user.userId}`}
+            style={{
+              color: 'var(--primary)',
+              textDecoration: 'underline',
+              fontWeight: '500'
+            }}
+          >
+            {user.name}
+          </Link>
+        </td>
+        <td>{user.email}</td>
+        <td>
+          <Badge bg={user.attendanceStatus === 'Present' ? 'success' : 'danger'}>
+            {user.attendanceStatus || 'Absent'}
+          </Badge>
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</Table>
           ) : (
             <p>No attendance data found.</p>
           )}
