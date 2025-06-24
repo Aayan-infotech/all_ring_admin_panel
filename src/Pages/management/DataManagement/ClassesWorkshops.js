@@ -1,6 +1,4 @@
 
-
-
 import React, { useEffect, useState } from 'react';
 import {
   Table,
@@ -45,7 +43,8 @@ const ClassesWorkshops = () => {
   const [selectedClass, setSelectedClass] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
     const [showDetailsModal, setShowDetailsModal] = useState(false);
-
+const [showDeleteModal, setShowDeleteModal] = useState(false);
+const [itemToDelete, setItemToDelete] = useState(null);
   const [showAddQuestionModal, setShowAddQuestionModal] = useState(false);
   const [showViewQuestionsModal, setShowViewQuestionsModal] = useState(false);
   const [questionText, setQuestionText] = useState('');
@@ -189,38 +188,72 @@ const fetchQuestions = async (classId) => {
       fetchInstructors(); // Add this line
 
   }, []);
-
-  const toggleStatus = async (id) => {
-    try {
-      const token = localStorage.getItem('adminToken');
-      await axios.patch(`http://18.209.91.97:5010/api/AdminClasses/blockClass/${id}`, {}, {
+const toggleStatus = async (id) => {
+  try {
+    const token = localStorage.getItem('adminToken');
+    const response = await axios.patch(
+      `http://18.209.91.97:5010/api/AdminClasses/blockClass/${id}`, 
+      {}, 
+      {
         headers: { Authorization: `Bearer ${token}` },
-      });
+      }
+    );
+    
+    // Log the response for debugging
+    console.log('Status toggle response:', response.data);
+    
+    // Update the UI immediately with the new status from response
+    setClasses(prev =>
+      prev.map(cls =>
+        cls._id === id ? { 
+          ...cls, 
+          status: response.data.data.status // Use the status from response
+        } : cls
+      )
+    );
+    
+    toast.success(`Status changed to ${response.data.data.status}`);
+  } catch (err) {
+    console.error('Status toggle failed:', err);
+    toast.error('Failed to update status');
+  }
+};
+// Replace your current handleDelete with these two functions:
+const handleDeleteClick = (id) => {
+  setItemToDelete(id);
+  setShowDeleteModal(true);
+};
 
-      setClasses(prev =>
-        prev.map(cls =>
-          cls._id === id ? { ...cls, status: cls.status === 'active' ? 'inactive' : 'active' } : cls
-        )
-      );
-    } catch (err) {
-      console.error('Status toggle failed:', err);
-    }
-  };
+const handleDelete = async () => {
+  try {
+    const token = localStorage.getItem('adminToken');
+    await axios.delete(`http://18.209.91.97:5010/api/AdminClasses/deleteClass/${itemToDelete}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this class?')) return;
+    setClasses(prev => prev.filter(cls => cls._id !== itemToDelete));
+    setShowDeleteModal(false);
+    toast.success('Class deleted successfully!');
+  } catch (err) {
+    console.error('Delete failed:', err);
+    toast.error('Failed to delete class');
+  }
+};
 
-    try {
-      const token = localStorage.getItem('adminToken');
-      await axios.delete(`http://18.209.91.97:5010/api/AdminClasses/deleteClass/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+  // const handleDelete = async (id) => {
+  //   if (!window.confirm('Are you sure you want to delete this class?')) return;
 
-      setClasses(prev => prev.filter(cls => cls._id !== id));
-    } catch (err) {
-      console.error('Delete failed:', err);
-    }
-  };
+  //   try {
+  //     const token = localStorage.getItem('adminToken');
+  //     await axios.delete(`http://18.209.91.97:5010/api/AdminClasses/deleteClass/${id}`, {
+  //       headers: { Authorization: `Bearer ${token}` },
+  //     });
+
+  //     setClasses(prev => prev.filter(cls => cls._id !== id));
+  //   } catch (err) {
+  //     console.error('Delete failed:', err);
+  //   }
+  // };
 
   const handleAddQuestion = async (classId) => {
     try {
@@ -257,13 +290,18 @@ const fetchQuestions = async (classId) => {
       toast.error('Failed to update question');
     }
   };
-
-  const filtered = classes.filter(cls => {
-    const matchesTitle = cls.title?.toLowerCase().includes(search.toLowerCase());
-    const matchesLocation = filterLocation ? cls.location?.location === filterLocation : true;
-    const matchesStatus = filterStatus ? cls.status?.toLowerCase() === filterStatus.toLowerCase() : true;
-    return matchesTitle && matchesLocation && matchesStatus;
-  });
+const filtered = classes.filter(cls => {
+  const matchesTitle = cls.title?.toLowerCase().includes(search.toLowerCase());
+  const matchesLocation = filterLocation ? cls.location?.location === filterLocation : true;
+  const matchesStatus = filterStatus ? cls.status?.toLowerCase() === filterStatus.toLowerCase() : true;
+  return matchesTitle && matchesLocation && matchesStatus;
+});
+  // const filtered = classes.filter(cls => {
+  //   const matchesTitle = cls.title?.toLowerCase().includes(search.toLowerCase());
+  //   const matchesLocation = filterLocation ? cls.location?.location === filterLocation : true;
+  //   const matchesStatus = filterStatus ? cls.status?.toLowerCase() === filterStatus.toLowerCase() : true;
+  //   return matchesTitle && matchesLocation && matchesStatus;
+  // });
 
   return (
     <div className="p-4" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
@@ -345,19 +383,36 @@ const fetchQuestions = async (classId) => {
                   <td>{item.theme}</td>
                   <td>{item.Type}</td>
                   <td>{item.location?.location || 'N/A'}</td>
-                  <td>
+                  {/* <td>
                     <Badge bg={item.status === 'active' ? 'success' : 'danger'}>{item.status}</Badge>
-                  </td>
+                  </td> */}
+                  <td>
+  <Badge 
+    bg={item.status === 'Active' ? 'success' : 'danger'} // Note capitalization
+    style={{ textTransform: 'capitalize' }}
+  >
+    {item.status}
+  </Badge>
+</td>
                   <td>
                     <div className="d-flex flex-wrap gap-2 justify-content-center">
-                      <Button
+                      {/* <Button
                         variant="light"
                         className={`icon-btn border-0 ${item.status === 'active' ? 'bg-light border-danger text-danger' : 'bg-light border-success text-success'}`}
                         size="sm"
                         onClick={() => toggleStatus(item._id)}
                       >
                         {item.status === 'active' ? <XCircleFill size={16} /> : <CheckCircleFill size={16} />}
-                      </Button>
+                      </Button> */}
+                      <Button
+  variant="light"
+  className={`icon-btn border-0 ${item.status === 'Active' ? 'bg-light border-danger text-danger' : 'bg-light border-success text-success'}`}
+  size="sm"
+  onClick={() => toggleStatus(item._id)}
+  title={item.status === 'Active' ? 'Deactivate' : 'Activate'}
+>
+  {item.status === 'Active' ? <XCircleFill size={16} /> : <CheckCircleFill size={16} />}
+</Button>
                       <Button
                         variant="light"
                         className="icon-btn border-warning text-warning"
@@ -369,14 +424,22 @@ const fetchQuestions = async (classId) => {
                       >
                         <PencilSquare size={16} />
                       </Button>
-                      <Button
+                      {/* <Button
                         variant="light"
                         className="icon-btn border-danger text-danger"
                         size="sm"
                         onClick={() => handleDelete(item._id)}
                       >
                         <Trash size={16} />
-                      </Button>
+                      </Button> */}
+                      <Button
+  variant="light"
+  className="icon-btn border-danger text-danger"
+  size="sm"
+  onClick={() => handleDeleteClick(item._id)}
+>
+  <Trash size={16} />
+</Button>
                       <Button
                         variant="light"
                         className="icon-btn border-dark text-dark"
@@ -421,7 +484,22 @@ const fetchQuestions = async (classId) => {
         </div>
       )}
 
-      
+      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
+  <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
+    <Modal.Title>Confirm Delete</Modal.Title>
+  </Modal.Header>
+  <Modal.Body style={{ backgroundColor: 'var(--accent)' }}>
+    Are you sure you want to delete this class? This action cannot be undone.
+  </Modal.Body>
+  <Modal.Footer style={{ backgroundColor: 'var(--accent)' }}>
+    <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+      Cancel
+    </Button>
+    <Button variant="danger" onClick={handleDelete}>
+      Delete
+    </Button>
+  </Modal.Footer>
+</Modal>
       <AddClassOffcanvas show={showAddForm} handleClose={() => { setShowAddForm(false); setSelectedClass(null); }} onSaved={fetchClasses} selected={selectedClass} />
       <AddMediaOffcanvas show={showMediaForm} handleClose={() => setShowMediaForm(false)} classId={selectedClass?._id} />
       <AddNotesOffcanvas show={showNotesForm} handleClose={() => setShowNotesForm(false)} classId={selectedClass?._id} />
