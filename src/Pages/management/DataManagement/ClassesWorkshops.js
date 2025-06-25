@@ -100,18 +100,20 @@ const handleUpdateClass = async () => {
   // Session type - you'll need to add this to your form
   formData.append('sessionType', form.sessionType.value || 'weekly');
   
-  // Time fields - format them as "HH:MM AM/PM"
-  const formatTime = (time) => {
-    const [hours, minutes] = time.split(':');
-    const hourInt = parseInt(hours, 10);
-    const period = hourInt >= 12 ? 'PM' : 'AM';
-    const displayHour = hourInt % 12 || 12;
-    return `${displayHour}:${minutes} ${period}`;
-  };
-  
-  formData.append('startTime', formatTime(form.time.value || '12:00'));
-  formData.append('endTime', formatTime(form.endTime.value || '13:00')); // You'll need to add endTime field
-  
+
+const formatTime = (time) => {
+  const [hours, minutes] = time.split(':');
+  const hourInt = parseInt(hours, 10);
+  const period = hourInt >= 12 ? 'PM' : 'AM';
+  const displayHour = hourInt % 12 || 12;
+  return `${displayHour}:${minutes} ${period}`;
+};
+
+// Add startTime and endTime from sessions[0] edit fields
+formData.append('startTime', formatTime(form.startTime.value || '12:00'));
+formData.append('endTime', formatTime(form.sessionEndTime.value || '13:00'));
+
+ 
   formData.append('location', form.location.value);
   formData.append('Instructor', form.instructor.value);
   formData.append('Type', form.Type.value); // You'll need to add Type field
@@ -280,6 +282,21 @@ const filtered = classes.filter(cls => {
   const matchesStatus = filterStatus ? cls.status?.toLowerCase() === filterStatus.toLowerCase() : true;
   return matchesTitle && matchesLocation && matchesStatus;
 });
+const convertTo24Hour = (timeStr) => {
+  if (!timeStr) return '';
+  const [time, modifier] = timeStr.split(' ');
+  let [hours, minutes] = time.split(':');
+  hours = parseInt(hours);
+
+  if (modifier === 'PM' && hours !== 12) {
+    hours += 12;
+  }
+  if (modifier === 'AM' && hours === 12) {
+    hours = 0;
+  }
+
+  return `${String(hours).padStart(2, '0')}:${minutes}`;
+};
 
 
   return (
@@ -705,15 +722,36 @@ const filtered = classes.filter(cls => {
     </Form.Select>
   </Form.Group>
 
-  <Form.Group className="mb-3">
-    <Form.Label>End Time</Form.Label>
-    <Form.Control
-      type="time"
-      name="endTime"
-      defaultValue={selectedClass.endTime || ''}
-      required
-    />
-  </Form.Group>
+ {/* Start Time Field from Sessions[0] */}
+<Form.Group className="mb-3">
+  <Form.Label>Start Time</Form.Label>
+  <Form.Control
+    type="time"
+    name="startTime"
+    defaultValue={
+      selectedClass.sessions && selectedClass.sessions.length > 0
+        ? convertTo24Hour(selectedClass.sessions[0].startTime)
+        : ''
+    }
+    required
+  />
+</Form.Group>
+
+{/* End Time Field from Sessions[0] */}
+<Form.Group className="mb-3">
+  <Form.Label>End Time</Form.Label>
+  <Form.Control
+    type="time"
+    name="sessionEndTime"
+    defaultValue={
+      selectedClass.sessions && selectedClass.sessions.length > 0
+        ? convertTo24Hour(selectedClass.sessions[0].endTime)
+        : ''
+    }
+    required
+  />
+</Form.Group>
+
 
   <Form.Group className="mb-3">
     <Form.Label>Type</Form.Label>
@@ -728,16 +766,7 @@ const filtered = classes.filter(cls => {
     </Form.Select>
   </Form.Group>
 
-  {/* Time Field */}
-  <Form.Group className="mb-3">
-    <Form.Label>Time</Form.Label>
-    <Form.Control
-      type="time"
-      name="time"
-      defaultValue={selectedClass.time}
-      required
-    />
-  </Form.Group>
+ 
 
   {/* Location Field */}
   <Form.Group className="mb-3">
