@@ -427,23 +427,45 @@ const handleAssignTeam = async () => {
                   {instructors.length > 0 ? (
                     <ListGroup variant="flush">
                       {instructors.map(instructor => (
+                        // <ListGroup.Item
+                        //   key={instructor._id}
+                        //   action
+                        //   active={selectedInstructors.some(i => i._id === instructor._id)}
+                        //   onClick={() => toggleInstructorSelection(instructor)}
+                        //   className="py-3"
+                        //   style={{
+                        //     backgroundColor:
+                        //       selectedInstructors.some(i => i._id === instructor._id) 
+                        //         ? 'rgba(13, 110, 253, 0.1)' 
+                        //         : 'white',
+                        //     borderLeft:
+                        //       selectedInstructors.some(i => i._id === instructor._id)
+                        //         ? '4px solid var(--primary)'
+                        //         : 'none',
+                        //   }}
+                        // >
                         <ListGroup.Item
-                          key={instructor._id}
-                          action
-                          active={selectedInstructors.some(i => i._id === instructor._id)}
-                          onClick={() => toggleInstructorSelection(instructor)}
-                          className="py-3"
-                          style={{
-                            backgroundColor:
-                              selectedInstructors.some(i => i._id === instructor._id) 
-                                ? 'rgba(13, 110, 253, 0.1)' 
-                                : 'white',
-                            borderLeft:
-                              selectedInstructors.some(i => i._id === instructor._id)
-                                ? '4px solid var(--primary)'
-                                : 'none',
-                          }}
-                        >
+  key={instructor._id}
+  action
+  active={selectedInstructors.some(i => i._id === instructor._id)}
+  onClick={() => toggleInstructorSelection(instructor)}
+  className="py-3"
+  style={{
+    backgroundColor:
+      instructor.status === 'Assigned'
+        ? 'rgba(0, 123, 255, 0.1)' // light blue for pre-assigned
+        : selectedInstructors.some(i => i._id === instructor._id)
+        ? 'rgba(13, 110, 253, 0.1)'
+        : 'white',
+    borderLeft:
+      instructor.status === 'Assigned'
+        ? '4px solid var(--primary)'
+        : selectedInstructors.some(i => i._id === instructor._id)
+        ? '4px solid var(--primary)'
+        : 'none',
+  }}
+>
+
                           <div className="d-flex align-items-center">
                             <div className="position-relative me-3">
                               <img
@@ -604,21 +626,43 @@ const handleAssignTeam = async () => {
 
                         <ListGroup variant="flush">
   {filteredUsers.map(user => (
-    <ListGroup.Item 
-      key={user._id}
-      action
-      active={selectedUsers.some(u => u._id === user._id)}
-      onClick={() => toggleUserSelection(user)}
-      className="py-3"
-      style={{ 
-        backgroundColor: selectedUsers.some(u => u._id === user._id) 
-          ? 'rgba(13, 110, 253, 0.1)' 
-          : 'white',
-        borderLeft: selectedUsers.some(u => u._id === user._id) 
-          ? '4px solid var(--primary)' 
-          : 'none'
-      }}
-    >
+    // <ListGroup.Item 
+    //   key={user._id}
+    //   action
+    //   active={selectedUsers.some(u => u._id === user._id)}
+    //   onClick={() => toggleUserSelection(user)}
+    //   className="py-3"
+    //   style={{ 
+    //     backgroundColor: selectedUsers.some(u => u._id === user._id) 
+    //       ? 'rgba(13, 110, 253, 0.1)' 
+    //       : 'white',
+    //     borderLeft: selectedUsers.some(u => u._id === user._id) 
+    //       ? '4px solid var(--primary)' 
+    //       : 'none'
+    //   }}
+    // >
+    <ListGroup.Item
+  key={user._id}
+  action
+  active={selectedUsers.some(u => u._id === user._id)}
+  onClick={() => toggleUserSelection(user)}
+  className="py-3"
+  style={{
+    backgroundColor:
+      user.status === 'Assigned'
+        ? 'rgba(0, 123, 255, 0.1)'
+        : selectedUsers.some(u => u._id === user._id)
+        ? 'rgba(13, 110, 253, 0.1)'
+        : 'white',
+    borderLeft:
+      user.status === 'Assigned'
+        ? '4px solid var(--primary)'
+        : selectedUsers.some(u => u._id === user._id)
+        ? '4px solid var(--primary)'
+        : 'none',
+  }}
+>
+
       <div className="d-flex align-items-center">
         <div className="position-relative me-3">
           <img
