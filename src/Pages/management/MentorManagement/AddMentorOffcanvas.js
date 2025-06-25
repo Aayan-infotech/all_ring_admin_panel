@@ -47,7 +47,7 @@ const AddMentorOffcanvas = ({ show, handleClose, onMentorAdded }) => {
 
     try {
       await axios.post(
-        'http://18.209.91.97:5010/api/auth/register/mentor',
+        'http://18.209.91.97:5010/api/auth/adminRegister/mentor',
         formData,
         { headers: { 'Content-Type': 'multipart/form-data' } }
       );

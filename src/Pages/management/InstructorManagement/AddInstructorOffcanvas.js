@@ -44,7 +44,7 @@ useEffect(() => {
 
 
     try {
-      await axios.post('http://18.209.91.97:5010/api/auth/register/instructor', formData, {
+      await axios.post('http://18.209.91.97:5010/api/auth/adminRegister/instructor', formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
