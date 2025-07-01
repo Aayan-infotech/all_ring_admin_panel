@@ -16,11 +16,29 @@ const AddInstructorOffcanvas = ({ show, handleClose, onInstructorAdded }) => {
   } = useForm();
   const [locations, setLocations] = useState([]);
  // Fetch locations from API
+// useEffect(() => {
+//   const fetchLocations = async () => {
+//     try {
+//       const response = await axios.get('http://18.209.91.97:5010/api/location/getAllLocations');
+//       setLocations(response.data?.data || []); // ✅ fix: use response.data.data instead of response.data.locations
+//     } catch (error) {
+//       console.error('Error fetching locations:', error);
+//       toast.error('Failed to load locations');
+//     }
+//   };
+
+//   fetchLocations();
+// }, []);
 useEffect(() => {
   const fetchLocations = async () => {
     try {
       const response = await axios.get('http://18.209.91.97:5010/api/location/getAllLocations');
-      setLocations(response.data?.data || []); // ✅ fix: use response.data.data instead of response.data.locations
+      
+      // Filter to only include active locations
+      const activeLocations = (response.data?.data || [])
+        .filter(location => location.status === 'Active');
+      
+      setLocations(activeLocations);
     } catch (error) {
       console.error('Error fetching locations:', error);
       toast.error('Failed to load locations');
@@ -29,7 +47,6 @@ useEffect(() => {
 
   fetchLocations();
 }, []);
-
   const onSubmit = async (data) => {
     const token = localStorage.getItem('adminToken');
     const formData = new FormData();

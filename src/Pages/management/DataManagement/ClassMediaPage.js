@@ -250,7 +250,7 @@ useEffect(() => {
 />
 
       {/* Media Details Modal */}
-      <Modal show={showMediaModal} onHide={() => setShowMediaModal(false)} size="lg" centered>
+      {/* <Modal show={showMediaModal} onHide={() => setShowMediaModal(false)} size="lg" centered>
         <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
           <Modal.Title>Class Media Details</Modal.Title>
         </Modal.Header>
@@ -333,7 +333,105 @@ useEffect(() => {
             Close
           </Button>
         </Modal.Footer>
-      </Modal>
+      </Modal> */}
+      {/* Media Details Modal */}
+<Modal show={showMediaModal} onHide={() => setShowMediaModal(false)} size="lg" centered>
+  <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
+    <Modal.Title>Class Media Details</Modal.Title>
+  </Modal.Header>
+  <Modal.Body>
+    {mediaLoading ? (
+      <div className="text-center py-4">
+        <div className="d-flex justify-content-center align-items-center" style={{ height: '200px' }}>
+          <Spinner animation="border" variant="primary" style={{ width: '3rem', height: '3rem' }} />
+          <span className="ms-3">Loading media details...</span>
+        </div>
+      </div>
+    ) : (
+      <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
+        {classMedia.length === 0 ? (
+          <div className="text-center py-4" style={{ color: 'var(--text-primary)' }}>
+            <i className="bi bi-folder-x" style={{ fontSize: '2rem', color: '#6c757d' }}></i>
+            <p className="mt-2">No media found for this class</p>
+          </div>
+        ) : (
+          <Table striped bordered hover responsive>
+            <thead style={{ backgroundColor: 'var(--accent)' }}>
+              <tr>
+                <th style={{ color: 'var(--secondary)' }}>#</th>
+                <th style={{ color: 'var(--secondary)' }}>Title</th>
+                <th style={{ color: 'var(--secondary)' }}>Description</th>
+                <th style={{ color: 'var(--secondary)' }}>Video</th>
+                <th style={{ color: 'var(--secondary)' }}>Status</th>
+                <th style={{ color: 'var(--secondary)' }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {classMedia.map((media, index) => (
+                <tr key={media._id}>
+                  <td>{index + 1}</td>
+                  <td>{media.title}</td>
+                  <td>{media.Description || 'N/A'}</td>
+                  <td>
+                    {media.uploadVideo ? (
+                      <a 
+                        href={media.uploadVideo} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        style={{ color: 'var(--primary)', textDecoration: 'none' }}
+                        className="d-flex align-items-center"
+                      >
+                        <i className="bi bi-play-circle-fill me-2"></i> 
+                        Watch Video
+                      </a>
+                    ) : (
+                      <span className="text-muted">No video</span>
+                    )}
+                  </td>
+                  <td>
+                    <Badge 
+                      pill
+                      style={{ 
+                        backgroundColor: media.status === 'active' ? 'var(--success)' : 'var(--danger)',
+                        padding: '6px 12px',
+                        fontSize: '13px'
+                      }}
+                    >
+                      {media.status}
+                    </Badge>
+                  </td>
+                  <td>
+                    <Button
+                      variant="outline-danger"
+                      size="sm"
+                      onClick={() => handleDeleteMedia(selectedClassId, media._id)}
+                    >
+                      <i className="bi bi-trash"></i> Delete
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        )}
+      </div>
+    )}
+  </Modal.Body>
+  <Modal.Footer style={{ backgroundColor: 'var(--accent)' }}>
+    <Button
+      variant="primary"
+      onClick={() => setShowMediaModal(false)}
+      style={{
+        padding: '8px 25px',
+        backgroundColor: 'var(--primary)',
+        border: 'none',
+        borderRadius: '4px'
+      }}
+    >
+      Close
+    </Button>
+  </Modal.Footer>
+</Modal>
     </div>
   );
 };

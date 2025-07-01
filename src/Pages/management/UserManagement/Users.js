@@ -111,15 +111,36 @@ const Users = () => {
     }
   };
 
-  const fetchLocations = async () => {
-    try {
-      const res = await axios.get('http://18.209.91.97:5010/api/location/getAllLocations');
-      setLocations(res.data.data || []);
-    } catch (error) {
-      console.error('Failed to fetch locations:', error);
-    }
-  };
-
+  // const fetchLocations = async () => {
+  //   try {
+  //     const res = await axios.get('http://18.209.91.97:5010/api/location/getAllLocations');
+  //     setLocations(res.data.data || []);
+  //   } catch (error) {
+  //     console.error('Failed to fetch locations:', error);
+  //   }
+  // };
+const fetchLocations = async () => {
+  try {
+    const token = localStorage.getItem('adminToken');
+    const res = await axios.get('http://18.209.91.97:5010/api/location/getAllLocations', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    
+    // Filter only active locations and transform the data
+    const activeLocations = (res.data.data || [])
+      .filter(location => location.status === 'Active')
+      .map(location => ({
+        _id: location._id,
+        location: location.location,
+        status: location.status
+      }));
+    
+    setLocations(activeLocations);
+  } catch (error) {
+    console.error('Failed to fetch locations:', error);
+    toast.error('Failed to load active locations');
+  }
+};
 const handleSaveChanges = async () => {
   const formData = getValues(); 
   console.log("Form values:", formData);

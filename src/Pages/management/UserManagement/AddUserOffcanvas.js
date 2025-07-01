@@ -24,13 +24,13 @@ const AddUserOffcanvas = ({ show, handleClose, onUserAdded , editingUser }) => {
     },
   });
     const [locations, setLocations] = useState([]);
-
-
 useEffect(() => {
   const fetchLocations = async () => {
     try {
       const response = await axios.get('http://18.209.91.97:5010/api/location/getAllLocations');
-      setLocations(response.data?.data || []); 
+      // Filter only active locations
+      const activeLocations = (response.data?.data || []).filter(loc => loc.status === 'Active');
+      setLocations(activeLocations); 
     } catch (error) {
       console.error('Error fetching locations:', error);
       toast.error('Failed to load locations');
@@ -39,6 +39,20 @@ useEffect(() => {
 
   fetchLocations();
 }, []);
+
+// useEffect(() => {
+//   const fetchLocations = async () => {
+//     try {
+//       const response = await axios.get('http://18.209.91.97:5010/api/location/getAllLocations');
+//       setLocations(response.data?.data || []); 
+//     } catch (error) {
+//       console.error('Error fetching locations:', error);
+//       toast.error('Failed to load locations');
+//     }
+//   };
+
+//   fetchLocations();
+// }, []);
 
 
   const formatDate = (dateString) => {
@@ -123,20 +137,21 @@ useEffect(() => {
 
           <Form.Group className="mb-4" controlId="location">
             <Form.Label style={{ color: 'var(--secondary)', fontWeight: 'bold' }}>Location</Form.Label>
-      {/* <Form.Select
+     
+
+
+{/* <Form.Select
   {...register('location', { required: 'Location is required' })}
   isInvalid={!!errors.location}
   style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
 >
   <option value="">Select location</option>
   {locations.map((loc) => (
-    <option key={loc._id} value={loc.location}>
+    <option key={loc._id} value={loc._id}>
       {loc.location}
     </option>
   ))}
 </Form.Select> */}
-
-
 <Form.Select
   {...register('location', { required: 'Location is required' })}
   isInvalid={!!errors.location}
@@ -149,7 +164,6 @@ useEffect(() => {
     </option>
   ))}
 </Form.Select>
-
 
             <Form.Control.Feedback type="invalid">{errors.location?.message}</Form.Control.Feedback>
           </Form.Group>

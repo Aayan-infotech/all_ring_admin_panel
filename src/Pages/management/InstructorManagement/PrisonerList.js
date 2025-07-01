@@ -8,7 +8,8 @@ import {
   Form,
   Badge,
   Row,
-  Col
+  Col,
+  Breadcrumb
 } from 'react-bootstrap';
 import {
   PencilSquare,
@@ -44,8 +45,10 @@ const PrisonerList = () => {
 
   const fetchLocations = async () => {
     try {
-      const res = await axios.get('http://18.209.91.97:5010/api/location/getAllLocations');
-      setLocations(res.data?.data || []);
+      const response = await axios.get('http://18.209.91.97:5010/api/location/getAllLocations');
+            const activeLocations = (response.data?.data || []).filter(loc => loc.status === 'Active');
+
+      setLocations(activeLocations);
     } catch (err) {
       toast.error("Failed to fetch locations");
     }
@@ -123,6 +126,38 @@ useEffect(() => {
   return (
     <div className="p-4">
       <ToastContainer />
+         <div className="mb-3">
+              <Breadcrumb style={{ 
+                backgroundColor: 'var(--light)', 
+                padding: '0.75rem 1rem',
+                borderRadius: '0.375rem',
+                marginBottom: '1rem'
+              }}>
+                <Breadcrumb.Item 
+                  href="/dashboard" 
+                  style={{ 
+                    color: 'var(--secondary)',
+                    textDecoration: 'none',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}
+                >
+                  <i className="fas fa-home me-2"></i> Dashboard
+                </Breadcrumb.Item>
+                <Breadcrumb.Item 
+                  active 
+                  style={{ 
+                    color: 'var(--primary)',
+                    fontWeight: '500',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}
+                >
+                  <i className="fas fa-chalkboard-teacher me-2"></i> Prisoner Management
+                </Breadcrumb.Item>
+              </Breadcrumb>
+           
+            </div>
       <h3 style={{ color: 'var(--primary)', fontWeight: 'bold' }}>Prisoner Management</h3>
       
       <Row className="mb-4 g-3">

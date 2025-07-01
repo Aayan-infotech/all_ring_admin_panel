@@ -16,31 +16,65 @@ const AddClassOffcanvas = ({ show, handleClose, onSaved }) => {
   const [newTag, setNewTag] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     const token = localStorage.getItem('adminToken');
+  //     if (!token) return;
+
+  //     setIsLoading(true);
+  //     try {
+  //       const [instructorsRes, locationsRes] = await Promise.all([
+  //         axios.get('http://18.209.91.97:5010/api/admin/getRegister/instructor', {
+  //           headers: { Authorization: `Bearer ${token}` }
+  //         }),
+  //         axios.get('http://18.209.91.97:5010/api/location/getAllLocations')
+  //       ]);
+  //       setInstructors(instructorsRes.data?.users || []);
+  //       setLocations(locationsRes.data?.data || []);
+  //     } catch (error) {
+  //       console.error('Error fetching data:', error);
+  //       toast.error('Failed to load form data');
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   };
+
+  //   if (show) fetchData();
+  // }, [show]);
+
+
+
+
   useEffect(() => {
-    const fetchData = async () => {
-      const token = localStorage.getItem('adminToken');
-      if (!token) return;
+  const fetchData = async () => {
+    const token = localStorage.getItem('adminToken');
+    if (!token) return;
 
-      setIsLoading(true);
-      try {
-        const [instructorsRes, locationsRes] = await Promise.all([
-          axios.get('http://18.209.91.97:5010/api/admin/getRegister/instructor', {
-            headers: { Authorization: `Bearer ${token}` }
-          }),
-          axios.get('http://18.209.91.97:5010/api/location/getAllLocations')
-        ]);
-        setInstructors(instructorsRes.data?.users || []);
-        setLocations(locationsRes.data?.data || []);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        toast.error('Failed to load form data');
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    setIsLoading(true);
+    try {
+      const [instructorsRes, locationsRes] = await Promise.all([
+        axios.get('http://18.209.91.97:5010/api/admin/getRegister/instructor', {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+        axios.get('http://18.209.91.97:5010/api/location/getAllLocations')
+      ]);
 
-    if (show) fetchData();
-  }, [show]);
+      // Filter active locations (status is 'Active')
+      const activeLocations = (locationsRes.data?.data || [])
+        .filter(location => location.status === 'Active');
+
+      setInstructors(instructorsRes.data?.users || []);
+      setLocations(activeLocations); // only active locations
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      toast.error('Failed to load form data');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (show) fetchData();
+}, [show]);
 
   const handleAddTag = (e) => {
     e.preventDefault();

@@ -23,7 +23,7 @@ const [showAddCanvas, setShowAddCanvas] = useState(false);
 const [showPrisonerCanvas, setShowPrisonerCanvas] = useState(false);
 const [selectedInstructorId, setSelectedInstructorId] = useState('');
 const [locationObjects, setLocationObjects] = useState([]); // for _id and name
-
+const [selectedInstructorLocation, setSelectedInstructorLocation] = useState('');
   const [loading, setLoading] = useState(false);
   const [selectedInstructor, setSelectedInstructor] = useState(null);
   const [viewModal, setViewModal] = useState(false);
@@ -393,27 +393,7 @@ const toggleStatus = async (instructor) => {
     <Button variant="secondary" onClick={() => { setSelectedInstructor(instructor); setResetModal(true); }}><LockFill /></Button>
    
 
-{/* <Button
-  size="sm"
-  onClick={() => toggleStatus(instructor)}
-  style={{
-    backgroundColor: 'transparent',
-    border: 'none',
-    padding: '0 5px',
-    color: instructor.user_status === 0 ? 'gray' : 
-           instructor.user_status === 1 ? 'var(--danger)' : 'var(--success)',
-    cursor: 'pointer', // Always clickable
-  }}
-  title={instructor.user_status === 0 ? "Not verified" : "Toggle status"}
->
-  {instructor.user_status === 0 ? (
-    <XCircleFill size={20} /> // ❌ 
-  ) : instructor.user_status === 1 ? (
-    <CheckCircleFill size={20} /> // ✅ 
-  ) : (
-    <XCircleFill size={20} /> // ❌ 
-  )}
-</Button> */}
+
  <Button
   size="sm"
   onClick={() => toggleStatus(instructor)}
@@ -445,7 +425,7 @@ const toggleStatus = async (instructor) => {
     <CheckCircleFill size={20} />
   )}
 </Button>     
-    <Button
+    {/* <Button
       variant="dark"
       onClick={() => {
         setSelectedInstructorId(instructor._id);
@@ -453,7 +433,17 @@ const toggleStatus = async (instructor) => {
       }}
     >
       + Prisoner
-    </Button>
+    </Button> */}
+    <Button
+  variant="dark"
+  onClick={() => {
+    setSelectedInstructorId(instructor._id);
+    setSelectedInstructorLocation(instructor.location?._id || instructor.location || '');
+    setShowPrisonerCanvas(true);
+  }}
+>
+  + Prisoner
+</Button>
   </ButtonGroup>
 </td>
 
@@ -476,6 +466,8 @@ const toggleStatus = async (instructor) => {
   handleClose={() => setShowPrisonerCanvas(false)}
   instructorId={selectedInstructorId}
   locations={locationObjects}
+    preSelectedLocation={selectedInstructorLocation}
+
 />
 
 

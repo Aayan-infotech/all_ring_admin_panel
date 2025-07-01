@@ -153,16 +153,29 @@ formData.append('endTime', formatTime(form.sessionEndTime.value || '13:00'));
   }
 };
 
-
-
   const fetchLocations = async () => {
     try {
-      const res = await axios.get('http://18.209.91.97:5010/api/location/getAllLocations');
-      setAllLocations(res.data?.data || []);
-    } catch (err) {
-      console.error('Error fetching locations:', err);
+      const response = await axios.get('http://18.209.91.97:5010/api/location/getAllLocations');
+      
+      // Filter to only include active locations
+      const activeLocations = (response.data?.data || [])
+        .filter(location => location.status === 'Active');
+      
+      setAllLocations(activeLocations);
+    } catch (error) {
+      console.error('Error fetching locations:', error);
+      toast.error('Failed to load locations');
     }
   };
+
+  // const fetchLocations = async () => {
+  //   try {
+  //     const res = await axios.get('http://18.209.91.97:5010/api/location/getAllLocations');
+  //     setAllLocations(res.data?.data || []);
+  //   } catch (err) {
+  //     console.error('Error fetching locations:', err);
+  //   }
+  // };
 
 const fetchQuestions = async (classId) => {
   try {
@@ -302,7 +315,7 @@ const convertTo24Hour = (timeStr) => {
   return (
     <div className="p-4" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2 style={{ color: 'var(--secondary)', fontWeight: 600 }}>Classes & Workshops</h2>
+        <h2 style={{ color: 'var(--secondary)', fontWeight: 600 }}>Classes and Workshop</h2>
         <div>
           <Button 
             onClick={() => setShowAddForm(true)} 

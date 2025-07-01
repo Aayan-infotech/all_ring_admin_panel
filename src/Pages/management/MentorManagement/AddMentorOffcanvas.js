@@ -18,12 +18,21 @@ const AddMentorOffcanvas = ({ show, handleClose, onMentorAdded }) => {
   const [locations, setLocations] = useState([]);
 
 
-
-  useEffect(() => {
+useEffect(() => {
   const fetchLocations = async () => {
     try {
       const response = await axios.get('http://18.209.91.97:5010/api/location/getAllLocations');
-      setLocations(response.data?.data || []); // ✅ fix: use response.data.data instead of response.data.locations
+      
+      // Filter only active locations
+      const activeLocations = (response.data?.data || [])
+        .filter(location => location.status === 'Active')
+        .map(location => ({
+          _id: location._id,
+          location: location.location,
+          status: location.status
+        }));
+      
+      setLocations(activeLocations);
     } catch (error) {
       console.error('Error fetching locations:', error);
       toast.error('Failed to load locations');
@@ -32,6 +41,19 @@ const AddMentorOffcanvas = ({ show, handleClose, onMentorAdded }) => {
 
   fetchLocations();
 }, []);
+//   useEffect(() => {
+//   const fetchLocations = async () => {
+//     try {
+//       const response = await axios.get('http://18.209.91.97:5010/api/location/getAllLocations');
+//       setLocations(response.data?.data || []); // ✅ fix: use response.data.data instead of response.data.locations
+//     } catch (error) {
+//       console.error('Error fetching locations:', error);
+//       toast.error('Failed to load locations');
+//     }
+//   };
+
+//   fetchLocations();
+// }, []);
 
   const onSubmit = async (data) => {
     const formData = new FormData();
