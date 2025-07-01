@@ -31,7 +31,7 @@ const Users = () => {
     handleSubmit,
     watch,
       getValues, 
-
+reset,
     formState: { errors }
   } = useForm();
 
@@ -53,7 +53,15 @@ const Users = () => {
     if (!location) return 'N/A';
     return typeof location === 'object' ? location.location : location;
   };
-
+useEffect(() => {
+  if (editingUser) {
+    reset({
+      name: editingUser.name,
+      number: editingUser.number,
+      location: getLocationString(editingUser.location)
+    });
+  }
+}, [editingUser, reset]);
   const handleShowAddUser = () => setShowAddUser(true);
   const handleCloseAddUser = () => setShowAddUser(false);
 
@@ -141,10 +149,51 @@ const fetchLocations = async () => {
     toast.error('Failed to load active locations');
   }
 };
-const handleSaveChanges = async () => {
-  const formData = getValues(); 
-  console.log("Form values:", formData);
+// const handleSaveChanges = async () => {
+//   const formData = getValues(); 
+//   console.log("Form values:", formData);
 
+//   try {
+//     const token = localStorage.getItem('adminToken');
+//     if (!token) {
+//       toast.error("Authentication token missing!");
+//       return;
+//     }
+
+//     const formDataToSend = new FormData();
+//     formDataToSend.append('name', formData.name);
+//     formDataToSend.append('number', formData.number);
+
+//     const selectedLocation = locations.find(loc => loc.location === formData.location);
+//     formDataToSend.append('location', selectedLocation ? selectedLocation._id : formData.location);
+
+//     console.log("FormData being sent:");
+//     for (let [key, value] of formDataToSend.entries()) {
+//       console.log(`${key}: ${value}`);
+//     }
+
+//     const response = await axios.put(
+//       `http://18.209.91.97:5010/api/auth/update-user/${editingUser._id}`,
+//       formDataToSend,
+//       {
+//         headers: {
+//           'Authorization': `Bearer ${token}`,
+//           'Content-Type': 'multipart/form-data'
+//         }
+//       }
+//     );
+
+//     console.log("Edit Response:", response.data);
+//     toast.success("User updated successfully!");
+//     fetchUsers();
+//     setShowEditModal(false);
+
+//   } catch (error) {
+//     console.error("Edit Error:", error.response?.data || error.message);
+//     toast.error(error.response?.data?.message || "User update failed");
+//   }
+// };
+const handleSaveChanges = async () => {
   try {
     const token = localStorage.getItem('adminToken');
     if (!token) {
@@ -152,14 +201,18 @@ const handleSaveChanges = async () => {
       return;
     }
 
+    const formData = getValues(); // Get all form values
     const formDataToSend = new FormData();
+
+    // Append all fields to FormData
     formDataToSend.append('name', formData.name);
-    formDataToSend.append('number', formData.number);
+    formDataToSend.append('number', formData.number || '');
 
+    // Handle location - find ID if it's a string
     const selectedLocation = locations.find(loc => loc.location === formData.location);
-    formDataToSend.append('location', selectedLocation ? selectedLocation._id : formData.location);
+    formDataToSend.append('location', selectedLocation ? selectedLocation._id : formData.location || '');
 
-    console.log("FormData being sent:");
+    // Debug: Log FormData contents
     for (let [key, value] of formDataToSend.entries()) {
       console.log(`${key}: ${value}`);
     }
@@ -175,18 +228,15 @@ const handleSaveChanges = async () => {
       }
     );
 
-    console.log("Edit Response:", response.data);
     toast.success("User updated successfully!");
     fetchUsers();
     setShowEditModal(false);
-
+    setEditingUser(null);
   } catch (error) {
-    console.error("Edit Error:", error.response?.data || error.message);
+    console.error("Edit Error:", error);
     toast.error(error.response?.data?.message || "User update failed");
   }
 };
-
-
   const toggleStatus = async (user) => {
     if (user.user_status === 0) {
       toast.error("❌ User email is not verified. Please verify first!", {
@@ -421,7 +471,7 @@ const handleSaveChanges = async () => {
                         <Button
                           size="sm"
                           onClick={() => {
-                            setEditingUser(user);
+    setEditingUser(user); // Set the user to edit
                             setShowEditModal(true);
                           }}
                           style={{
@@ -606,9 +656,75 @@ const handleSaveChanges = async () => {
     )}
   </Modal.Body>
 </Modal>
-
-
 <Modal
+  show={showEditModal}
+  onHide={() => {
+    setShowEditModal(false);
+    reset();
+  }}
+  centered
+  className="edit-profile-modal"
+>
+  <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
+    <Modal.Title>Edit User Profile</Modal.Title>
+  </Modal.Header>
+  <Modal.Body style={{ backgroundColor: 'var(--accent)', color: 'var(--text-primary)' }}>
+    <Form> {/* Remove onSubmit here */}
+      <Form.Group className="mb-3">
+        <Form.Label style={{ color: 'var(--text-primary)' }}>Name *</Form.Label>
+        <Form.Control
+          {...register('name', { required: "Name is required" })}
+          isInvalid={!!errors.name}
+        />
+        <Form.Control.Feedback type="invalid">
+          {errors.name?.message}
+        </Form.Control.Feedback>
+      </Form.Group>
+
+      <Form.Group className="mb-3">
+        <Form.Label style={{ color: 'var(--text-primary)' }}>Phone</Form.Label>
+        <Form.Control
+          {...register('number')}
+        />
+      </Form.Group>
+
+      <Form.Group className="mb-3">
+        <Form.Label style={{ color: 'var(--text-primary)' }}>Location</Form.Label>
+        <Form.Select
+          {...register('location')}
+        >
+          <option value="">Select Location</option>
+          {locations.map((loc) => (
+            <option key={loc._id} value={loc.location}>
+              {loc.location}
+            </option>
+          ))}
+        </Form.Select>
+      </Form.Group>
+
+      <div className="d-flex justify-content-end gap-2 mt-4">
+        <Button
+          variant="secondary"
+          onClick={() => setShowEditModal(false)}
+        >
+          Cancel
+        </Button>
+        <Button
+          variant="primary"
+          onClick={() => {
+            // Manually handle form data and submission
+            const formData = getValues();
+            handleSaveChanges(formData);
+          }}
+        >
+          Save Changes
+        </Button>
+      </div>
+    </Form>
+  </Modal.Body>
+</Modal>
+
+{/* <Modal
   show={showEditModal}
   onHide={() => setShowEditModal(false)}
   centered
@@ -682,7 +798,7 @@ const handleSaveChanges = async () => {
       </Form>
     )}
   </Modal.Body>
-</Modal>
+</Modal> */}
 
     </div>
   );
