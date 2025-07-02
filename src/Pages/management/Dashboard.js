@@ -52,13 +52,13 @@ const fetchParticipationData = async () => {
         },
         { 
           label: 'Registration Percentage', 
-          value: parseFloat(data.registrationPercentage), // Convert "50.00%" to 50
+          value: parseFloat(data.registrationPercentage),
           color: '#f9a825',
           displayValue: data.registrationPercentage
         },
         { 
           label: 'Attendance Percentage', 
-          value: parseFloat(data.attendancePercentage), // Convert "0.00%" to 0
+          value: parseFloat(data.attendancePercentage), 
           color: '#43a047',
           displayValue: data.attendancePercentage
         },
@@ -210,7 +210,7 @@ const dashboardStats = dashboardCounts ? [
 
     
       <Row className="widgets-row">
-  {/* Participation Overview - Full Width */}
+ 
   <Col xs={12}>
     <Card className="participation-card mb-4">
       <Card.Body>
@@ -243,7 +243,7 @@ const dashboardStats = dashboardCounts ? [
     </Card>
   </Col>
 
-  {/* Trending Instructors - Full Width */}
+
   <Col xs={12}>
     <Card className="instructors-card">
       <Card.Body>
