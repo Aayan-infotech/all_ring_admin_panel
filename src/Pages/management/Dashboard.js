@@ -18,6 +18,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [participationData, setParticipationData] = useState([]);
   const [participationLoading, setParticipationLoading] = useState(true);
+const [dashboardCounts, setDashboardCounts] = useState(null);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -70,8 +71,20 @@ const fetchParticipationData = async () => {
   }
 };
 
-    fetchStats();
-    fetchParticipationData();
+ const fetchDashboardCounts = async () => {
+    try {
+      const res = await axios.get('http://18.209.91.97:5010/api/register/dashboardCounts');
+      if (res.data.success) {
+        setDashboardCounts(res.data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching dashboard counts:', error);
+    }
+  };
+
+  fetchStats();
+  fetchParticipationData();
+  fetchDashboardCounts();
   }, []);
 
   const stats = statsData
@@ -107,19 +120,30 @@ const fetchParticipationData = async () => {
       ]
     : [];
 
-const dashboardStats = [
-  { title: 'Upcoming Sessions', icon: <JournalBookmarkFill size={24} />, },
-  { title: 'Live Sessions', icon: <FileEarmarkPlayFill size={24} />, },
-  { title: 'Total Prisoners', icon: <PeopleFill size={24} />, },
-  { title: 'Total Locations', icon: <DatabaseFill size={24} />, },
-];
 
-  // const modules = [
-  //   { title: 'User Management', icon: <PeopleFill size={24} />, route: '/users', id: 'users' },
-  //   { title: 'Mentor Management', icon: <PersonCheckFill size={24} />, route: '/mentors', id: 'mentors' },
-  //   { title: 'Instructor Management', icon: <PersonLinesFill size={24} />, route: '/instructors', id: 'instructors' },
-  //   { title: 'Data Management', icon: <DatabaseFill size={24} />, route: '/data', id: 'data' },
-  // ];
+const dashboardStats = dashboardCounts ? [
+  {
+    title: 'Upcoming Sessions',
+    icon: <JournalBookmarkFill size={24} />,
+    value: dashboardCounts.upcomingCount
+  },
+  {
+    title: 'Live Sessions',
+    icon: <FileEarmarkPlayFill size={24} />,
+    value: dashboardCounts.liveCount
+  },
+  {
+    title: 'Total Prisoners',
+    icon: <PeopleFill size={24} />,
+    value: dashboardCounts.totalPrisoners
+  },
+  {
+    title: 'Total Locations',
+    icon: <DatabaseFill size={24} />,
+    value: dashboardCounts.totalLocations
+  }
+] : [];
+
 
   const trendingInstructors = [
     { name: 'Anjali Mehta', location: 'Delhi', sessions: 25 },
@@ -138,32 +162,7 @@ const dashboardStats = [
         </div>
       </div>
 
-      {/* Stats */}
-      {/* <Row className="stats-row">
-        {loading ? (
-          <Col className="text-center py-5">
-            <Spinner animation="border" variant="primary" />
-          </Col>
-        ) : (
-          stats.map((stat, idx) => (
-            <Col key={idx} xs={6} sm={6} md={3}>
-              <Card className="stat-card">
-                <Card.Body>
-                  <div className="stat-content">
-                    <div>
-                      <h6>{stat.title}</h6>
-                      <h3 style={{ color: stat.color }}>{stat.value}</h3>
-                    </div>
-                    <div className="stat-icon" style={{ backgroundColor: `${stat.color}20` }}>
-                      {stat.icon}
-                    </div>
-                  </div>
-                </Card.Body>
-              </Card>
-            </Col>
-          ))
-        )}
-      </Row> */}
+    
 
       <Row className="stats-row">
         {loading ? (
@@ -194,107 +193,22 @@ const dashboardStats = [
 </Row>
 
 
-      {/* Module Cards */}
-      {/* <Row className="modules-row">
-        {modules.map((module, idx) => (
-          <Col key={idx} xs={6} sm={6} md={3}>
-            <Card
-              onClick={() => {
-                localStorage.setItem('activeModule', module.id);
-                window.location.href = module.route;
-              }}
-              className="module-card"
-            >
-              <Card.Body>
-                <div className="module-icon-container">{module.icon}</div>
-                <h6>{module.title}</h6>
-              </Card.Body>
-            </Card>
-          </Col>
-        ))}
-      </Row> */}
 <Row className="modules-row">
   {dashboardStats.map((item, idx) => (
     <Col key={idx} xs={6} sm={6} md={3}>
-      <Card
-        // onClick={() => {
-        //   window.location.href = item.route;
-        // }}
-        className="module-card"
-      >
+      <Card className="module-card">
         <Card.Body className="text-center">
           <div className="module-icon-container mb-2">{item.icon}</div>
-          <h6>{item.title}</h6>
+          <h6 className="mb-1">{item.title}</h6>
+          <h5 style={{ fontWeight: 'bold' }}>{item.value}</h5>
         </Card.Body>
       </Card>
     </Col>
   ))}
 </Row>
 
-      {/* Widgets */}
-      {/* <Row className="widgets-row">
-        <Col xs={12} md={6}>
-          <Card className="participation-card">
-            <Card.Body>
-              <h5 className="widget-title">Participation Overview</h5>
 
-              {participationLoading ? (
-                <Spinner animation="border" variant="primary" />
-              ) : (
-                participationData.map((item, idx) => (
-                  <Box key={idx} sx={{ mb: 2 }}>
-                    <Typography variant="subtitle2" gutterBottom>
-                      {item.label}: {item.displayValue}
-                    </Typography>
-                    <LinearProgress
-                      variant="determinate"
-                      value={item.value}
-                      sx={{
-                        height: 12,
-                        borderRadius: 6,
-                        '& .MuiLinearProgress-bar': {
-                          backgroundColor: item.color,
-                        },
-                        backgroundColor: '#e0e0e0',
-                      }}
-                    />
-                  </Box>
-                ))
-              )}
-            </Card.Body>
-          </Card>
-        </Col>
-
-        <Col xs={12} md={6}>
-          <Card className="instructors-card">
-            <Card.Body>
-              <h5 className="widget-title">Trending Instructors & Locations</h5>
-              <div className="table-responsive">
-                <table className="instructors-table">
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Instructor</th>
-                      <th>Location</th>
-                      <th>Sessions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {trendingInstructors.map((item, idx) => (
-                      <tr key={idx}>
-                        <td>{idx + 1}</td>
-                        <td>{item.name}</td>
-                        <td>{item.location}</td>
-                        <td>{item.sessions}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row> */}
+    
       <Row className="widgets-row">
   {/* Participation Overview - Full Width */}
   <Col xs={12}>
