@@ -427,23 +427,7 @@ const handleAssignTeam = async () => {
                   {instructors.length > 0 ? (
                     <ListGroup variant="flush">
                       {instructors.map(instructor => (
-                        // <ListGroup.Item
-                        //   key={instructor._id}
-                        //   action
-                        //   active={selectedInstructors.some(i => i._id === instructor._id)}
-                        //   onClick={() => toggleInstructorSelection(instructor)}
-                        //   className="py-3"
-                        //   style={{
-                        //     backgroundColor:
-                        //       selectedInstructors.some(i => i._id === instructor._id) 
-                        //         ? 'rgba(13, 110, 253, 0.1)' 
-                        //         : 'white',
-                        //     borderLeft:
-                        //       selectedInstructors.some(i => i._id === instructor._id)
-                        //         ? '4px solid var(--primary)'
-                        //         : 'none',
-                        //   }}
-                        // >
+                    
                         <ListGroup.Item
   key={instructor._id}
   action
