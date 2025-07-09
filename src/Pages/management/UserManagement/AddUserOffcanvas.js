@@ -3,11 +3,14 @@ import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import React, { useEffect, useState } from 'react';
+import 'react-phone-input-2/lib/bootstrap.css';
+import PhoneInput from 'react-phone-input-2';
 
 const AddUserOffcanvas = ({ show, handleClose, onUserAdded , editingUser }) => {
   const {
     register,
     handleSubmit,
+    setValue,
     watch,
     reset,
     formState: { errors, isSubmitting },
@@ -40,19 +43,7 @@ useEffect(() => {
   fetchLocations();
 }, []);
 
-// useEffect(() => {
-//   const fetchLocations = async () => {
-//     try {
-//       const response = await axios.get('http://18.209.91.97:5010/api/location/getAllLocations');
-//       setLocations(response.data?.data || []); 
-//     } catch (error) {
-//       console.error('Error fetching locations:', error);
-//       toast.error('Failed to load locations');
-//     }
-//   };
 
-//   fetchLocations();
-// }, []);
 
 
   const formatDate = (dateString) => {
@@ -140,18 +131,7 @@ useEffect(() => {
      
 
 
-{/* <Form.Select
-  {...register('location', { required: 'Location is required' })}
-  isInvalid={!!errors.location}
-  style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
->
-  <option value="">Select location</option>
-  {locations.map((loc) => (
-    <option key={loc._id} value={loc._id}>
-      {loc.location}
-    </option>
-  ))}
-</Form.Select> */}
+
 <Form.Select
   {...register('location', { required: 'Location is required' })}
   isInvalid={!!errors.location}
@@ -168,7 +148,7 @@ useEffect(() => {
             <Form.Control.Feedback type="invalid">{errors.location?.message}</Form.Control.Feedback>
           </Form.Group>
 
-          <Form.Group className="mb-4" controlId="number">
+          {/* <Form.Group className="mb-4" controlId="number">
             <Form.Label style={{ color: 'var(--secondary)', fontWeight: 'bold' }}>Phone Number</Form.Label>
             <Form.Control
               type="text"
@@ -178,7 +158,34 @@ useEffect(() => {
               placeholder="Enter phone number"
             />
             <Form.Control.Feedback type="invalid">{errors.number?.message}</Form.Control.Feedback>
-          </Form.Group>
+          </Form.Group> */}
+<Form.Group className="mb-4" controlId="number">
+  <Form.Label style={{ color: 'var(--secondary)', fontWeight: 'bold' }}>Phone Number</Form.Label>
+  <PhoneInput
+    country={'in'}
+    enableSearch={true}
+    inputStyle={{
+      width: '100%',
+      border: '2px solid var(--accent)',
+      borderRadius: '8px',
+    }}
+    specialLabel=""
+    value={watch('number')}
+    onChange={(phone) => {
+      // Set value manually because react-hook-form doesn't bind this component directly
+      setValue('number', phone);
+    }}
+    isValid={(value) => {
+      if (!value || value.length < 6) return 'Invalid number';
+      return true;
+    }}
+  />
+  {errors.number && (
+    <div className="text-danger mt-1" style={{ fontSize: '0.875rem' }}>
+      {errors.number.message}
+    </div>
+  )}
+</Form.Group>
 
           <Form.Group className="mb-4" controlId="password">
             <Form.Label style={{ color: 'var(--secondary)', fontWeight: 'bold' }}>Password</Form.Label>

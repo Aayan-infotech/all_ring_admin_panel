@@ -9,7 +9,9 @@ import {
   Badge,
   Row,
   Col,
-  Breadcrumb
+  Breadcrumb,
+  OverlayTrigger,
+  Tooltip,
 } from 'react-bootstrap';
 import {
   PencilSquare,
@@ -46,8 +48,7 @@ const PrisonerList = () => {
   const fetchLocations = async () => {
     try {
       const response = await axios.get('http://18.209.91.97:5010/api/location/getAllLocations');
-            const activeLocations = (response.data?.data || []).filter(loc => loc.status === 'Active');
-
+      const activeLocations = (response.data?.data || []).filter(loc => loc.status === 'Active');
       setLocations(activeLocations);
     } catch (err) {
       toast.error("Failed to fetch locations");
@@ -64,23 +65,26 @@ const PrisonerList = () => {
       toast.error("Delete failed");
     }
   };
-const toggleStatus = async (prisoner) => {
-  const newStatus = prisoner.status === 1 ? 2 : 1;
-  try {
-    await axios.patch(`http://18.209.91.97:5010/api/prisoner/changePrisonerStatus/${prisoner._id}`, {
-      status: newStatus
-    });
-    
-    setPrisoners(prev => prev.map(p => 
-      p._id === prisoner._id ? { ...p, status: newStatus } : p
-    ));
-    
-    toast.success(`Status changed to ${newStatus === 1 ? 'Active' : 'Inactive'}`);
-  } catch (err) {
-    toast.error("Failed to update status");
-    console.error(err);
-  }
-};
+
+  const toggleStatus = async (prisoner) => {
+    const newStatus = prisoner.status === 'Active' ? 'Blocked' : 'Active';
+    try {
+      await axios.patch(`http://18.209.91.97:5010/api/prisoner/changePrisonerStatus/${prisoner._id}`, {
+        status: newStatus
+      });
+
+      setPrisoners(prev =>
+        prev.map(p =>
+          p._id === prisoner._id ? { ...p, status: newStatus } : p
+        )
+      );
+
+      toast.success(`Status changed to ${newStatus}`);
+    } catch (err) {
+      toast.error("Failed to update status");
+      console.error(err);
+    }
+  };
 
   const handleUpdate = async () => {
     try {
@@ -101,65 +105,65 @@ const toggleStatus = async (prisoner) => {
     fetchLocations();
   }, []);
 
+  useEffect(() => {
+    let filtered = prisoners;
 
-useEffect(() => {
-  let filtered = prisoners;
+    if (searchTerm) {
+      filtered = filtered.filter(p =>
+        p.prisonerName?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
 
-  if (searchTerm) {
-    filtered = filtered.filter(p =>
-      p.prisonerName?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }
+    if (filterLocation) {
+      filtered = filtered.filter(p => p.location?._id === filterLocation);
+    }
 
-  if (filterLocation) {
-    filtered = filtered.filter(p => p.location?._id === filterLocation);
-  }
+    if (filterStatus !== 'all') {
+      filtered = filtered.filter(p =>
+        filterStatus === 'active' ? p.status === 'Active' : p.status === 'Blocked'
+      );
+    }
 
-  if (filterStatus !== 'all') {
-    filtered = filtered.filter(p =>
-      filterStatus === 'active' ? p.status === 1 : p.status === 2
-    );
-  }
+    setFilteredPrisoners(filtered);
+  }, [searchTerm, filterLocation, filterStatus, prisoners]);
 
-  setFilteredPrisoners(filtered);
-}, [searchTerm, filterLocation, filterStatus, prisoners]);
   return (
     <div className="p-4">
       <ToastContainer />
-         <div className="mb-3">
-              <Breadcrumb style={{ 
-                backgroundColor: 'var(--light)', 
-                padding: '0.75rem 1rem',
-                borderRadius: '0.375rem',
-                marginBottom: '1rem'
-              }}>
-                <Breadcrumb.Item 
-                  href="/dashboard" 
-                  style={{ 
-                    color: 'var(--secondary)',
-                    textDecoration: 'none',
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}
-                >
-                  <i className="fas fa-home me-2"></i> Dashboard
-                </Breadcrumb.Item>
-                <Breadcrumb.Item 
-                  active 
-                  style={{ 
-                    color: 'var(--primary)',
-                    fontWeight: '500',
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}
-                >
-                  <i className="fas fa-chalkboard-teacher me-2"></i> Prisoner Management
-                </Breadcrumb.Item>
-              </Breadcrumb>
-           
-            </div>
+      <div className="mb-3">
+        <Breadcrumb style={{
+          backgroundColor: 'var(--light)',
+          padding: '0.75rem 1rem',
+          borderRadius: '0.375rem',
+          marginBottom: '1rem'
+        }}>
+          <Breadcrumb.Item
+            href="/dashboard"
+            style={{
+              color: 'var(--secondary)',
+              textDecoration: 'none',
+              display: 'flex',
+              alignItems: 'center'
+            }}
+          >
+            <i className="fas fa-home me-2"></i> Dashboard
+          </Breadcrumb.Item>
+          <Breadcrumb.Item
+            active
+            style={{
+              color: 'var(--primary)',
+              fontWeight: '500',
+              display: 'flex',
+              alignItems: 'center'
+            }}
+          >
+            <i className="fas fa-chalkboard-teacher me-2"></i> Prisoner Management
+          </Breadcrumb.Item>
+        </Breadcrumb>
+      </div>
+
       <h3 style={{ color: 'var(--primary)', fontWeight: 'bold' }}>Prisoner Management</h3>
-      
+
       <Row className="mb-4 g-3">
         <Col md={3}>
           <Form.Control
@@ -198,8 +202,7 @@ useEffect(() => {
         <thead style={{ backgroundColor: 'var(--secondary)', color: '#fff' }}>
           <tr>
             <th>#</th>
-                        <th>Prisoner Id</th>
-
+            <th>Prisoner Id</th>
             <th>Prisoner Name</th>
             <th>Location</th>
             <th>Instructor</th>
@@ -207,66 +210,76 @@ useEffect(() => {
             <th>Actions</th>
           </tr>
         </thead>
-        <tbody>
-          {filteredPrisoners.map((p, idx) => (
-            <tr key={p._id}>
-              <td>{idx + 1}</td>
-              <td>{p.prisonerId}</td>
-              <td>{p.prisonerName}</td>
-              <td>{p.location?.location || 'N/A'}</td>
-              <td>{p.instructorId?.name || 'N/A'}</td>
-             
-              <td>
-  <Badge
-    pill
-    bg={p.status === 1 ? 'success' : 'danger'}
-    style={{
-      padding: '8px 12px',
-      fontWeight: '500',
-      textTransform: 'capitalize'
-    }}
-  >
-    {p.status === 1 ? 'Active' : 'Inactive'}
-  </Badge>
-</td>
-              <td>
-                <Button
-                  size="sm"
-                  style={{ backgroundColor: 'var(--warning)', border: 'none', marginRight: '5px' }}
-                  onClick={() => {
-                    setSelectedPrisoner(p);
-                    setEditModal(true);
-                  }}
-                >
-                  <PencilSquare color="black" />
-                </Button>
+      <tbody>
+  {filteredPrisoners.map((p, idx) => (
+    <tr key={p._id} style={{ verticalAlign: 'middle' }}>
+      <td>{idx + 1}</td>
+      <td>{p.prisonerId}</td>
+      <td>{p.prisonerName}</td>
+      <td>{p.location?.location || 'N/A'}</td>
+      <td>{p.instructorId?.name || 'N/A'}</td>
+      <td>
+        <Badge
+          pill
+          bg={p.status === 'Active' ? 'success' : 'danger'}
+          style={{
+            padding: '8px 12px',
+            fontWeight: '500',
+            textTransform: 'capitalize',
+            fontSize: '0.85rem'
+          }}
+        >
+          {p.status}
+        </Badge>
+      </td>
+      <td>
+        <div className="d-flex align-items-center gap-2">
+          <OverlayTrigger placement="top" overlay={<Tooltip>Edit</Tooltip>}>
+            <Button size="sm" style={{ height: '32px', width: '32px', backgroundColor: 'var(--warning)', border: 'none' }}
+              onClick={() => {
+                setSelectedPrisoner(p);
+                setEditModal(true);
+              }}
+            >
+              <PencilSquare color="black" size={16} />
+            </Button>
+          </OverlayTrigger>
 
-            
-<Button
-  size="sm"
-  onClick={() => toggleStatus(p)}
-  style={{
-    backgroundColor: 'transparent',
-    border: 'none',
-    padding: '0 5px',
-    color: p.status === 1 ? 'var(--danger)' : 'var(--success)',
-    cursor: 'pointer',
-  }}
-  title={p.status === 1 ? 'Deactivate' : 'Activate'}
->
-  {p.status === 1 ? <XCircleFill size={20} /> : <CheckCircleFill size={20} />}
-</Button>
-                <Button
-                  size="sm"
-                  style={{ backgroundColor: 'var(--danger)', border: 'none' }}
-                  onClick={() => setConfirmDelete({ show: true, id: p._id })}
-                >
-                  <Trash />
-                </Button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
+          <OverlayTrigger
+            placement="top"
+            overlay={<Tooltip>{p.status === 'Active' ? 'Deactivate' : 'Activate'}</Tooltip>}
+          >
+            <Button
+              size="sm"
+              onClick={() => toggleStatus(p)}
+              style={{
+                height: '32px',
+                width: '32px',
+                backgroundColor: 'transparent',
+                border: 'none',
+                padding: 0,
+                color: p.status === 'Active' ? 'var(--danger)' : 'var(--success)',
+              }}
+            >
+              {p.status === 'Active' ? <XCircleFill size={20} /> : <CheckCircleFill size={20} />}
+            </Button>
+          </OverlayTrigger>
+
+          <OverlayTrigger placement="top" overlay={<Tooltip>Delete</Tooltip>}>
+            <Button
+              size="sm"
+              style={{ height: '32px', width: '32px', backgroundColor: 'var(--danger)', border: 'none' }}
+              onClick={() => setConfirmDelete({ show: true, id: p._id })}
+            >
+              <Trash size={16} />
+            </Button>
+          </OverlayTrigger>
+        </div>
+      </td>
+    </tr>
+  ))}
+</tbody>
+
       </Table>
 
       {/* Edit Modal */}
@@ -341,4 +354,3 @@ useEffect(() => {
 };
 
 export default PrisonerList;
-

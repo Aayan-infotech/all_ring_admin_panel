@@ -2,7 +2,7 @@
 
 
 import React, { useState, useEffect } from 'react';
-import { Table, Button,Row,Col, ButtonGroup, Badge, InputGroup, Form, Spinner, Modal,Breadcrumb  } from 'react-bootstrap';
+import { Table, Button,Row,Col, ButtonGroup, Badge, InputGroup, Form, Spinner, Modal,Breadcrumb ,OverlayTrigger, Tooltip  } from 'react-bootstrap';
 import {
   PencilSquare,
   CheckCircleFill,
@@ -251,7 +251,7 @@ const filteredMentors = mentors.filter((mentor) => {
 
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 style={{ color: 'var(--secondary)', fontWeight: '600' }}>Mentor Management</h2>
-        <Button
+        {/* <Button
           variant="primary"
           onClick={() => setShowAddMentor(true)}
           style={{
@@ -263,7 +263,25 @@ const filteredMentors = mentors.filter((mentor) => {
         >
           <PlusCircle className="me-2" />
           Add New Mentor
-        </Button>
+        </Button> */}
+        <OverlayTrigger
+  placement="top"
+  overlay={<Tooltip>Create a new mentor account</Tooltip>}
+>
+  <Button
+    variant="primary"
+    onClick={() => setShowAddMentor(true)}
+    style={{
+      backgroundColor: 'var(--primary)',
+      border: 'none',
+      padding: '10px 20px',
+      borderRadius: '8px',
+    }}
+  >
+    <PlusCircle className="me-2" />
+    Add New Mentor
+  </Button>
+</OverlayTrigger>
       </div>
 
       <div className="row mb-4">
@@ -376,7 +394,7 @@ const filteredMentors = mentors.filter((mentor) => {
     }
   </Badge>
 </td>
-                  <td>
+                  {/* <td>
                     <ButtonGroup>
                       <Button
                         size="sm"
@@ -449,7 +467,112 @@ const filteredMentors = mentors.filter((mentor) => {
                         <LockFill size={20} />
                       </Button>
                     </ButtonGroup>
-                  </td>
+                  </td> */}
+
+
+
+        
+
+<td>
+  <ButtonGroup>
+    <OverlayTrigger
+      placement="top"
+      overlay={
+        <Tooltip>
+          {mentor.user_status === 0 
+            ? "Email not verified" 
+            : mentor.accountStatus === 'active' 
+              ? "Deactivate mentor" 
+              : "Activate mentor"}
+        </Tooltip>
+      }
+    >
+      <Button
+        size="sm"
+        onClick={() => toggleStatus(mentor)}
+        style={{
+          backgroundColor: 'transparent',
+          border: 'none',
+          padding: '0 5px',
+          color: mentor.user_status === 0 ? 'gray' : 
+                mentor.accountStatus === 'active' ? 'var(--danger)' : 'var(--success)',
+          cursor: 'pointer',
+        }}
+      >
+        {mentor.user_status === 0 ? (
+          <XCircleFill size={20} />
+        ) : mentor.accountStatus === 'active' ? (
+          <XCircleFill size={20} />
+        ) : (
+          <CheckCircleFill size={20} />
+        )}
+      </Button>
+    </OverlayTrigger>
+
+    <OverlayTrigger
+      placement="top"
+      overlay={<Tooltip>Edit mentor</Tooltip>}
+    >
+      <Button
+        size="sm"
+        onClick={() => {
+          setSelectedUser(mentor);
+          setShowEditModal(true);
+        }}
+        style={{
+          backgroundColor: 'transparent',
+          border: 'none',
+          padding: '0 5px',
+          color: 'var(--warning)'
+        }}
+      >
+        <PencilSquare size={20} />
+      </Button>
+    </OverlayTrigger>
+
+    <OverlayTrigger
+      placement="top"
+      overlay={<Tooltip>View profile</Tooltip>}
+    >
+      <Button
+        size="sm"
+        onClick={() => {
+          setSelectedUser(mentor);
+          setShowProfileModal(true);
+        }}
+        style={{
+          backgroundColor: 'transparent',
+          border: 'none',
+          padding: '0 5px',
+          color: '#0d6efd'
+        }}
+      >
+        <EyeFill size={20} />
+      </Button>
+    </OverlayTrigger>
+
+    <OverlayTrigger
+      placement="top"
+      overlay={<Tooltip>Reset password</Tooltip>}
+    >
+      <Button
+        size="sm"
+        onClick={() => {
+          setSelectedUser(mentor);
+          setShowResetModal(true);
+        }}
+        style={{
+          backgroundColor: 'transparent',
+          border: 'none',
+          padding: '0 5px',
+          color: '#17a2b8'
+        }}
+      >
+        <LockFill size={20} />
+      </Button>
+    </OverlayTrigger>
+  </ButtonGroup>
+</td>
                 </tr>
               ))}
             </tbody>

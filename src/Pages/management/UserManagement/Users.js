@@ -7,6 +7,8 @@ import {
   Form,
   Spinner,
   Row,
+  OverlayTrigger,
+  Tooltip,
   Col,
   Modal,
   Breadcrumb  ,
@@ -76,6 +78,8 @@ useEffect(() => {
   };
 
   const handleResetPassword = async (formData) => {
+      console.log("Reset Form Data:", formData); // 👈 check if this prints
+
     if (formData.newPassword !== formData.confirmPassword) {
       toast.error("Passwords do not match");
       return;
@@ -119,14 +123,16 @@ useEffect(() => {
     }
   };
 
-  // const fetchLocations = async () => {
-  //   try {
-  //     const res = await axios.get('http://18.209.91.97:5010/api/location/getAllLocations');
-  //     setLocations(res.data.data || []);
-  //   } catch (error) {
-  //     console.error('Failed to fetch locations:', error);
-  //   }
-  // };
+  // Define tooltips for action buttons
+  const actionTooltips = {
+    toggleStatus: (status) => {
+      if (status === 0) return "Verify email first";
+      return status === 1 ? "Deactivate user" : "Activate user";
+    },
+    resetPassword: "Reset password",
+    editUser: "Edit user",
+    viewProfile: "View profile"
+  };
 const fetchLocations = async () => {
   try {
     const token = localStorage.getItem('adminToken');
@@ -322,7 +328,7 @@ const handleSaveChanges = async () => {
 
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 style={{ color: 'var(--secondary)' }}>User Management</h2>
-        <Button
+        {/* <Button
           variant="primary"
           onClick={handleShowAddUser}
           style={{
@@ -333,7 +339,24 @@ const handleSaveChanges = async () => {
           }}
         >
           <PlusCircle className="me-2" /> Add New User
-        </Button>
+        </Button> */}
+        <OverlayTrigger
+  placement="top"
+  overlay={<Tooltip>Create a new user account</Tooltip>}
+>
+  <Button
+    variant="primary"
+    onClick={handleShowAddUser}
+    style={{
+      backgroundColor: 'var(--primary)',
+      border: 'none',
+      padding: '10px 20px',
+      borderRadius: '8px',
+    }}
+  >
+    <PlusCircle className="me-2" /> Add New User
+  </Button>
+</OverlayTrigger>
       </div>
  <Row className="mb-4 g-3">
   <Col md={4}>
@@ -428,7 +451,7 @@ const handleSaveChanges = async () => {
                       </Badge>
                     </td>
                     <td>
-                      <ButtonGroup>
+                      {/* <ButtonGroup>
                         <Button
                           size="sm"
                           onClick={() => toggleStatus(user)}
@@ -496,7 +519,96 @@ const handleSaveChanges = async () => {
                         >
                           <EyeFill size={20} />
                         </Button>
-                      </ButtonGroup>
+                      </ButtonGroup> */}
+                       {/* Update the ButtonGroup with tooltips */}
+      <ButtonGroup>
+        <OverlayTrigger
+          placement="top"
+          overlay={<Tooltip>{actionTooltips.toggleStatus(user.user_status)}</Tooltip>}
+        >
+          <Button
+            size="sm"
+            onClick={() => toggleStatus(user)}
+            style={{
+              backgroundColor: 'transparent',
+              border: 'none',
+              padding: '0 5px',
+              color: 
+                user.user_status === 1 ? 'var(--danger)' : 
+                user.user_status === 2 ? 'var(--success)' : 
+                'var(--warning)',
+              cursor: user.user_status === 0 ? 'not-allowed' : 'pointer',
+              opacity: user.user_status === 0 ? 0.6 : 1
+            }}
+            disabled={user.user_status === 0}
+          >
+            {user.user_status === 1 ? (
+              <XCircleFill size={20} />
+            ) : user.user_status === 2 ? (
+              <CheckCircleFill size={20} />
+            ) : (
+              <XCircleFill size={20} />
+            )}
+          </Button>
+        </OverlayTrigger>
+
+        <OverlayTrigger
+          placement="top"
+          overlay={<Tooltip>{actionTooltips.resetPassword}</Tooltip>}
+        >
+          <Button
+            size="sm"
+            onClick={() => handleShowResetModal(user._id)}
+            style={{
+              backgroundColor: 'transparent',
+              border: 'none',
+              padding: '0 5px',
+              color: '#17a2b8'
+            }}
+          >
+            <Lock size={20} />
+          </Button>
+        </OverlayTrigger>
+
+        <OverlayTrigger
+          placement="top"
+          overlay={<Tooltip>{actionTooltips.editUser}</Tooltip>}
+        >
+          <Button
+            size="sm"
+            onClick={() => {
+              setEditingUser(user);
+              setShowEditModal(true);
+            }}
+            style={{
+              backgroundColor: 'transparent',
+              border: 'none',
+              padding: '0 5px',
+              color: 'var(--warning)'
+            }}
+          >
+            <PencilSquare size={20} />
+          </Button>
+        </OverlayTrigger>
+
+        <OverlayTrigger
+          placement="top"
+          overlay={<Tooltip>{actionTooltips.viewProfile}</Tooltip>}
+        >
+          <Button
+            size="sm"
+            onClick={() => handleViewProfile(user)}
+            style={{
+              backgroundColor: 'transparent',
+              border: 'none',
+              padding: '0 5px',
+              color: '#0d6efd'
+            }}
+          >
+            <EyeFill size={20} />
+          </Button>
+        </OverlayTrigger>
+      </ButtonGroup>
                     </td>
                   </tr>
                 ))

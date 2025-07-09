@@ -6,12 +6,16 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import React, { useEffect, useState } from 'react';
+import PhoneInput from 'react-phone-input-2';
+
 
 const AddMentorOffcanvas = ({ show, handleClose, onMentorAdded }) => {
   const {
     register,
     handleSubmit,
     watch,
+      setValue,
+
     reset,
     formState: { errors, isSubmitting }
   } = useForm();
@@ -102,7 +106,7 @@ useEffect(() => {
           </Form.Group>
 
           {/* Phone Number */}
-          <Form.Group className="mb-3" controlId="number">
+          {/* <Form.Group className="mb-3" controlId="number">
             <Form.Label>Phone Number</Form.Label>
             <Form.Control
               type="text"
@@ -110,7 +114,36 @@ useEffect(() => {
               {...register('number', { required: 'Phone number is required' })}
             />
             {errors.number && <span className="text-danger small">{errors.number.message}</span>}
-          </Form.Group>
+          </Form.Group> */}
+<Form.Group className="mb-4" controlId="number">
+  <Form.Label >
+    Phone Number
+  </Form.Label>
+  <PhoneInput
+    country={'in'}
+    enableSearch={true}
+    inputStyle={{
+      width: '100%',
+      // border: '2px solid var(--accent)',
+      borderRadius: '8px',
+    }}
+    specialLabel=""
+    value={watch('number')}
+    onChange={(phone) => {
+      setValue('number', phone, { shouldValidate: true });
+    }}
+    isValid={(value) => {
+      if (!value || value.length < 6) return 'Invalid number';
+      return true;
+    }}
+  />
+  {errors.number && (
+    <div className="text-danger mt-1" style={{ fontSize: '0.875rem' }}>
+      {errors.number.message}
+    </div>
+  )}
+</Form.Group>
+
 
           {/* Email */}
           <Form.Group className="mb-3" controlId="email">
