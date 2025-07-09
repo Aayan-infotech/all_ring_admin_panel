@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import {
-  Table, Button, ButtonGroup, Badge, Modal, Form, InputGroup, Spinner, Row, Col,Breadcrumb 
+  Table, Button, ButtonGroup, Badge, Modal, Form, InputGroup, Spinner, Row, Col,Breadcrumb ,Tooltip,OverlayTrigger
 } from 'react-bootstrap';
 import {
   PencilSquare, EyeFill, LockFill, CheckCircleFill, XCircleFill
@@ -40,6 +40,144 @@ const [locationList, setLocationList] = useState([]);
     fetchLocations();
 
 }, []);
+
+
+  const actionTooltips = {
+    view: (props) => (
+      <Tooltip id="view-tooltip" {...props}>
+        View Instructor Details
+      </Tooltip>
+    ),
+    edit: (props) => (
+      <Tooltip id="edit-tooltip" {...props}>
+        Edit Instructor
+      </Tooltip>
+    ),
+    reset: (props) => (
+      <Tooltip id="reset-tooltip" {...props}>
+        Reset Password
+      </Tooltip>
+    ),
+    toggle: (instructor) => (props) => (
+      <Tooltip id="toggle-tooltip" {...props}>
+        {instructor.user_status === 0 
+          ? "Email not verified" 
+          : instructor.user_status === 1 
+            ? "Deactivate Instructor" 
+            : "Activate Instructor"}
+      </Tooltip>
+    ),
+    addPrisoner: (props) => (
+      <Tooltip id="add-prisoner-tooltip" {...props}>
+        Add Prisoner for this Instructor
+      </Tooltip>
+    ),
+    viewPrisoners: (props) => (
+      <Tooltip id="view-prisoners-tooltip" {...props}>
+        View All Prisoners
+      </Tooltip>
+    ),
+    addInstructor: (props) => (
+      <Tooltip id="add-instructor-tooltip" {...props}>
+        Add New Instructor
+      </Tooltip>
+    )
+  };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 const getLocationString = (location) => {
   if (!location) return '-';
@@ -258,7 +396,7 @@ const toggleStatus = async (instructor) => {
   <h3>Instructor Management</h3>
 </div>
 
-<div className="d-flex justify-content-end mb-3">
+{/* <div className="d-flex justify-content-end mb-3">
   <Button
   onClick={() => window.location.href = "/prisoners"}
   style={{
@@ -283,8 +421,37 @@ const toggleStatus = async (instructor) => {
   >
     + Add Instructor
   </Button>
-</div>
+</div> */}
+ <div className="d-flex justify-content-end mb-3">
+        <OverlayTrigger placement="top" overlay={actionTooltips.viewPrisoners}>
+          <Button
+            onClick={() => window.location.href = "/prisoners"}
+            style={{
+              backgroundColor: 'var(--info)',
+              border: 'none',
+              borderRadius: '8px',
+              fontWeight: 'bold',
+              marginRight: '10px',
+            }}
+          >
+            👁 View Prisoners
+          </Button>
+        </OverlayTrigger>
 
+        <OverlayTrigger placement="top" overlay={actionTooltips.addInstructor}>
+          <Button
+            onClick={() => setShowAddCanvas(true)}
+            style={{
+              backgroundColor: 'var(--primary)',
+              border: 'none',
+              borderRadius: '8px',
+              fontWeight: 'bold',
+            }}
+          >
+            + Add Instructor
+          </Button>
+        </OverlayTrigger>
+      </div>
 <Row className="mb-3">
   <Col md={4}>
     <InputGroup>
@@ -372,81 +539,78 @@ const toggleStatus = async (instructor) => {
   </Badge>
 </td>
              
-              <td>
-  <ButtonGroup>
-    <Button variant="info" onClick={() => { setSelectedInstructor(instructor); setViewModal(true); }}><EyeFill /></Button>
-    {/* <Button variant="warning" onClick={() => { setSelectedInstructor(instructor); setEditForm(instructor); setEditModal(true); }}><PencilSquare /></Button> */}
-    <Button 
-  variant="warning" 
-  onClick={() => { 
-    setSelectedInstructor(instructor); 
-    setEditForm({
-      name: instructor.name,
-      email: instructor.email,
-      location: instructor.location?._id || instructor.location || ''
-    }); 
-    setEditModal(true); 
-  }}
->
-  <PencilSquare />
-</Button>
-    <Button variant="secondary" onClick={() => { setSelectedInstructor(instructor); setResetModal(true); }}><LockFill /></Button>
-   
+ <td>
+        <ButtonGroup>
+          <OverlayTrigger placement="top" overlay={actionTooltips.view}>
+            <Button variant="info" onClick={() => { setSelectedInstructor(instructor); setViewModal(true); }}>
+              <EyeFill />
+            </Button>
+          </OverlayTrigger>
 
+          <OverlayTrigger placement="top" overlay={actionTooltips.edit}>
+            <Button 
+              variant="warning" 
+              onClick={() => { 
+                setSelectedInstructor(instructor); 
+                setEditForm({
+                  name: instructor.name,
+                  email: instructor.email,
+                  location: instructor.location?._id || instructor.location || ''
+                }); 
+                setEditModal(true); 
+              }}
+            >
+              <PencilSquare />
+            </Button>
+          </OverlayTrigger>
 
- <Button
-  size="sm"
-  onClick={() => toggleStatus(instructor)}
-  style={{
-    backgroundColor: 'transparent',
-    border: 'none',
-    padding: '0 5px',
-    color: instructor.user_status === 0 
-      ? 'gray' 
-      : instructor.user_status === 1 
-        ? 'var(--danger)' 
-        : 'var(--success)',
-    cursor: instructor.user_status === 0 ? 'not-allowed' : 'pointer',
-  }}
-  title={
-    instructor.user_status === 0 
-      ? "Not verified - can't toggle" 
-      : instructor.user_status === 1 
-        ? "Deactivate" 
-        : "Activate"
-  }
-  disabled={instructor.user_status === 0}
->
-  {instructor.user_status === 0 ? (
-    <XCircleFill size={20} />
-  ) : instructor.user_status === 1 ? (
-    <XCircleFill size={20} />
-  ) : (
-    <CheckCircleFill size={20} />
-  )}
-</Button>     
-    {/* <Button
-      variant="dark"
-      onClick={() => {
-        setSelectedInstructorId(instructor._id);
-        setShowPrisonerCanvas(true);
-      }}
-    >
-      + Prisoner
-    </Button> */}
-    <Button
-  variant="dark"
-  onClick={() => {
-    setSelectedInstructorId(instructor._id);
-    setSelectedInstructorLocation(instructor.location?._id || instructor.location || '');
-    setShowPrisonerCanvas(true);
-  }}
->
-  + Prisoner
-</Button>
-  </ButtonGroup>
-</td>
+          <OverlayTrigger placement="top" overlay={actionTooltips.reset}>
+            <Button variant="secondary" onClick={() => { setSelectedInstructor(instructor); setResetModal(true); }}>
+              <LockFill />
+            </Button>
+          </OverlayTrigger>
 
+          <OverlayTrigger placement="top" overlay={actionTooltips.toggle(instructor)}>
+            <Button
+              size="sm"
+              onClick={() => toggleStatus(instructor)}
+              style={{
+                backgroundColor: 'transparent',
+                border: 'none',
+                padding: '0 5px',
+                color: instructor.user_status === 0 
+                  ? 'gray' 
+                  : instructor.user_status === 1 
+                    ? 'var(--danger)' 
+                    : 'var(--success)',
+                cursor: instructor.user_status === 0 ? 'not-allowed' : 'pointer',
+              }}
+              disabled={instructor.user_status === 0}
+            >
+              {instructor.user_status === 0 ? (
+                <XCircleFill size={20} />
+              ) : instructor.user_status === 1 ? (
+                <XCircleFill size={20} />
+              ) : (
+                <CheckCircleFill size={20} />
+              )}
+            </Button>
+          </OverlayTrigger>
+
+          <OverlayTrigger placement="top" overlay={actionTooltips.addPrisoner}>
+            <Button
+              variant="dark"
+              onClick={() => {
+                setSelectedInstructorId(instructor._id);
+                setSelectedInstructorLocation(instructor.location?._id || instructor.location || '');
+                setShowPrisonerCanvas(true);
+              }}
+            >
+              + Prisoner
+            </Button>
+          </OverlayTrigger>
+        </ButtonGroup>
+      </td>
               </tr>
             ))}
           </tbody>
