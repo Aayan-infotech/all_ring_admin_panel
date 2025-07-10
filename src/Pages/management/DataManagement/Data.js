@@ -415,23 +415,7 @@ const Data = () => {
 
            
 
-              {/* <Form.Group className="mb-3">
-                <Form.Label>Latitude</Form.Label>
-                <Form.Control 
-                  type="text" 
-                  value={formData.latitude} 
-                  readOnly
-                />
-              </Form.Group> */}
-
-              {/* <Form.Group className="mb-3">
-                <Form.Label>Longitude</Form.Label>
-                <Form.Control 
-                  type="text" 
-                  value={formData.longitude} 
-                  readOnly
-                />
-              </Form.Group> */}
+           
 
               <div className="d-flex gap-2">
                 <Button variant="secondary" onClick={handleClose} style={{ flex: 1 }}>
