@@ -234,8 +234,33 @@ useEffect(() => {
             />
             <Form.Control.Feedback type="invalid">{errors.confirmPassword?.message}</Form.Control.Feedback>
           </Form.Group>
-
-          <Form.Group className="mb-4" controlId="dateofbirth">
+<Form.Group className="mb-4" controlId="dateofbirth">
+  <Form.Label style={{ color: 'var(--secondary)', fontWeight: 'bold' }}>Date of Birth</Form.Label>
+  <Form.Control
+    type="date"
+    {...register('dateofbirth', { 
+      required: 'Date of birth is required',
+      validate: {
+        notFuture: value => {
+          const selectedDate = new Date(value);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0); // Remove time part
+          return selectedDate <= today || "Date cannot be in the future";
+        }
+      }
+    })}
+    isInvalid={!!errors.dateofbirth}
+    style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
+    max={new Date().toISOString().split('T')[0]} // Disable future dates
+    onKeyDown={(e) => e.preventDefault()} // Prevent manual typing
+    onPaste={(e) => e.preventDefault()} // Prevent pasting
+  />
+  <Form.Control.Feedback type="invalid">
+    {errors.dateofbirth?.message}
+  </Form.Control.Feedback>
+  <Form.Text muted>Will be converted to DD-MM-YYYY format</Form.Text>
+</Form.Group>
+          {/* <Form.Group className="mb-4" controlId="dateofbirth">
             <Form.Label style={{ color: 'var(--secondary)', fontWeight: 'bold' }}>Date of Birth</Form.Label>
             <Form.Control
               type="date"
@@ -245,7 +270,7 @@ useEffect(() => {
             />
             <Form.Control.Feedback type="invalid">{errors.dateofbirth?.message}</Form.Control.Feedback>
             <Form.Text muted>Will be converted to DD-MM-YYYY format</Form.Text>
-          </Form.Group>
+          </Form.Group> */}
 
           <Form.Group className="mb-4" controlId="files">
             <Form.Label style={{ color: 'var(--secondary)', fontWeight: 'bold' }}>Profile Image</Form.Label>
