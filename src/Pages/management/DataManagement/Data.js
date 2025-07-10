@@ -1,6 +1,7 @@
 
 
 
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Button, Form, Offcanvas, Table, Spinner, Modal, Breadcrumb } from 'react-bootstrap';
@@ -298,7 +299,7 @@ const Data = () => {
                       {item.status}
                     </span>
                   </td>
-                  <td>
+                  {/* <td>
                     <div className="d-flex gap-2 align-items-center">
                       <Button size="sm" variant="info" onClick={() => handleEdit(item)}>Edit</Button>
                       <Button size="sm" variant="danger" onClick={() => confirmDelete(item)}>Delete</Button>
@@ -318,7 +319,41 @@ const Data = () => {
                         />
                       )}
                     </div>
-                  </td>
+                  </td> */}
+                  <td>
+  <div className="d-flex gap-2 align-items-center">
+    <OverlayTrigger placement="top" overlay={<Tooltip>Edit Location</Tooltip>}>
+      <Button size="sm" variant="info" onClick={() => handleEdit(item)}>
+        Edit
+      </Button>
+    </OverlayTrigger>
+
+    <OverlayTrigger placement="top" overlay={<Tooltip>Delete Location</Tooltip>}>
+      <Button size="sm" variant="danger" onClick={() => confirmDelete(item)}>
+        Delete
+      </Button>
+    </OverlayTrigger>
+
+    {item.status === 'Active' ? (
+      <OverlayTrigger placement="top" overlay={<Tooltip>Block this location</Tooltip>}>
+        <XCircleFill
+          className="text-danger"
+          style={{ cursor: 'pointer', fontSize: '1.2rem', marginLeft: '10px' }}
+          onClick={() => handleToggleStatus(item._id)}
+        />
+      </OverlayTrigger>
+    ) : (
+      <OverlayTrigger placement="top" overlay={<Tooltip>Activate this location</Tooltip>}>
+        <CheckCircleFill
+          className="text-success"
+          style={{ cursor: 'pointer', fontSize: '1.2rem', marginLeft: '10px' }}
+          onClick={() => handleToggleStatus(item._id)}
+        />
+      </OverlayTrigger>
+    )}
+  </div>
+</td>
+
                 </tr>
               ))}
             </tbody>
