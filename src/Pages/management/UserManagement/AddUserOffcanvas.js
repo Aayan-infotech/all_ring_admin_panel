@@ -12,6 +12,8 @@ const AddUserOffcanvas = ({ show, handleClose, onUserAdded , editingUser }) => {
     handleSubmit,
     setValue,
     watch,
+      clearErrors,  // Add this
+  setError,     // Add this
     reset,
     formState: { errors, isSubmitting },
   } = useForm({
@@ -148,18 +150,7 @@ useEffect(() => {
             <Form.Control.Feedback type="invalid">{errors.location?.message}</Form.Control.Feedback>
           </Form.Group>
 
-          {/* <Form.Group className="mb-4" controlId="number">
-            <Form.Label style={{ color: 'var(--secondary)', fontWeight: 'bold' }}>Phone Number</Form.Label>
-            <Form.Control
-              type="text"
-              {...register('number', { required: 'Phone number is required' })}
-              isInvalid={!!errors.number}
-              style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
-              placeholder="Enter phone number"
-            />
-            <Form.Control.Feedback type="invalid">{errors.number?.message}</Form.Control.Feedback>
-          </Form.Group> */}
-<Form.Group className="mb-4" controlId="number">
+{/* <Form.Group className="mb-4" controlId="number">
   <Form.Label style={{ color: 'var(--secondary)', fontWeight: 'bold' }}>Phone Number</Form.Label>
   <PhoneInput
     country={'in'}
@@ -178,6 +169,33 @@ useEffect(() => {
     isValid={(value) => {
       if (!value || value.length < 6) return 'Invalid number';
       return true;
+    }}
+  />
+  {errors.number && (
+    <div className="text-danger mt-1" style={{ fontSize: '0.875rem' }}>
+      {errors.number.message}
+    </div>
+  )}
+</Form.Group> */}
+
+<Form.Group className="mb-4" controlId="number">
+  <Form.Label style={{ color: 'var(--secondary)', fontWeight: 'bold' }}>Phone Number</Form.Label>
+  <PhoneInput
+    country={'in'}
+    enableSearch={true}
+    inputStyle={{
+      width: '100%',
+      border: '2px solid var(--accent)',
+      borderRadius: '8px',
+    }}
+    specialLabel=""
+    value={watch('number')}
+    onChange={(phone) => {
+      setValue('number', phone);
+      // Clear error when user starts typing
+      if (errors.number) {
+        clearErrors('number');
+      }
     }}
   />
   {errors.number && (

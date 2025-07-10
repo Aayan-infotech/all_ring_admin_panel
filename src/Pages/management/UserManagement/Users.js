@@ -76,36 +76,68 @@ useEffect(() => {
     setViewUser(user);
     setShowViewModal(true);
   };
+const handleResetPassword = async () => {
+  const newPassword = watch("newPassword");
+  const confirmPassword = watch("confirmPassword");
 
-  const handleResetPassword = async (formData) => {
-      console.log("Reset Form Data:", formData); // 👈 check if this prints
+  console.log("Reset Form Data:", { newPassword, confirmPassword });
 
-    if (formData.newPassword !== formData.confirmPassword) {
-      toast.error("Passwords do not match");
-      return;
-    }
+  if (newPassword !== confirmPassword) {
+    toast.error("Passwords do not match");
+    return;
+  }
 
-    try {
-      const token = localStorage.getItem('adminToken');
-      await axios.put(
-        `http://18.209.91.97:5010/api/admin/changeUserPassword/${selectedUserId}`,
-        {
-          newPassword: formData.newPassword,
-          confirmPassword: formData.confirmPassword,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+  try {
+    const token = localStorage.getItem('adminToken');
+    await axios.put(
+      `http://18.209.91.97:5010/api/admin/changeUserPassword/${selectedUserId}`,
+      {
+        newPassword,
+        confirmPassword,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
         }
-      );
-      toast.success('Password updated successfully!');
-      setShowResetModal(false);
-    } catch (err) {
-      console.error(err);
-      toast.error('Something went wrong while updating the password.');
-    }
-  };
+      }
+    );
+    toast.success('Password updated successfully!');
+    setShowResetModal(false);
+  } catch (err) {
+    console.error(err);
+    toast.error('Something went wrong while updating the password.');
+  }
+};
+
+  // const handleResetPassword = async (formData) => {
+  //     console.log("Reset Form Data:", formData); // 👈 check if this prints
+
+  //   if (formData.newPassword !== formData.confirmPassword) {
+  //     toast.error("Passwords do not match");
+  //     return;
+  //   }
+
+  //   try {
+  //     const token = localStorage.getItem('adminToken');
+  //     await axios.put(
+  //       `http://18.209.91.97:5010/api/admin/changeUserPassword/${selectedUserId}`,
+  //       {
+  //         newPassword: formData.newPassword,
+  //         confirmPassword: formData.confirmPassword,
+  //       },
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`
+  //         }
+  //       }
+  //     );
+  //     toast.success('Password updated successfully!');
+  //     setShowResetModal(false);
+  //   } catch (err) {
+  //     console.error(err);
+  //     toast.error('Something went wrong while updating the password.');
+  //   }
+  // };
 
   const fetchUsers = async () => {
     const token = localStorage.getItem('adminToken');
@@ -627,60 +659,63 @@ const handleSaveChanges = async () => {
         }}
       />
 
-      <Modal
-        show={showResetModal}
-        onHide={() => setShowResetModal(false)}
-        centered
-        className="reset-password-modal"
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Reset Password</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form onSubmit={handleSubmit(handleResetPassword)}>
-            <Form.Group controlId="newPassword">
-              <Form.Label>New Password</Form.Label>
-              <Form.Control
-                type="password"
-                {...register("newPassword", { required: true })}
-                placeholder="Enter new password"
-              />
-              {errors.newPassword && (
-                <small className="text-danger">New password is required</small>
-              )}
-            </Form.Group>
 
-            <Form.Group controlId="confirmPassword" className="mt-3">
-              <Form.Label>Confirm Password</Form.Label>
-              <Form.Control
-                type="password"
-                {...register("confirmPassword", {
-                  required: true,
-                  validate: (value) =>
-                    value === watch("newPassword") || "Passwords do not match",
-                })}
-                placeholder="Confirm new password"
-              />
-              {errors.confirmPassword && (
-                <small className="text-danger">
-                  {errors.confirmPassword.message || "Confirm password is required"}
-                </small>
-              )}
-            </Form.Group>
+<Modal
+  show={showResetModal}
+  onHide={() => setShowResetModal(false)}
+  centered
+  className="reset-password-modal"
+>
+  <Modal.Header closeButton>
+    <Modal.Title>Reset Password</Modal.Title>
+  </Modal.Header>
+  <Modal.Body>
+    <Form>
+      <Form.Group controlId="newPassword">
+        <Form.Label>New Password</Form.Label>
+        <Form.Control
+          type="password"
+          {...register("newPassword", { required: true })}
+          placeholder="Enter new password"
+        />
+        {errors.newPassword && (
+          <small className="text-danger">New password is required</small>
+        )}
+      </Form.Group>
 
-            <div className="d-flex justify-content-end mt-4">
-              <Button variant="secondary" onClick={() => setShowResetModal(false)} className="me-2">
-                Cancel
-              </Button>
-              <Button type="submit" variant="danger">
-                Update Password
-              </Button>
-            </div>
-          </Form>
-        </Modal.Body>
-      </Modal>
+      <Form.Group controlId="confirmPassword" className="mt-3">
+        <Form.Label>Confirm Password</Form.Label>
+        <Form.Control
+          type="password"
+          {...register("confirmPassword", {
+            required: true,
+            validate: (value) =>
+              value === watch("newPassword") || "Passwords do not match",
+          })}
+          placeholder="Confirm new password"
+        />
+        {errors.confirmPassword && (
+          <small className="text-danger">
+            {errors.confirmPassword.message || "Confirm password is required"}
+          </small>
+        )}
+      </Form.Group>
 
-
+      <div className="d-flex justify-content-end mt-4">
+        <Button variant="secondary" onClick={() => setShowResetModal(false)} className="me-2">
+          Cancel
+        </Button>
+        <Button 
+          variant="danger" 
+          onClick={handleResetPassword}
+          disabled={!watch("newPassword") || !watch("confirmPassword")}
+        >
+          Update Password
+        </Button>
+      </div>
+    </Form>
+  </Modal.Body>
+</Modal>
 
       <Modal
   show={showViewModal}
