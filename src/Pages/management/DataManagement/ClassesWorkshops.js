@@ -56,7 +56,7 @@ const [instructors, setInstructors] = useState([]);
 const fetchInstructors = async () => {
   try {
     const token = localStorage.getItem('adminToken');
-    const res = await axios.get('http://18.209.91.97:5010/api/admin/getRegister/instructor', {
+    const res = await axios.get('http://52.20.55.193:5010/api/admin/getRegister/instructor', {
       headers: { Authorization: `Bearer ${token}` }
     });
     setInstructors(res.data?.users || []);
@@ -69,7 +69,7 @@ const fetchInstructors = async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('adminToken');
-      const res = await axios.get('http://18.209.91.97:5010/api/AdminClasses/getAllClasses', {
+      const res = await axios.get('http://52.20.55.193:5010/api/AdminClasses/getAllClasses', {
         headers: { Authorization: `Bearer ${token}` },
       });
       const apiData = Array.isArray(res.data?.data) ? res.data.data : res.data;
@@ -134,7 +134,7 @@ formData.append('endTime', formatTime(form.sessionEndTime.value || '13:00'));
   try {
     const token = localStorage.getItem('adminToken');
     const response = await axios.put(
-      `http://18.209.91.97:5010/api/AdminClasses/updateClass/${selectedClass._id}`,
+      `http://52.20.55.193:5010/api/AdminClasses/updateClass/${selectedClass._id}`,
       formData,
       {
         headers: { 
@@ -155,7 +155,7 @@ formData.append('endTime', formatTime(form.sessionEndTime.value || '13:00'));
 
   const fetchLocations = async () => {
     try {
-      const response = await axios.get('http://18.209.91.97:5010/api/location/getAllLocations');
+      const response = await axios.get('http://52.20.55.193:5010/api/location/getAllLocations');
       
       // Filter to only include active locations
       const activeLocations = (response.data?.data || [])
@@ -170,7 +170,7 @@ formData.append('endTime', formatTime(form.sessionEndTime.value || '13:00'));
 
   // const fetchLocations = async () => {
   //   try {
-  //     const res = await axios.get('http://18.209.91.97:5010/api/location/getAllLocations');
+  //     const res = await axios.get('http://52.20.55.193:5010/api/location/getAllLocations');
   //     setAllLocations(res.data?.data || []);
   //   } catch (err) {
   //     console.error('Error fetching locations:', err);
@@ -181,7 +181,7 @@ const fetchQuestions = async (classId) => {
   try {
     const token = localStorage.getItem('adminToken');
     const res = await axios.get(
-      `http://18.209.91.97:5010/api/questionaire/getQuestions/${classId}`,
+      `http://52.20.55.193:5010/api/questionaire/getQuestions/${classId}`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
     
@@ -207,7 +207,7 @@ const toggleStatus = async (id) => {
   try {
     const token = localStorage.getItem('adminToken');
     const response = await axios.patch(
-      `http://18.209.91.97:5010/api/AdminClasses/blockClass/${id}`, 
+      `http://52.20.55.193:5010/api/AdminClasses/blockClass/${id}`, 
       {}, 
       {
         headers: { Authorization: `Bearer ${token}` },
@@ -239,7 +239,7 @@ const handleDeleteClick = (id) => {
 const handleDelete = async () => {
   try {
     const token = localStorage.getItem('adminToken');
-    await axios.delete(`http://18.209.91.97:5010/api/AdminClasses/deleteClass/${itemToDelete}`, {
+    await axios.delete(`http://52.20.55.193:5010/api/AdminClasses/deleteClass/${itemToDelete}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
@@ -258,7 +258,7 @@ const handleDelete = async () => {
     try {
       const token = localStorage.getItem('adminToken');
       await axios.post(
-        `http://18.209.91.97:5010/api/questionaire/addQuestions/${classId}`,
+        `http://52.20.55.193:5010/api/questionaire/addQuestions/${classId}`,
         { questionText },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -276,7 +276,7 @@ const handleDelete = async () => {
     try {
       const token = localStorage.getItem('adminToken');
       await axios.put(
-        `http://18.209.91.97:5010/api/questionaire/editQuestion/${classId}/${questionId}`,
+        `http://52.20.55.193:5010/api/questionaire/editQuestion/${classId}/${questionId}`,
         { questionText },
         { headers: { Authorization: `Bearer ${token}` } }
       );

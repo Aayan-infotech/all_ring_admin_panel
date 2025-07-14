@@ -188,7 +188,7 @@ const fetchInstructors = async () => {
   try {
     setLoading(true);
     const token = localStorage.getItem('adminToken');
-    const res = await axios.get('http://18.209.91.97:5010/api/admin/getRegister/instructor', {
+    const res = await axios.get('http://52.20.55.193:5010/api/admin/getRegister/instructor', {
       headers: { Authorization: `Bearer ${token}` }
     });
     const allUsers = (res.data.users || []).map(user => ({
@@ -207,7 +207,7 @@ const fetchInstructors = async () => {
 };
 const fetchLocations = async () => {
   try {
-    const res = await axios.get('http://18.209.91.97:5010/api/location/getAllLocations');
+    const res = await axios.get('http://52.20.55.193:5010/api/location/getAllLocations');
     const locations = res.data?.data || [];
     const activeLocations = locations
       .filter(loc => loc.status === 'Active')
@@ -239,7 +239,7 @@ const handleSaveChanges = async () => {
     formDataToSend.append('location', editForm.location); // This should be the location ID
 
     const response = await axios.put(
-      `http://18.209.91.97:5010/api/auth/update-user/${selectedInstructor._id}`,
+      `http://52.20.55.193:5010/api/auth/update-user/${selectedInstructor._id}`,
       formDataToSend,
       {
         headers: {
@@ -279,7 +279,7 @@ const toggleStatus = async (instructor) => {
 
   try {
     await axios.patch(
-      `http://18.209.91.97:5010/api/admin/editUserStatus/${instructor._id}`,
+      `http://52.20.55.193:5010/api/admin/editUserStatus/${instructor._id}`,
       { user_status: newStatus },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -315,7 +315,7 @@ const toggleStatus = async (instructor) => {
 
 //   try {
 //     await axios.patch(
-//       `http://18.209.91.97:5010/api/admin/editUserStatus/${instructor._id}`,
+//       `http://52.20.55.193:5010/api/admin/editUserStatus/${instructor._id}`,
 //       { user_status: newStatus },
 //       { headers: { Authorization: `Bearer ${token}` } }
 //     );
@@ -343,7 +343,7 @@ const toggleStatus = async (instructor) => {
     if (passwords.newPassword !== passwords.confirmPassword) return toast.error('Passwords do not match');
     try {
       const token = localStorage.getItem('adminToken');
-      await axios.put(`http://18.209.91.97:5010/api/admin/changeUserPassword/${selectedInstructor._id}`, passwords, {
+      await axios.put(`http://52.20.55.193:5010/api/admin/changeUserPassword/${selectedInstructor._id}`, passwords, {
         headers: { Authorization: `Bearer ${token}` }
       });
 

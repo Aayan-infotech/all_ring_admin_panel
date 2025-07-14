@@ -41,7 +41,7 @@ const ClassAttendance = () => {
     const fetchClasses = async () => {
       try {
         setLoading(true);
-        const res = await axios.get('http://18.209.91.97:5010/api/AdminClasses/getAllClasses');
+        const res = await axios.get('http://52.20.55.193:5010/api/AdminClasses/getAllClasses');
         setData(res.data.data || []);
         
         const locations = [...new Set(res.data.data.map(cls => cls.location?.location).filter(Boolean))];
@@ -62,7 +62,7 @@ const handleShowAttendance = async (cls) => {
     setAttLoading(true);
 
     const res = await axios.get(
-      `http://18.209.91.97:5010/api/register/getRegistredUserWithAttendence/${cls._id}`
+      `http://52.20.55.193:5010/api/register/getRegistredUserWithAttendence/${cls._id}`
     );
 
     const users = res.data?.data?.users || [];
