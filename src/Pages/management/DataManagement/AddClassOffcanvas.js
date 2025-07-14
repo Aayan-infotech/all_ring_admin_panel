@@ -9,7 +9,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 
 const AddClassOffcanvas = ({ show, handleClose, onSaved }) => {
-  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm();
+  const { register, handleSubmit, reset, formState: { errors, isSubmitting },watch  } = useForm();
   const [instructors, setInstructors] = useState([]);
   const [locations, setLocations] = useState([]);
   const [tags, setTags] = useState([]);
@@ -42,7 +42,11 @@ const AddClassOffcanvas = ({ show, handleClose, onSaved }) => {
   //   if (show) fetchData();
   // }, [show]);
 
-
+  // Get today's date in YYYY-MM-DD format (for date input min attribute)
+  const today = new Date().toISOString().split('T')[0];
+  
+  // Watch startDate to set as min for endDate
+  const startDate = watch('startDate');
 
 
   useEffect(() => {
@@ -212,8 +216,51 @@ const onSubmit = async (data) => {
                 </Form.Control.Feedback>
               </Form.Group>
             </Row>
+   <Row className="mb-3">
+              <Form.Group as={Col} md={6} controlId="startDate">
+                <Form.Label>Start Date <span className="text-danger">*</span></Form.Label>
+                <Form.Control
+                  type="date"
+                  min={today}
+                  onKeyDown={(e) => e.preventDefault()} // Prevent manual typing
+                  {...register('startDate', { 
+                    required: 'Start date is required',
+                    validate: value => {
+                      const selectedDate = new Date(value);
+                      const today = new Date();
+                      today.setHours(0, 0, 0, 0);
+                      return selectedDate >= today || "Start date cannot be in the past";
+                    }
+                  })}
+                  isInvalid={!!errors.startDate}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.startDate?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
 
-            <Row className="mb-3">
+              <Form.Group as={Col} md={6} controlId="endDate">
+                <Form.Label>End Date <span className="text-danger">*</span></Form.Label>
+                <Form.Control
+                  type="date"
+                  min={startDate || today}
+                  onKeyDown={(e) => e.preventDefault()} // Prevent manual typing
+                  {...register('endDate', { 
+                    required: 'End date is required',
+                    validate: value => {
+                      if (!startDate) return true;
+                      return new Date(value) >= new Date(startDate) || "End date cannot be before start date";
+                    }
+                  })}
+                  isInvalid={!!errors.endDate}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.endDate?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Row>
+
+            {/* <Row className="mb-3">
               <Form.Group as={Col} md={6} controlId="startDate">
                 <Form.Label>Start Date <span className="text-danger">*</span></Form.Label>
                 <Form.Control
@@ -239,7 +286,7 @@ const onSubmit = async (data) => {
                   {errors.endDate?.message}
                 </Form.Control.Feedback>
               </Form.Group>
-            </Row>
+            </Row> */}
 
             <Row className="mb-3">
               <Form.Group as={Col} md={12} controlId="sessionType">
@@ -260,8 +307,41 @@ const onSubmit = async (data) => {
                 </Form.Control.Feedback>
               </Form.Group>
             </Row>
+   <Row className="mb-3">
+              <Form.Group as={Col} md={6} controlId="startTime">
+                <Form.Label>Start Time <span className="text-danger">*</span></Form.Label>
+                <Form.Control
+                  type="time"
+                  onKeyDown={(e) => e.preventDefault()} // Prevent manual typing
+                  {...register('startTime', { required: 'Start time is required' })}
+                  isInvalid={!!errors.startTime}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.startTime?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
 
-            <Row className="mb-3">
+              <Form.Group as={Col} md={6} controlId="endTime">
+                <Form.Label>End Time <span className="text-danger">*</span></Form.Label>
+                <Form.Control
+                  type="time"
+                  onKeyDown={(e) => e.preventDefault()} // Prevent manual typing
+                  {...register('endTime', { 
+                    required: 'End time is required',
+                    validate: value => {
+                      const startTime = watch('startTime');
+                      if (!startTime) return true;
+                      return value > startTime || "End time must be after start time";
+                    }
+                  })}
+                  isInvalid={!!errors.endTime}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.endTime?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Row>
+            {/* <Row className="mb-3">
               <Form.Group as={Col} md={6} controlId="startTime">
                 <Form.Label>Start Time <span className="text-danger">*</span></Form.Label>
                 <Form.Control
@@ -287,7 +367,7 @@ const onSubmit = async (data) => {
                   {errors.endTime?.message}
                 </Form.Control.Feedback>
               </Form.Group>
-            </Row>
+            </Row> */}
 
             <Row className="mb-3">
               <Form.Group as={Col} md={12} controlId="instructor">

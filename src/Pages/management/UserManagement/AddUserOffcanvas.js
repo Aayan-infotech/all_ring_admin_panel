@@ -260,17 +260,6 @@ useEffect(() => {
   </Form.Control.Feedback>
   <Form.Text muted>Will be converted to DD-MM-YYYY format</Form.Text>
 </Form.Group>
-          {/* <Form.Group className="mb-4" controlId="dateofbirth">
-            <Form.Label style={{ color: 'var(--secondary)', fontWeight: 'bold' }}>Date of Birth</Form.Label>
-            <Form.Control
-              type="date"
-              {...register('dateofbirth', { required: 'Date of birth is required' })}
-              isInvalid={!!errors.dateofbirth}
-              style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
-            />
-            <Form.Control.Feedback type="invalid">{errors.dateofbirth?.message}</Form.Control.Feedback>
-            <Form.Text muted>Will be converted to DD-MM-YYYY format</Form.Text>
-          </Form.Group> */}
 
           <Form.Group className="mb-4" controlId="files">
             <Form.Label style={{ color: 'var(--secondary)', fontWeight: 'bold' }}>Profile Image</Form.Label>
