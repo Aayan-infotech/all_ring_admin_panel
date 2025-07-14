@@ -235,7 +235,7 @@ const handleSaveChanges = async () => {
     
     // Append all fields to the FormData object
     formDataToSend.append('name', editForm.name);
-    formDataToSend.append('email', editForm.email);
+    // formDataToSend.append('email', editForm.email);
     formDataToSend.append('location', editForm.location); // This should be the location ID
 
     const response = await axios.put(
@@ -753,13 +753,13 @@ const toggleStatus = async (instructor) => {
           onChange={e => setEditForm({...editForm, name: e.target.value})}
         />
       </Form.Group>
-      <Form.Group className="mb-3">
+      {/* <Form.Group className="mb-3">
         <Form.Label>Email</Form.Label>
         <Form.Control 
           value={editForm.email || ''} 
           onChange={e => setEditForm({...editForm, email: e.target.value})}
         />
-      </Form.Group>
+      </Form.Group> */}
       <Form.Group className="mb-3">
         <Form.Label>Location</Form.Label>
         <Form.Select 
