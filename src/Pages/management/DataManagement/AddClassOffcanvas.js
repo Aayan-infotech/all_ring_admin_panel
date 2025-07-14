@@ -7,9 +7,25 @@ import { Offcanvas, Form, Button, Spinner, Row, Col } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
 
 const AddClassOffcanvas = ({ show, handleClose, onSaved }) => {
-  const { register, handleSubmit, reset, formState: { errors, isSubmitting },watch  } = useForm();
+  // const { register, handleSubmit, reset, formState: { errors, isSubmitting },watch  } = useForm();
+  const {
+  register,
+  handleSubmit,
+  reset,
+  formState: { errors, isSubmitting },
+  watch,
+  setValue,
+  trigger,
+  setError,
+  clearErrors
+} = useForm();
+
   const [instructors, setInstructors] = useState([]);
   const [locations, setLocations] = useState([]);
   const [tags, setTags] = useState([]);
@@ -307,7 +323,7 @@ const onSubmit = async (data) => {
                 </Form.Control.Feedback>
               </Form.Group>
             </Row>
-   <Row className="mb-3">
+   {/* <Row className="mb-3">
               <Form.Group as={Col} md={6} controlId="startTime">
                 <Form.Label>Start Time <span className="text-danger">*</span></Form.Label>
                 <Form.Control
@@ -340,34 +356,69 @@ const onSubmit = async (data) => {
                   {errors.endTime?.message}
                 </Form.Control.Feedback>
               </Form.Group>
-            </Row>
-            {/* <Row className="mb-3">
-              <Form.Group as={Col} md={6} controlId="startTime">
-                <Form.Label>Start Time <span className="text-danger">*</span></Form.Label>
-                <Form.Control
-                  type="time"
-                  {...register('startTime', { required: 'Start time is required' })}
-                  isInvalid={!!errors.startTime}
-                  // style={{ borderColor: 'var(--secondary)' }}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {errors.startTime?.message}
-                </Form.Control.Feedback>
-              </Form.Group>
-
-              <Form.Group as={Col} md={6} controlId="endTime">
-                <Form.Label>End Time <span className="text-danger">*</span></Form.Label>
-                <Form.Control
-                  type="time"
-                  {...register('endTime', { required: 'End time is required' })}
-                  isInvalid={!!errors.endTime}
-                  // style={{ borderColor: 'var(--secondary)' }}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {errors.endTime?.message}
-                </Form.Control.Feedback>
-              </Form.Group>
             </Row> */}
+       <LocalizationProvider dateAdapter={AdapterDayjs}>
+  <Row className="mb-3">
+    <Form.Group as={Col} md={6}>
+      <Form.Label>Start Time <span className="text-danger">*</span></Form.Label>
+      <TimePicker
+        ampm
+        value={watch('startTime') ? dayjs(watch('startTime'), 'HH:mm') : null}
+        onChange={(value) => {
+          setValue('startTime', value ? value.format('HH:mm') : '');
+          trigger('endTime'); // Re-validate endTime
+        }}
+        renderInput={({ inputRef, inputProps, InputProps }) => (
+          <div className="position-relative">
+            <Form.Control
+              ref={inputRef}
+              {...inputProps}
+              isInvalid={!!errors.startTime}
+              onKeyDown={(e) => e.preventDefault()} // prevent manual typing
+            />
+            {InputProps?.endAdornment}
+            <Form.Control.Feedback type="invalid">
+              {errors.startTime?.message}
+            </Form.Control.Feedback>
+          </div>
+        )}
+      />
+    </Form.Group>
+
+    <Form.Group as={Col} md={6}>
+      <Form.Label>End Time <span className="text-danger">*</span></Form.Label>
+      <TimePicker
+        ampm
+        value={watch('endTime') ? dayjs(watch('endTime'), 'HH:mm') : null}
+        onChange={(value) => {
+          const start = watch('startTime');
+          const end = value ? value.format('HH:mm') : '';
+          setValue('endTime', end);
+          if (start && end && end <= start) {
+            setError('endTime', { type: 'manual', message: 'End time must be after start time' });
+          } else {
+            clearErrors('endTime');
+          }
+        }}
+        renderInput={({ inputRef, inputProps, InputProps }) => (
+          <div className="position-relative">
+            <Form.Control
+              ref={inputRef}
+              {...inputProps}
+              isInvalid={!!errors.endTime}
+              onKeyDown={(e) => e.preventDefault()}
+            />
+            {InputProps?.endAdornment}
+            <Form.Control.Feedback type="invalid">
+              {errors.endTime?.message}
+            </Form.Control.Feedback>
+          </div>
+        )}
+      />
+    </Form.Group>
+  </Row>
+</LocalizationProvider>
+
 
             <Row className="mb-3">
               <Form.Group as={Col} md={12} controlId="instructor">
