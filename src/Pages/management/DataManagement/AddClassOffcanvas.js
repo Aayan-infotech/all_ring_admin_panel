@@ -64,6 +64,21 @@ const AddClassOffcanvas = ({ show, handleClose, onSaved }) => {
   // Watch startDate to set as min for endDate
   const startDate = watch('startDate');
 
+const generateTimeOptions = () => {
+  const times = [];
+  for (let hour = 1; hour <= 12; hour++) {
+    for (let min of [0, 30]) {
+      ['AM', 'PM'].forEach(ampm => {
+        const formattedHour = hour.toString().padStart(2, '0');
+        const formattedMin = min.toString().padStart(2, '0');
+        times.push(`${formattedHour}:${formattedMin} ${ampm}`);
+      });
+    }
+  }
+  return times;
+};
+
+const timeOptions = generateTimeOptions();
 
   useEffect(() => {
   const fetchData = async () => {
@@ -357,7 +372,7 @@ const onSubmit = async (data) => {
                 </Form.Control.Feedback>
               </Form.Group>
             </Row> */}
-       <LocalizationProvider dateAdapter={AdapterDayjs}>
+       {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
   <Row className="mb-3">
     <Form.Group as={Col} md={6}>
       <Form.Label>Start Time <span className="text-danger">*</span></Form.Label>
@@ -417,7 +432,50 @@ const onSubmit = async (data) => {
       />
     </Form.Group>
   </Row>
-</LocalizationProvider>
+</LocalizationProvider> */}
+<Row className="mb-3">
+  <Form.Group as={Col} md={6} controlId="startTime">
+    <Form.Label>Start Time <span className="text-danger">*</span></Form.Label>
+    <Form.Select
+      {...register('startTime', { required: 'Start time is required' })}
+      isInvalid={!!errors.startTime}
+    >
+      <option value="">Select Start Time</option>
+      {timeOptions.map((time, idx) => (
+        <option key={idx} value={time}>{time}</option>
+      ))}
+    </Form.Select>
+    <Form.Control.Feedback type="invalid">
+      {errors.startTime?.message}
+    </Form.Control.Feedback>
+  </Form.Group>
+
+  <Form.Group as={Col} md={6} controlId="endTime">
+    <Form.Label>End Time <span className="text-danger">*</span></Form.Label>
+    <Form.Select
+      {...register('endTime', {
+        required: 'End time is required',
+        validate: value => {
+          const times = timeOptions;
+          const start = watch('startTime');
+          const startIndex = times.indexOf(start);
+          const endIndex = times.indexOf(value);
+          if (!start || startIndex === -1 || endIndex === -1) return true;
+          return endIndex > startIndex || "End time must be after start time";
+        }
+      })}
+      isInvalid={!!errors.endTime}
+    >
+      <option value="">Select End Time</option>
+      {timeOptions.map((time, idx) => (
+        <option key={idx} value={time}>{time}</option>
+      ))}
+    </Form.Select>
+    <Form.Control.Feedback type="invalid">
+      {errors.endTime?.message}
+    </Form.Control.Feedback>
+  </Form.Group>
+</Row>
 
 
             <Row className="mb-3">
