@@ -155,7 +155,7 @@ const dashboardStats = dashboardCounts ? [
   return (
     <div className="dashboard-container">
       <div className="dashboard-header">
-        <h2>Dashboard Overview</h2>
+        <h2>Dashboard Overview </h2>
         <div className="dashboard-date">
           <span>Today: {new Date().toLocaleDateString()}</span>
           <CalendarCheck size={20} className="calendar-icon" />
