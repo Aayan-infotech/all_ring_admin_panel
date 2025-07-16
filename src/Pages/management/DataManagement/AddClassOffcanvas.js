@@ -125,15 +125,25 @@ const timeOptions = generateTimeOptions();
 
 const onSubmit = async (data) => {
   const formData = new FormData();
+   // Combine time fields
+  const startTime = `${data.startTimeHour}:${data.startTimeMinute} ${data.startTimeAmPm}`;
+  const endTime = `${data.endTimeHour}:${data.endTimeMinute} ${data.endTimeAmPm}`;
   
+  // Validate end time is after start time
+  const start = new Date(`01/01/2000 ${startTime}`);
+  const end = new Date(`01/01/2000 ${endTime}`);
+  if (end <= start) {
+    toast.error('End time must be after start time');
+    return;
+  }
   // Append fields exactly as in the curl request
   formData.append('title', data.title);
   formData.append('theme', data.theme);
   formData.append('startDate', data.startDate);
   formData.append('endDate', data.endDate);
   formData.append('sessionType', data.sessionType);
-  formData.append('startTime', data.startTime);
-  formData.append('endTime', data.endTime);
+formData.append('startTime', startTime);
+  formData.append('endTime', endTime);
   formData.append('location', data.location);
   formData.append('Instructor', data.instructor); // Note capital 'I'
   formData.append('Type', data.type); // Note capital 'T'
@@ -338,102 +348,92 @@ const onSubmit = async (data) => {
                 </Form.Control.Feedback>
               </Form.Group>
             </Row>
-   {/* <Row className="mb-3">
-              <Form.Group as={Col} md={6} controlId="startTime">
-                <Form.Label>Start Time <span className="text-danger">*</span></Form.Label>
-                <Form.Control
-                  type="time"
-                  onKeyDown={(e) => e.preventDefault()} // Prevent manual typing
-                  {...register('startTime', { required: 'Start time is required' })}
-                  isInvalid={!!errors.startTime}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {errors.startTime?.message}
-                </Form.Control.Feedback>
-              </Form.Group>
-
-              <Form.Group as={Col} md={6} controlId="endTime">
-                <Form.Label>End Time <span className="text-danger">*</span></Form.Label>
-                <Form.Control
-                  type="time"
-                  onKeyDown={(e) => e.preventDefault()} // Prevent manual typing
-                  {...register('endTime', { 
-                    required: 'End time is required',
-                    validate: value => {
-                      const startTime = watch('startTime');
-                      if (!startTime) return true;
-                      return value > startTime || "End time must be after start time";
-                    }
-                  })}
-                  isInvalid={!!errors.endTime}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {errors.endTime?.message}
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Row> */}
-       {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
-  <Row className="mb-3">
-    <Form.Group as={Col} md={6}>
-      <Form.Label>Start Time <span className="text-danger">*</span></Form.Label>
-      <TimePicker
-        ampm
-        value={watch('startTime') ? dayjs(watch('startTime'), 'HH:mm') : null}
-        onChange={(value) => {
-          setValue('startTime', value ? value.format('HH:mm') : '');
-          trigger('endTime'); // Re-validate endTime
-        }}
-        renderInput={({ inputRef, inputProps, InputProps }) => (
-          <div className="position-relative">
-            <Form.Control
-              ref={inputRef}
-              {...inputProps}
-              isInvalid={!!errors.startTime}
-              onKeyDown={(e) => e.preventDefault()} // prevent manual typing
-            />
-            {InputProps?.endAdornment}
-            <Form.Control.Feedback type="invalid">
-              {errors.startTime?.message}
-            </Form.Control.Feedback>
-          </div>
-        )}
-      />
-    </Form.Group>
-
-    <Form.Group as={Col} md={6}>
-      <Form.Label>End Time <span className="text-danger">*</span></Form.Label>
-      <TimePicker
-        ampm
-        value={watch('endTime') ? dayjs(watch('endTime'), 'HH:mm') : null}
-        onChange={(value) => {
-          const start = watch('startTime');
-          const end = value ? value.format('HH:mm') : '';
-          setValue('endTime', end);
-          if (start && end && end <= start) {
-            setError('endTime', { type: 'manual', message: 'End time must be after start time' });
-          } else {
-            clearErrors('endTime');
-          }
-        }}
-        renderInput={({ inputRef, inputProps, InputProps }) => (
-          <div className="position-relative">
-            <Form.Control
-              ref={inputRef}
-              {...inputProps}
-              isInvalid={!!errors.endTime}
-              onKeyDown={(e) => e.preventDefault()}
-            />
-            {InputProps?.endAdornment}
-            <Form.Control.Feedback type="invalid">
-              {errors.endTime?.message}
-            </Form.Control.Feedback>
-          </div>
-        )}
-      />
-    </Form.Group>
-  </Row>
-</LocalizationProvider> */}
 <Row className="mb-3">
+  {/* Start Time */}
+  <Form.Group as={Col} md={6} controlId="startTime">
+    <Form.Label>Start Time <span className="text-danger">*</span></Form.Label>
+    <div className="d-flex gap-2">
+      {/* Hours */}
+      <Form.Select
+        {...register('startTimeHour', { required: 'Start hour is required' })}
+        isInvalid={!!errors.startTimeHour}
+      >
+        <option value="">Hour</option>
+        {Array.from({length: 12}, (_, i) => i + 1).map(hour => (
+          <option key={`start-hour-${hour}`} value={hour}>{hour}</option>
+        ))}
+      </Form.Select>
+      
+      {/* Minutes */}
+      <Form.Select
+        {...register('startTimeMinute', { required: 'Start minute is required' })}
+        isInvalid={!!errors.startTimeMinute}
+      >
+        <option value="">Min</option>
+        <option value="00">00</option>
+        <option value="15">15</option>
+        <option value="30">30</option>
+        <option value="45">45</option>
+      </Form.Select>
+      
+      {/* AM/PM */}
+      <Form.Select
+        {...register('startTimeAmPm', { required: 'Start AM/PM is required' })}
+        isInvalid={!!errors.startTimeAmPm}
+      >
+        <option value="">AM/PM</option>
+        <option value="AM">AM</option>
+        <option value="PM">PM</option>
+      </Form.Select>
+    </div>
+    {(errors.startTimeHour || errors.startTimeMinute || errors.startTimeAmPm) && (
+      <div className="text-danger small mt-1">Start time is required</div>
+    )}
+  </Form.Group>
+
+  {/* End Time */}
+  <Form.Group as={Col} md={6} controlId="endTime">
+    <Form.Label>End Time <span className="text-danger">*</span></Form.Label>
+    <div className="d-flex gap-2">
+      {/* Hours */}
+      <Form.Select
+        {...register('endTimeHour', { required: 'End hour is required' })}
+        isInvalid={!!errors.endTimeHour}
+      >
+        <option value="">Hour</option>
+        {Array.from({length: 12}, (_, i) => i + 1).map(hour => (
+          <option key={`end-hour-${hour}`} value={hour}>{hour}</option>
+        ))}
+      </Form.Select>
+      
+      {/* Minutes */}
+      <Form.Select
+        {...register('endTimeMinute', { required: 'End minute is required' })}
+        isInvalid={!!errors.endTimeMinute}
+      >
+        <option value="">Min</option>
+        <option value="00">00</option>
+        <option value="15">15</option>
+        <option value="30">30</option>
+        <option value="45">45</option>
+      </Form.Select>
+      
+      {/* AM/PM */}
+      <Form.Select
+        {...register('endTimeAmPm', { required: 'End AM/PM is required' })}
+        isInvalid={!!errors.endTimeAmPm}
+      >
+        <option value="">AM/PM</option>
+        <option value="AM">AM</option>
+        <option value="PM">PM</option>
+      </Form.Select>
+    </div>
+    {(errors.endTimeHour || errors.endTimeMinute || errors.endTimeAmPm) && (
+      <div className="text-danger small mt-1">End time is required</div>
+    )}
+  </Form.Group>
+</Row>
+{/* <Row className="mb-3">
   <Form.Group as={Col} md={6} controlId="startTime">
     <Form.Label>Start Time <span className="text-danger">*</span></Form.Label>
     <Form.Select
@@ -475,7 +475,7 @@ const onSubmit = async (data) => {
       {errors.endTime?.message}
     </Form.Control.Feedback>
   </Form.Group>
-</Row>
+</Row> */}
 
 
             <Row className="mb-3">
