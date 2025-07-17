@@ -48,7 +48,7 @@ const AssignTeam = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('adminToken');
-      const res = await axios.get('http://52.20.55.193:5010/api/admin/getRegister/instructor', {
+      const res = await axios.get('http://98.82.228.18:5010/api/admin/getRegister/instructor', {
         headers: { Authorization: `Bearer ${token}` }
       });
       const allUsers = (res.data.users || []).map(user => ({
@@ -68,7 +68,7 @@ const AssignTeam = () => {
 
   const fetchLocations = async () => {
     try {
-      const res = await axios.get('http://52.20.55.193:5010/api/location/getAllLocations');
+      const res = await axios.get('http://98.82.228.18:5010/api/location/getAllLocations');
       const locations = res.data?.data || [];
       const activeLocationNames = locations
         .filter(loc => loc.status === 'Active') 
@@ -100,7 +100,7 @@ const handleAssignClick = async (instructorId) => {
     setAssignLoading(true);
     const token = localStorage.getItem('adminToken');
     const response = await axios.get(
-      `http://52.20.55.193:5010/api/assignUsers/getUsersByLocation/${instructorId}`,
+      `http://98.82.228.18:5010/api/assignUsers/getUsersByLocation/${instructorId}`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
@@ -146,7 +146,7 @@ const handleAssignClick = async (instructorId) => {
       setAssignLoading(true);
       const token = localStorage.getItem('adminToken');
       await axios.post(
-        `http://52.20.55.193:5010/api/assignUsers/assignToInstructor/${selectedInstructorId}`,
+        `http://98.82.228.18:5010/api/assignUsers/assignToInstructor/${selectedInstructorId}`,
         { userIds: selectedUsers },
         { headers: { Authorization: `Bearer ${token}` } }
       );

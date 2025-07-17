@@ -22,7 +22,7 @@ const AddPrisonerOffcanvas = ({ show, handleClose, instructorId, locations, preS
         location,
       };
 
-      await axios.post('http://52.20.55.193:5010/api/prisoner/addPrisoner', payload);
+      await axios.post('http://98.82.228.18:5010/api/prisoner/addPrisoner', payload);
       toast.success('Prisoner added successfully');
 
       // Reset the form fields
@@ -38,7 +38,7 @@ const AddPrisonerOffcanvas = ({ show, handleClose, instructorId, locations, preS
 
   const fetchLocations = async () => {
     try {
-      const res = await axios.get('http://52.20.55.193:5010/api/location/getAllLocations');
+      const res = await axios.get('http://98.82.228.18:5010/api/location/getAllLocations');
       const locations = res.data?.data || [];
       const activeLocations = locations.filter(loc => loc.status === 'Active');
       setLocationList(activeLocations);
@@ -60,7 +60,7 @@ const AddPrisonerOffcanvas = ({ show, handleClose, instructorId, locations, preS
     if (!instructorId) return;
     setLoading(true);
     try {
-      const res = await axios.get(`http://52.20.55.193:5010/api/prisoner/prisonersByInstructor/${instructorId}`);
+      const res = await axios.get(`http://98.82.228.18:5010/api/prisoner/prisonersByInstructor/${instructorId}`);
       setPrisoners(res.data.data || []);
     } catch (err) {
       console.error("Failed to fetch prisoners:", err);
