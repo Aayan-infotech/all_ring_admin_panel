@@ -47,7 +47,7 @@ const Mentors = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('adminToken');
-      const res = await axios.get('http://52.20.55.193:5010/api/admin/getRegister/mentor', {
+      const res = await axios.get('http://98.82.228.18::5010/api/admin/getRegister/mentor', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -63,7 +63,7 @@ const Mentors = () => {
 
 const fetchLocations = async () => {
   try {
-    const res = await axios.get('http://52.20.55.193:5010/api/location/getAllLocations');
+    const res = await axios.get('http://98.82.228.18::5010/api/location/getAllLocations');
     const locations = res.data?.data || [];
     const activeLocations = locations
       .filter(loc => loc.status === 'Active')
@@ -93,7 +93,7 @@ const fetchLocations = async () => {
       const user_status = newStatus === 'active' ? 1 : 2;
 
       await axios.patch(
-        `http://52.20.55.193:5010/api/admin/editUserStatus/${mentor._id}`,
+        `http://98.82.228.18::5010/api/admin/editUserStatus/${mentor._id}`,
         { user_status },
         {
           headers: {
@@ -133,7 +133,7 @@ const fetchLocations = async () => {
       const token = localStorage.getItem('adminToken');
 
       await axios.put(
-        `http://52.20.55.193:5010/api/admin/changeUserPassword/${selectedUser._id}`,
+        `http://98.82.228.18::5010/api/admin/changeUserPassword/${selectedUser._id}`,
         { newPassword, confirmPassword },
         {
           headers: {
@@ -170,7 +170,7 @@ const handleSaveChanges = async () => {
     formDataToSend.append('location', formData.locationId);  // Send the ID
 
     const response = await axios.put(
-      `http://52.20.55.193:5010/api/auth/update-user/${selectedUser._id}`,
+      `http://98.82.228.18::5010/api/auth/update-user/${selectedUser._id}`,
       formDataToSend,
       {
         headers: {

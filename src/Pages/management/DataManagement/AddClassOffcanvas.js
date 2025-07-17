@@ -40,10 +40,10 @@ const AddClassOffcanvas = ({ show, handleClose, onSaved }) => {
   //     setIsLoading(true);
   //     try {
   //       const [instructorsRes, locationsRes] = await Promise.all([
-  //         axios.get('http://52.20.55.193:5010/api/admin/getRegister/instructor', {
+  //         axios.get('http://98.82.228.18::5010/api/admin/getRegister/instructor', {
   //           headers: { Authorization: `Bearer ${token}` }
   //         }),
-  //         axios.get('http://52.20.55.193:5010/api/location/getAllLocations')
+  //         axios.get('http://98.82.228.18::5010/api/location/getAllLocations')
   //       ]);
   //       setInstructors(instructorsRes.data?.users || []);
   //       setLocations(locationsRes.data?.data || []);
@@ -88,10 +88,10 @@ const timeOptions = generateTimeOptions();
     setIsLoading(true);
     try {
       const [instructorsRes, locationsRes] = await Promise.all([
-        axios.get('http://52.20.55.193:5010/api/admin/getRegister/instructor', {
+        axios.get('http://98.82.228.18::5010/api/admin/getRegister/instructor', {
           headers: { Authorization: `Bearer ${token}` }
         }),
-        axios.get('http://52.20.55.193:5010/api/location/getAllLocations')
+        axios.get('http://98.82.228.18::5010/api/location/getAllLocations')
       ]);
 
       // Filter active locations (status is 'Active')
@@ -124,8 +124,8 @@ const timeOptions = generateTimeOptions();
   };
 
 const onSubmit = async (data) => {
-  const formData = new FormData();
-   // Combine time fields
+  const formData = new FormData(); // Changed from formdata to FormData
+  // Combine time fields
   const startTime = `${data.startTimeHour}:${data.startTimeMinute} ${data.startTimeAmPm}`;
   const endTime = `${data.endTimeHour}:${data.endTimeMinute} ${data.endTimeAmPm}`;
   
@@ -136,13 +136,14 @@ const onSubmit = async (data) => {
     toast.error('End time must be after start time');
     return;
   }
+  
   // Append fields exactly as in the curl request
   formData.append('title', data.title);
   formData.append('theme', data.theme);
   formData.append('startDate', data.startDate);
   formData.append('endDate', data.endDate);
   formData.append('sessionType', data.sessionType);
-formData.append('startTime', startTime);
+  formData.append('startTime', startTime);
   formData.append('endTime', endTime);
   formData.append('location', data.location);
   formData.append('Instructor', data.instructor); // Note capital 'I'
@@ -160,7 +161,7 @@ formData.append('startTime', startTime);
 
   try {
     const token = localStorage.getItem('adminToken');
-    await axios.post('http://52.20.55.193:5010/api/AdminClasses/addClass', formData, {
+    await axios.post('http://98.82.228.18::5010/api/AdminClasses/addClass', formData, {
       headers: { 
         'Content-Type': 'multipart/form-data',
         Authorization: `Bearer ${token}`

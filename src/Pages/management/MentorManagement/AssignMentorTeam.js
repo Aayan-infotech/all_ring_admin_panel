@@ -53,7 +53,7 @@ const AssignMentorTeam = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('adminToken');
-      const res = await axios.get('http://52.20.55.193:5010/api/admin/getRegister/mentor', {
+      const res = await axios.get('http://98.82.228.18::5010/api/admin/getRegister/mentor', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -69,7 +69,7 @@ const AssignMentorTeam = () => {
   // Fetch locations data
   const fetchLocations = async () => {
     try {
-      const res = await axios.get('http://52.20.55.193:5010/api/location/getAllLocations');
+      const res = await axios.get('http://98.82.228.18::5010/api/location/getAllLocations');
       const locations = res.data?.data || [];
       const activeLocations = locations
         .filter(loc => loc.status === 'Active')
@@ -90,7 +90,7 @@ const AssignMentorTeam = () => {
       setLoadingInstructors(true);
       const token = localStorage.getItem('adminToken');
       const res = await axios.get(
-        `http://52.20.55.193:5010/api/assignInstructor/getInstructorByLocation/${mentorId}`,
+        `http://98.82.228.18::5010/api/assignInstructor/getInstructorByLocation/${mentorId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -115,7 +115,7 @@ const AssignMentorTeam = () => {
       // Fetch users for each instructor and combine
       const usersPromises = instructorIds.map(async (instructorId) => {
         const res = await axios.get(
-          `http://52.20.55.193:5010/api/assignInstructor/getUsersByInstructor/${instructorId}`,
+          `http://98.82.228.18::5010/api/assignInstructor/getUsersByInstructor/${instructorId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -162,7 +162,7 @@ const handleAssignTeam = async () => {
       };
 
       await axios.post(
-        `http://52.20.55.193:5010/api/assignInstructor/assignInstructorAndUsers/${selectedUser._id}`,
+        `http://98.82.228.18::5010/api/assignInstructor/assignInstructorAndUsers/${selectedUser._id}`,
         payload,
         {
           headers: {
