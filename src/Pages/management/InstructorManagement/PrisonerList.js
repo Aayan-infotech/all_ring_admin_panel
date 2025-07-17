@@ -38,7 +38,7 @@ const PrisonerList = () => {
 
   const fetchPrisoners = async () => {
     try {
-      const res = await axios.get('http://98.82.228.18::5010/api/prisoner/getPrisoners');
+      const res = await axios.get('http://98.82.228.18:5010/api/prisoner/getPrisoners');
       setPrisoners(res.data?.data || []);
     } catch (err) {
       toast.error("Failed to fetch prisoners");
@@ -47,7 +47,7 @@ const PrisonerList = () => {
 
   const fetchLocations = async () => {
     try {
-      const response = await axios.get('http://98.82.228.18::5010/api/location/getAllLocations');
+      const response = await axios.get('http://98.82.228.18:5010/api/location/getAllLocations');
       const activeLocations = (response.data?.data || []).filter(loc => loc.status === 'Active');
       setLocations(activeLocations);
     } catch (err) {
@@ -57,7 +57,7 @@ const PrisonerList = () => {
 
   const deletePrisoner = async () => {
     try {
-      await axios.delete(`http://98.82.228.18::5010/api/prisoner/deletePrisoner/${confirmDelete.id}`);
+      await axios.delete(`http://98.82.228.18:5010/api/prisoner/deletePrisoner/${confirmDelete.id}`);
       toast.success("Deleted successfully");
       setConfirmDelete({ show: false, id: null });
       fetchPrisoners();
@@ -69,7 +69,7 @@ const PrisonerList = () => {
   const toggleStatus = async (prisoner) => {
     const newStatus = prisoner.status === 'Active' ? 'Blocked' : 'Active';
     try {
-      await axios.patch(`http://98.82.228.18::5010/api/prisoner/changePrisonerStatus/${prisoner._id}`, {
+      await axios.patch(`http://98.82.228.18:5010/api/prisoner/changePrisonerStatus/${prisoner._id}`, {
         status: newStatus
       });
 
@@ -89,7 +89,7 @@ const PrisonerList = () => {
   const handleUpdate = async () => {
     try {
       await axios.put(
-        `http://98.82.228.18::5010/api/prisoner/updatePrisoner/${selectedPrisoner._id}`,
+        `http://98.82.228.18:5010/api/prisoner/updatePrisoner/${selectedPrisoner._id}`,
         selectedPrisoner
       );
       toast.success("Updated successfully");

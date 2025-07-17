@@ -40,10 +40,10 @@ const AddClassOffcanvas = ({ show, handleClose, onSaved }) => {
   //     setIsLoading(true);
   //     try {
   //       const [instructorsRes, locationsRes] = await Promise.all([
-  //         axios.get('http://98.82.228.18::5010/api/admin/getRegister/instructor', {
+  //         axios.get('http://98.82.228.18:5010/api/admin/getRegister/instructor', {
   //           headers: { Authorization: `Bearer ${token}` }
   //         }),
-  //         axios.get('http://98.82.228.18::5010/api/location/getAllLocations')
+  //         axios.get('http://98.82.228.18:5010/api/location/getAllLocations')
   //       ]);
   //       setInstructors(instructorsRes.data?.users || []);
   //       setLocations(locationsRes.data?.data || []);
@@ -88,10 +88,10 @@ const timeOptions = generateTimeOptions();
     setIsLoading(true);
     try {
       const [instructorsRes, locationsRes] = await Promise.all([
-        axios.get('http://98.82.228.18::5010/api/admin/getRegister/instructor', {
+        axios.get('http://98.82.228.18:5010/api/admin/getRegister/instructor', {
           headers: { Authorization: `Bearer ${token}` }
         }),
-        axios.get('http://98.82.228.18::5010/api/location/getAllLocations')
+        axios.get('http://98.82.228.18:5010/api/location/getAllLocations')
       ]);
 
       // Filter active locations (status is 'Active')
@@ -161,7 +161,7 @@ const onSubmit = async (data) => {
 
   try {
     const token = localStorage.getItem('adminToken');
-    await axios.post('http://98.82.228.18::5010/api/AdminClasses/addClass', formData, {
+    await axios.post('http://98.82.228.18:5010/api/AdminClasses/addClass', formData, {
       headers: { 
         'Content-Type': 'multipart/form-data',
         Authorization: `Bearer ${token}`

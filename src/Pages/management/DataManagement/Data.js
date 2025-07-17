@@ -10,7 +10,7 @@ import { toast } from 'react-toastify';
 import { XCircleFill, CheckCircleFill } from 'react-bootstrap-icons';
 import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api';
 
-const API_BASE = 'http://98.82.228.18::5010/api/location';
+const API_BASE = 'http://98.82.228.18:5010/api/location';
 
 // Map settings
 const mapContainerStyle = {
