@@ -24,7 +24,7 @@ const [dashboardCounts, setDashboardCounts] = useState(null);
     const fetchStats = async () => {
       try {
         const token = localStorage.getItem('adminToken');
-        const res = await axios.get('http://98.82.228.18:5010/api/admin/stats/overview', {
+        const res = await axios.get('http://52.20.55.193:5010/api/admin/stats/overview', {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.data.success) {
@@ -39,7 +39,7 @@ const [dashboardCounts, setDashboardCounts] = useState(null);
 
 const fetchParticipationData = async () => {
   try {
-    const res = await axios.get('http://98.82.228.18:5010/api/register/getParticipationOverview');
+    const res = await axios.get('http://52.20.55.193:5010/api/register/getParticipationOverview');
     if (res.data.success) {
       const data = res.data.data;
       
@@ -73,7 +73,7 @@ const fetchParticipationData = async () => {
 
  const fetchDashboardCounts = async () => {
     try {
-      const res = await axios.get('http://98.82.228.18:5010/api/register/dashboardCounts');
+      const res = await axios.get('http://52.20.55.193:5010/api/register/dashboardCounts');
       if (res.data.success) {
         setDashboardCounts(res.data.data);
       }

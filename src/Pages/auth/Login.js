@@ -21,7 +21,7 @@ const Login = () => {
 
   try {
     const response = await axios.post(
-      "http://98.82.228.18:5010/api/admin/auth/login", 
+      "http://52.20.55.193:5010/api/admin/auth/login", 
       data
     );
 

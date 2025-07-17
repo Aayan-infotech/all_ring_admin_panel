@@ -36,7 +36,7 @@ const ClassMediaPage = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('adminToken');
-      const res = await axios.get('http://98.82.228.18:5010/api/AdminClasses/getAllClasses', {
+      const res = await axios.get('http://52.20.55.193:5010/api/AdminClasses/getAllClasses', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -53,7 +53,7 @@ const ClassMediaPage = () => {
     setMediaLoading(true);
     try {
       const token = localStorage.getItem('adminToken');
-      const res = await axios.get(`http://98.82.228.18:5010/api/mediaAdmin/getAllMedia/${classId}`, {
+      const res = await axios.get(`http://52.20.55.193:5010/api/mediaAdmin/getAllMedia/${classId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -81,7 +81,7 @@ const ClassMediaPage = () => {
 
   try {
     const token = localStorage.getItem("adminToken");
-    await axios.delete(`http://98.82.228.18:5010/api/mediaAdmin/deleteMedia/${classId}/${mediaId}`, {
+    await axios.delete(`http://52.20.55.193:5010/api/mediaAdmin/deleteMedia/${classId}/${mediaId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
