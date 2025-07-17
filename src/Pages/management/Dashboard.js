@@ -253,7 +253,7 @@ const dashboardStats = dashboardCounts ? [
             <thead>
               <tr>
                 <th>#</th>
-                <th>Instructor</th>
+                <th>Instructors</th>
                 <th>Location</th>
                 <th>Sessions</th>
               </tr>
