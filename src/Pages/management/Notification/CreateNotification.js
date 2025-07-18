@@ -108,34 +108,36 @@ const NotificationCreator = () => {
 
       {/* Notification Type Selector */}
       {/* Notification Type Selector as Dropdown */}
-      <div className="mb-4">
-        <label className="form-label small text-muted mb-2">
-          SELECT NOTIFICATION TYPE
-        </label>
-        <select
-          className="form-select"
-          value={notificationType}
-          onChange={(e) => {
-            const selected = e.target.value;
-            setNotificationType(selected);
-            setSelectedTemplate(null);
-            setFormData({
-              title: "",
-              message: "",
-              date: "",
-              time: "",
-              className: "",
-              instructor: "",
-            });
-          }}
-          style={{ borderColor: "var(--primary)", maxWidth: "300px" }}
-        >
-          <option value="">-- Select Type --</option>
-          <option value="class">Class Reminder</option>
-          <option value="quote">Inspirational Quote</option>
-          <option value="event">Upcoming Event Invitation</option>
-        </select>
-      </div>
+<div className="mb-4">
+  <label className="form-label small text-muted mb-2">
+    SELECT NOTIFICATION TYPE
+  </label>
+  <select
+    className="form-select"
+    value={notificationType}
+    onChange={(e) => {
+      const selected = e.target.value;
+      setNotificationType(selected);
+      setSelectedTemplate(null);
+      setFormData({
+        title: "",
+        message: "",
+        date: "",
+        time: "",
+        className: "",
+        instructor: "",
+      });
+    }}
+    style={{ borderColor: "var(--primary)", maxWidth: "300px" }}
+  >
+    <option value="" disabled selected hidden>
+      Select Notification Type...
+    </option>
+    <option value="class">Class Reminder</option>
+    <option value="quote">Inspirational Quote</option>
+    <option value="event">Upcoming Event Invitation</option>
+  </select>
+</div>
 
       {/* Template Selection */}
       {notificationType && (
@@ -165,15 +167,7 @@ const NotificationCreator = () => {
                   alt={template.name}
                   className="w-100 h-100 object-fit-cover"
                 />
-                <div className="position-absolute bottom-0 start-0 end-0 p-3 bg-white bg-opacity-90">
-                  <h6
-                    className="fw-bold mb-0"
-                    style={{ color: "var(--secondary)" }}
-                  >
-                    {template.name}
-                  </h6>
-                  <small className="text-muted">{template.description}</small>
-                </div>
+              
                 {selectedTemplate?.id === template.id && (
                   <div className="position-absolute top-0 end-0 m-2 bg-primary rounded-circle p-1">
                     <svg
