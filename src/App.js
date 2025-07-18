@@ -27,6 +27,7 @@ import ClassMediaPage from './Pages/management/DataManagement/ClassMediaPage';
 import FeedbackPage from './Pages/management/DataManagement/FeedbackPage';
 import AssignTeam from './Pages/management/InstructorManagement/AssignTeam';
 import AssignMentorTeam from './Pages/management/MentorManagement/AssignMentorTeam';
+import CreateNotification from './Pages/management/Notification/CreateNotification';
 function App() {
   return (
     <Router>
@@ -43,7 +44,7 @@ function App() {
           <Route path="/mentors" element={<Mentors />} />
           <Route path="/instructors" element={<Instructors />} />
                     <Route path="/assignteam" element={<AssignTeam />} />
-
+     <Route path="/reminders" element={<CreateNotification />} />
           <Route path="/data" element={<Data />} />
           <Route path="data/classses" element={<ClassesWorkshops />} />
           <Route path="data/attendance" element={<ClassAttendance />} />
