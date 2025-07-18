@@ -14,7 +14,7 @@ import {
 import classTemplateImg from "./images/class-template.jpg";
 import quoteTemplateImg from "./images/quote-template.jpg";
 import eventTemplateImg from "./images/event-template.jpg";
-
+import { reminderTemplate1 } from "./template";
 const NotificationCreator = () => {
   const [notificationType, setNotificationType] = useState("");
   const [selectedTemplate, setSelectedTemplate] = useState(null);
@@ -26,6 +26,14 @@ const NotificationCreator = () => {
     className: "",
     instructor: "",
   });
+
+  const EmailTemplateViewer = () => {
+    return (
+      <div
+        dangerouslySetInnerHTML={{ __html: reminderTemplate1 }}
+      />
+    );
+  };
 
   const templates = {
     class: [
@@ -452,6 +460,7 @@ const NotificationCreator = () => {
                 </div>
               </div>
             </div>
+
           </div>
         </div>
       )}
