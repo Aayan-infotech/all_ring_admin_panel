@@ -349,12 +349,13 @@ const onSubmit = async (data) => {
                 </Form.Control.Feedback>
               </Form.Group>
             </Row>
-<Row className="mb-3">
-  {/* Start Time */}
-  <Form.Group as={Col} md={6} controlId="startTime">
-    <Form.Label>Start Time <span className="text-danger">*</span></Form.Label>
-    <div className="d-flex gap-2">
-      {/* Hours */}
+            <Row className="mb-3">
+
+<Form.Group as={Col} md={6} controlId="startTime">
+  <Form.Label>Start Time <span className="text-danger">*</span></Form.Label>
+  <div className="d-flex gap-2 align-items-start">
+    <div>
+      <Form.Label className="small">Hour</Form.Label>
       <Form.Select
         {...register('startTimeHour', { required: 'Start hour is required' })}
         isInvalid={!!errors.startTimeHour}
@@ -364,8 +365,10 @@ const onSubmit = async (data) => {
           <option key={`start-hour-${hour}`} value={hour}>{hour}</option>
         ))}
       </Form.Select>
-      
-      {/* Minutes */}
+    </div>
+
+    <div>
+      <Form.Label className="small">Minute</Form.Label>
       <Form.Select
         {...register('startTimeMinute', { required: 'Start minute is required' })}
         isInvalid={!!errors.startTimeMinute}
@@ -376,8 +379,10 @@ const onSubmit = async (data) => {
         <option value="30">30</option>
         <option value="45">45</option>
       </Form.Select>
-      
-      {/* AM/PM */}
+    </div>
+
+    <div>
+      <Form.Label className="small">AM/PM</Form.Label>
       <Form.Select
         {...register('startTimeAmPm', { required: 'Start AM/PM is required' })}
         isInvalid={!!errors.startTimeAmPm}
@@ -387,27 +392,29 @@ const onSubmit = async (data) => {
         <option value="PM">PM</option>
       </Form.Select>
     </div>
-    {(errors.startTimeHour || errors.startTimeMinute || errors.startTimeAmPm) && (
-      <div className="text-danger small mt-1">Start time is required</div>
-    )}
-  </Form.Group>
-
-  {/* End Time */}
-  <Form.Group as={Col} md={6} controlId="endTime">
-    <Form.Label>End Time <span className="text-danger">*</span></Form.Label>
-    <div className="d-flex gap-2">
-      {/* Hours */}
+  </div>
+  {(errors.startTimeHour || errors.startTimeMinute || errors.startTimeAmPm) && (
+    <div className="text-danger small mt-1">Start time is required</div>
+  )}
+</Form.Group>
+<Form.Group as={Col} md={6} controlId="endTime">
+  <Form.Label>End Time <span className="text-danger">*</span></Form.Label>
+  <div className="d-flex gap-2 align-items-start">
+    <div>
+      <Form.Label className="small">Hour</Form.Label>
       <Form.Select
         {...register('endTimeHour', { required: 'End hour is required' })}
         isInvalid={!!errors.endTimeHour}
       >
         <option value="">Hour</option>
-        {Array.from({length: 12}, (_, i) => i + 1).map(hour => (
+        {Array.from({ length: 12 }, (_, i) => i + 1).map(hour => (
           <option key={`end-hour-${hour}`} value={hour}>{hour}</option>
         ))}
       </Form.Select>
-      
-      {/* Minutes */}
+    </div>
+
+    <div>
+      <Form.Label className="small">Minute</Form.Label>
       <Form.Select
         {...register('endTimeMinute', { required: 'End minute is required' })}
         isInvalid={!!errors.endTimeMinute}
@@ -418,8 +425,10 @@ const onSubmit = async (data) => {
         <option value="30">30</option>
         <option value="45">45</option>
       </Form.Select>
-      
-      {/* AM/PM */}
+    </div>
+
+    <div>
+      <Form.Label className="small">AM/PM</Form.Label>
       <Form.Select
         {...register('endTimeAmPm', { required: 'End AM/PM is required' })}
         isInvalid={!!errors.endTimeAmPm}
@@ -429,54 +438,14 @@ const onSubmit = async (data) => {
         <option value="PM">PM</option>
       </Form.Select>
     </div>
-    {(errors.endTimeHour || errors.endTimeMinute || errors.endTimeAmPm) && (
-      <div className="text-danger small mt-1">End time is required</div>
-    )}
-  </Form.Group>
+  </div>
+  {(errors.endTimeHour || errors.endTimeMinute || errors.endTimeAmPm) && (
+    <div className="text-danger small mt-1">End time is required</div>
+  )}
+</Form.Group>
 </Row>
-{/* <Row className="mb-3">
-  <Form.Group as={Col} md={6} controlId="startTime">
-    <Form.Label>Start Time <span className="text-danger">*</span></Form.Label>
-    <Form.Select
-      {...register('startTime', { required: 'Start time is required' })}
-      isInvalid={!!errors.startTime}
-    >
-      <option value="">Select Start Time</option>
-      {timeOptions.map((time, idx) => (
-        <option key={idx} value={time}>{time}</option>
-      ))}
-    </Form.Select>
-    <Form.Control.Feedback type="invalid">
-      {errors.startTime?.message}
-    </Form.Control.Feedback>
-  </Form.Group>
 
-  <Form.Group as={Col} md={6} controlId="endTime">
-    <Form.Label>End Time <span className="text-danger">*</span></Form.Label>
-    <Form.Select
-      {...register('endTime', {
-        required: 'End time is required',
-        validate: value => {
-          const times = timeOptions;
-          const start = watch('startTime');
-          const startIndex = times.indexOf(start);
-          const endIndex = times.indexOf(value);
-          if (!start || startIndex === -1 || endIndex === -1) return true;
-          return endIndex > startIndex || "End time must be after start time";
-        }
-      })}
-      isInvalid={!!errors.endTime}
-    >
-      <option value="">Select End Time</option>
-      {timeOptions.map((time, idx) => (
-        <option key={idx} value={time}>{time}</option>
-      ))}
-    </Form.Select>
-    <Form.Control.Feedback type="invalid">
-      {errors.endTime?.message}
-    </Form.Control.Feedback>
-  </Form.Group>
-</Row> */}
+
 
 
             <Row className="mb-3">
