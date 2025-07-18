@@ -12,7 +12,11 @@ import {
 
 // Sample template images (replace with your actual image paths)
 import classTemplateImg from "./images/class-template.jpg";
-import quoteTemplateImg from "./images/quote-template.jpg";
+import motivationalImage from "./images/motivational-reminder1.jpg";
+// import motivationalImage3 from "./images/motivational-reminder2.jpg";
+import motivationalImage3 from '.././././../management/Notification/images/motivational-reminder2.jpg'
+import motivationalImage2 from "./images/motivational-reminder3.jpg";
+// import motivationalImage3 from "./images/motivational-reminder4.jpg";
 import eventTemplateImg from "./images/event-template.jpg";
 import { reminderTemplate1 } from "./template";
 const NotificationCreator = () => {
@@ -55,13 +59,25 @@ const NotificationCreator = () => {
         id: "quote-1",
         name: "Daily Motivation",
         description: "Inspire students with positive quotes",
-        image: quoteTemplateImg,
+        image: motivationalImage,
       },
       {
         id: "quote-2",
         name: "Exam Encouragement",
         description: "Boost morale before tests",
-        image: quoteTemplateImg,
+        image: motivationalImage3,
+      },
+       {
+        id: "quote-3",
+        name: "Exam Encouragement",
+        description: "Boost morale before tests",
+        image: motivationalImage2,
+      },
+         {
+        id: "quote-3",
+        name: "Exam Encouragement",
+        description: "Boost morale before tests",
+        image: motivationalImage2,
       },
     ],
     event: [
