@@ -87,7 +87,7 @@ useEffect(() => {
         <Form onSubmit={handleSubmit(onSubmit)} className="p-3 rounded shadow-sm" style={{ backgroundColor: '#fff' }}>
           
           <Form.Group className="mb-3">
-            <Form.Label>Name</Form.Label>
+            <Form.Label>Name</Form.Label>  
             <Form.Control
               type="text"
               {...register('name', { required: 'Name is required' })}
