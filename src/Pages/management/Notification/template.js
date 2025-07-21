@@ -257,7 +257,274 @@ export const classTemplate2 = ({
   </html>
 `;
 
+export const classTemplate3 = ({
+  title,
+  message,
+  date,
+  time,
+  instructor,
+}) => `<!DOCTYPE html>
+<html>
 
+<body>
+<div style="
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  background-color: #f5f7fa;
+  padding: 25px;
+  max-width: 500px;
+  margin: 20px auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+">
+  <!-- Header Section -->
+  <div style="
+    background: linear-gradient(135deg, #e83561 0%, #00d2ff 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+  ">
+    <h1 style="
+      margin: 0;
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    ">{{title}}</h1>
+    <p style="
+      margin: 8px 0 0;
+      font-size: 14px;
+      opacity: 0.9;
+    ">Class Reminder</p>
+  </div>
+  
+  <!-- Message Content -->
+  <div style="
+    background: white;
+    padding: 18px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  ">
+    <p style="
+      margin: 0;
+      color: #555;
+      line-height: 1.5;
+      font-size: 15px;
+    ">{{message}}</p>
+  </div>
+  
+  <!-- Details Grid -->
+  <div style="
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 20px;
+  ">
+    <!-- Date -->
+    <div style="
+      background: #f8f9fa;
+      padding: 12px;
+      border-radius: 6px;
+    ">
+      <p style="
+        margin: 0 0 4px;
+        font-size: 12px;
+        color: #7f8c8d;
+        text-transform: uppercase;
+      ">Date</p>
+      <p style="
+        margin: 0;
+        font-size: 16px;
+        color: #2c3e50;
+        font-weight: 500;
+      ">{{date}}</p>
+    </div>
+    
+    <!-- Time -->
+    <div style="
+      background: #f8f9fa;
+      padding: 12px;
+      border-radius: 6px;
+    ">
+      <p style="
+        margin: 0 0 4px;
+        font-size: 12px;
+        color: #7f8c8d;
+        text-transform: uppercase;
+      ">Time</p>
+      <p style="
+        margin: 0;
+        font-size: 16px;
+        color: #2c3e50;
+        font-weight: 500;
+      ">{{time}}</p>
+    </div>
+    
+    <!-- Class Name -->
+    <div style="
+      background: #f8f9fa;
+      padding: 12px;
+      border-radius: 6px;
+    ">
+      <p style="
+        margin: 0 0 4px;
+        font-size: 12px;
+        color: #7f8c8d;
+        text-transform: uppercase;
+      ">Class</p>
+      <p style="
+        margin: 0;
+        font-size: 16px;
+        color: #2c3e50;
+        font-weight: 500;
+      ">{{classname}}</p>
+    </div>
+    
+    <!-- Instructor -->
+    <div style="
+      background: #f8f9fa;
+      padding: 12px;
+      border-radius: 6px;
+    ">
+      <p style="
+        margin: 0 0 4px;
+        font-size: 12px;
+        color: #7f8c8d;
+        text-transform: uppercase;
+      ">Instructor</p>
+      <p style="
+        margin: 0;
+        font-size: 16px;
+        color: #2c3e50;
+        font-weight: 500;
+      ">{{instructor}}</p>
+    </div>
+  </div>
+  
+  <!-- Footer -->
+  <div style="
+    text-align: center;
+    font-size: 12px;
+    color: #95a5a6;
+    padding-top: 15px;
+    border-top: 1px solid #ecf0f1;
+  ">
+    <p style="margin: 0;">Please arrive 5 minutes before class starts</p>
+  </div>
+</div>
+</body>
+
+</html>
+`;
+
+export const classTemplate4 = ({
+  title,
+  message,
+  date,
+  time,
+  instructor,
+}) => `
+<!DOCTYPE html>
+<html>
+<body>
+<div style="
+  font-family: 'Arial', sans-serif;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 25px;
+  max-width: 450px;
+  margin: 0 auto;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+">
+  <!-- Header -->
+  <div style="text-align: center; margin-bottom: 5px;">
+    <p style="
+      margin: 0;
+      color: #666666;
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    ">{{class Name}}</p>
+  </div>
+  
+  <!-- Main Title -->
+  <h1 style="
+    margin: 0 0 20px 0;
+    padding: 0;
+    color: #333333;
+    font-size: 22px;
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: 600;
+  ">{{title}}</h1>
+ 
+  
+  <!-- Content Box -->
+  <div style="
+    background-color: #f9f9f9;
+    border-radius: 6px;
+    padding: 18px;
+    margin-bottom: 20px;
+  ">
+  <div style="display:flex;flex-direction:row;justify-content:space-between">
+    <p style="
+      margin: 0;
+      color: #555555;
+      line-height: 1.5;
+      font-size: 14px;
+      text-align: center;
+    ">{{Date}}</p>
+     <p style="
+      margin: 0;
+      color: #555555;
+      line-height: 1.5;
+      font-size: 14px;
+      text-align: center;
+    ">{{time}}</p>
+    </div>
+  </div>
+  
+  <!-- Time Section -->
+
+  
+   <div style="
+    background-color: #003865;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 15px;
+    text-align: center;
+  ">
+    <p style="
+      margin: 0;
+      color: #fff;
+      font-weight: bold;
+      font-size: 15px;
+    ">{{Instructor}}</p>
+  </div>
+  
+  
+    <div style="
+    background-color: #e83561;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 15px;
+    text-align: center;
+  ">
+    <p style="
+      margin: 0;
+      color: #fff;
+      font-weight: bold;
+      font-size: 15px;
+    ">{{Message}}</p>
+  </div>
+  <!-- Additional Text -->
+  
+</div>
+</body>
+</html>
+`;
 
 // Event Templates
 export const eventTemplate1 = ({ title, message, date, time }) => `

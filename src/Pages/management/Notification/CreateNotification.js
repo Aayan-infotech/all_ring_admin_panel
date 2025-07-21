@@ -406,8 +406,8 @@ import eventTemplateImg from "./images/event-template.jpg";
 import {
   classTemplate1,
   classTemplate2,
-  // classTemplate3,
-  // classTemplate4,
+  classTemplate3,
+  classTemplate4,
   eventTemplate1,
   eventTemplate2,
   eventTemplate3,
@@ -442,8 +442,8 @@ const NotificationCreator = () => {
   const templateMap = {
     "class-1": classTemplate1,
     "class-2": classTemplate2,
-    // "class-3": classTemplate3,
-    // "class-4": classTemplate4,
+    "class-3": classTemplate3,
+    "class-4": classTemplate4,
     "quote-1": reminderTemplate1,
     "quote-2": reminderTemplate2,
     "quote-3": reminderTemplate3,
@@ -475,18 +475,18 @@ const NotificationCreator = () => {
         description: "Reminder for assignment deadlines",
         image: classTemplateImg,
       },
-      // {
-      //   id: "class-3",
-      //   name: "Assignment Alert",
-      //   description: "Reminder for assignment deadlines",
-      //   image: classTemplateImg,
-      // },
-      // {
-      //   id: "class-4",
-      //   name: "Assignment Alert",
-      //   description: "Reminder for assignment deadlines",
-      //   image: classTemplateImg,
-      // },
+      {
+        id: "class-3",
+        name: "Assignment Alert",
+        description: "Reminder for assignment deadlines",
+        image: classTemplateImg,
+      },
+      {
+        id: "class-4",
+        name: "Assignment Alert",
+        description: "Reminder for assignment deadlines",
+        image: classTemplateImg,
+      },
     ],
     quote: [
       {
