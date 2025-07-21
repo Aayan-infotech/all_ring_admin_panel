@@ -406,8 +406,12 @@ import eventTemplateImg from "./images/event-template.jpg";
 import {
   classTemplate1,
   classTemplate2,
+  // classTemplate3,
+  // classTemplate4,
   eventTemplate1,
   eventTemplate2,
+  eventTemplate3,
+  eventTemplate4,
   reminderTemplate1,
   reminderTemplate2,
   reminderTemplate3,
@@ -438,12 +442,16 @@ const NotificationCreator = () => {
   const templateMap = {
     "class-1": classTemplate1,
     "class-2": classTemplate2,
+    // "class-3": classTemplate3,
+    // "class-4": classTemplate4,
     "quote-1": reminderTemplate1,
     "quote-2": reminderTemplate2,
     "quote-3": reminderTemplate3,
     "quote-4": reminderTemplate4,
     "event-1": eventTemplate1,
     "event-2": eventTemplate2,
+    "event-3": eventTemplate3,
+    "event-4": eventTemplate4,
   };
 
   const EmailTemplateViewer = ({ templateId, title, message, date, time, className, instructor }) => {
@@ -467,6 +475,18 @@ const NotificationCreator = () => {
         description: "Reminder for assignment deadlines",
         image: classTemplateImg,
       },
+      // {
+      //   id: "class-3",
+      //   name: "Assignment Alert",
+      //   description: "Reminder for assignment deadlines",
+      //   image: classTemplateImg,
+      // },
+      // {
+      //   id: "class-4",
+      //   name: "Assignment Alert",
+      //   description: "Reminder for assignment deadlines",
+      //   image: classTemplateImg,
+      // },
     ],
     quote: [
       {
@@ -503,6 +523,18 @@ const NotificationCreator = () => {
       },
       {
         id: "event-2",
+        name: "Workshop Alert",
+        description: "Announce skill-building sessions",
+        image: eventTemplateImg,
+      },
+       {
+        id: "event-3",
+        name: "Workshop Alert",
+        description: "Announce skill-building sessions",
+        image: eventTemplateImg,
+      },
+       {
+        id: "event-4",
         name: "Workshop Alert",
         description: "Announce skill-building sessions",
         image: eventTemplateImg,

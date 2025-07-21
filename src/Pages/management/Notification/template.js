@@ -107,7 +107,14 @@ import motivationalImage3 from "./images/motivational-reminder4.jpg";
 import eventTemplateImg from "./images/event-template.jpg";
 
 // Class Templates
-export const classTemplate1 = ({ title, message, date, time, className, instructor }) => `
+export const classTemplate1 = ({
+  title,
+  message,
+  date,
+  time,
+  className,
+  instructor,
+}) => `
   <!DOCTYPE html>
   <html>
     <head>
@@ -139,8 +146,12 @@ export const classTemplate1 = ({ title, message, date, time, className, instruct
                                     padding: 30px;
                                     box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
           <h2 style="color: #2c3e50; border-bottom: 2px solid #3498db; 
-                     padding-bottom: 10px; margin-top: 0;">${title || "Class Reminder"}</h2>
-          <p style="font-size: 16px; line-height: 1.6;">${message || "This is a reminder about your upcoming class."}</p>
+                     padding-bottom: 10px; margin-top: 0;">${
+                       title || "Class Reminder"
+                     }</h2>
+          <p style="font-size: 16px; line-height: 1.6;">${
+            message || "This is a reminder about your upcoming class."
+          }</p>
           
           <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 20px;">
             <div style="display: flex; margin-bottom: 8px;">
@@ -174,7 +185,14 @@ export const classTemplate1 = ({ title, message, date, time, className, instruct
   </html>
 `;
 
-export const classTemplate2 = ({ title, message, date, time, className, instructor }) => `
+export const classTemplate2 = ({
+  title,
+  message,
+  date,
+  time,
+  className,
+  instructor,
+}) => `
   <!DOCTYPE html>
   <html>
     <head>
@@ -197,8 +215,13 @@ export const classTemplate2 = ({ title, message, date, time, className, instruct
                     padding: 30px;
                     border-radius: 10px;
                     box-shadow: 0 0 20px rgba(0,0,0,0.1);">
-          <h2 style="color: #e74c3c; margin-top: 0;">${title || "Assignment Deadline"}</h2>
-          <p style="font-size: 16px; color: #555;">${message || "This is a reminder about your upcoming assignment deadline."}</p>
+          <h2 style="color: #e74c3c; margin-top: 0;">${
+            title || "Assignment Deadline"
+          }</h2>
+          <p style="font-size: 16px; color: #555;">${
+            message ||
+            "This is a reminder about your upcoming assignment deadline."
+          }</p>
           
           <div style="margin-top: 25px;">
             <div style="display: flex; align-items: center; margin-bottom: 10px;">
@@ -207,7 +230,9 @@ export const classTemplate2 = ({ title, message, date, time, className, instruct
             </div>
             <div style="display: flex; align-items: center; margin-bottom: 10px;">
               <span style="width: 100px; font-weight: bold;">Due Date:</span>
-              <span>${date || "Not specified"} at ${time || "Not specified"}</span>
+              <span>${date || "Not specified"} at ${
+  time || "Not specified"
+}</span>
             </div>
             <div style="display: flex; align-items: center;">
               <span style="width: 100px; font-weight: bold;">Instructor:</span>
@@ -231,6 +256,8 @@ export const classTemplate2 = ({ title, message, date, time, className, instruct
     </body>
   </html>
 `;
+
+
 
 // Event Templates
 export const eventTemplate1 = ({ title, message, date, time }) => `
@@ -259,7 +286,9 @@ export const eventTemplate1 = ({ title, message, date, time }) => `
                     text-align: center;
                     box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
           
-          <h1 style="color: #9b59b6; margin-top: 0;">${title || "You're Invited!"}</h1>
+          <h1 style="color: #9b59b6; margin-top: 0;">${
+            title || "You're Invited!"
+          }</h1>
           <p style="font-size: 16px; color: #555; margin-bottom: 25px;">
             ${message || "We'd love for you to join us for this special event."}
           </p>
@@ -269,7 +298,9 @@ export const eventTemplate1 = ({ title, message, date, time }) => `
                       border-radius: 8px;
                       margin-bottom: 25px;">
             <div style="font-size: 18px; font-weight: bold; color: #8e44ad;">
-              <div style="margin-bottom: 8px;">📅 ${date || "Date not specified"}</div>
+              <div style="margin-bottom: 8px;">📅 ${
+                date || "Date not specified"
+              }</div>
               <div>⏰ ${time || "Time not specified"}</div>
             </div>
           </div>
@@ -324,12 +355,17 @@ export const eventTemplate2 = ({ title, message, date, time }) => `
                     box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
           
           <div style="text-align: center; margin-bottom: 25px;">
-            <h2 style="color: #2c3e50; margin-bottom: 10px;">${title || "Workshop Announcement"}</h2>
+            <h2 style="color: #2c3e50; margin-bottom: 10px;">${
+              title || "Workshop Announcement"
+            }</h2>
             <div style="width: 50px; height: 3px; background: #3498db; margin: 0 auto;"></div>
           </div>
           
           <p style="font-size: 16px; line-height: 1.6; color: #34495e;">
-            ${message || "Join us for an exciting workshop to enhance your skills!"}
+            ${
+              message ||
+              "Join us for an exciting workshop to enhance your skills!"
+            }
           </p>
           
           <div style="background-color: #f8f9fa;
@@ -362,6 +398,301 @@ export const eventTemplate2 = ({ title, message, date, time }) => `
           </div>
         </div>
       </div>
+    </body>
+  </html>
+`;
+
+export const eventTemplate3 = ({
+  title,
+  message,
+  date,
+  time,
+  className,
+  instructor,
+}) => `
+  <!DOCTYPE html>
+  <html>
+  <body>
+    <div style="
+  font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
+  padding: 40px;
+  text-align: center;
+">
+  <div style="
+    background-color: black;
+    border-radius: 15px;
+    padding: 30px;
+    max-width: 500px;
+    margin: 0 auto;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  ">
+    <h1 style="
+      color: #fff;
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 30px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    ">EVENT INVITATION</h1>
+    
+    <div style="
+      margin-bottom: 25px;
+      border-top: 2px solid #eee;
+      padding-top: 25px;
+    ">
+      <h5 style="
+        font-size: 18px;
+        color: #fff;
+        margin-bottom: 10px;
+        letter-spacing: 1px;
+      ">${title}</h5>
+      <p style="
+        font-size: 18px;
+        color: #fff;
+        margin-bottom: 10px;
+        letter-spacing: 1px;
+      ">TIME & ACCOMMODATION</p>
+    </div>
+    
+    <div style="
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    ">
+      <div style="text-align: left;">
+        <p style="
+          font-size: 16px;
+          color: #fff;
+          margin-bottom: 8px;
+        ">TIME</p>
+        <p style="
+          font-size: 18px;
+          color: #fff;
+          font-weight: bold;
+        ">00:00</p>
+      </div>
+      
+      <div style="text-align: right;">
+        <p style="
+          font-size: 16px;
+          color: #fff;
+          margin-bottom: 8px;
+        ">DATE</p>
+        <p style="
+          font-size: 18px;
+          color: #fff;
+          font-weight: bold;
+        ">DD/MM/YYYY</p>
+      </div>
+    </div>
+    
+    <div style="
+      background-color: #f9f9f9;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 25px;
+    ">
+      <p style="
+        font-size: 16px;
+        color: #000;
+        margin-bottom: 5px;
+      ">VENUE</p>
+      <p style="
+        font-size: 18px;
+        color: #000;
+        font-weight: bold;
+      ">LOCATION NAME</p>
+    </div>
+    
+    <div style="
+      background-color: #4CAF50;
+      color: white;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 20px;
+      font-weight: bold;
+    ">
+      PRICE: $3500
+    </div>
+  </div>
+</div>
+    </body>
+  </html>
+  `;
+
+export const eventTemplate4 = ({
+  title,
+  message,
+  date,
+  time,
+  className,
+  instructor,
+}) => `
+  <!DOCTYPE html>
+  <html>
+    <body>
+<div style="
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+  padding: 40px 20px;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+">
+  <div style="
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+    position: relative;
+  ">
+    <!-- Header with gradient -->
+    <div style="
+      background: linear-gradient(135deg, #e83561 0%, #003865 100%);
+      padding: 30px;
+      color: white;
+      text-align: center;
+    ">
+      <h1 style="
+        margin: 0;
+        font-size: 32px;
+        font-weight: 700;
+        letter-spacing: 1px;
+      ">EXCLUSIVE EVENT</h1>
+      <p style="
+        margin: 10px 0 0;
+        font-size: 16px;
+        opacity: 0.9;
+        letter-spacing: 0.5px;
+      ">You're Cordially Invited</p>
+    </div>
+    
+    <!-- Event Details -->
+    <div style="padding: 30px;">
+      <!-- Date/Time -->
+      <div style="
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 25px;
+        padding-bottom: 25px;
+        border-bottom: 1px solid #f0f0f0;
+      ">
+        <div>
+          <p style="
+            margin: 0 0 5px;
+            font-size: 14px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+          ">Date</p>
+          <p style="
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+          ">June 15, 2024</p>
+        </div>
+        <div>
+          <p style="
+            margin: 0 0 5px;
+            font-size: 14px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+          ">Time</p>
+          <p style="
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+          ">7:00 PM</p>
+        </div>
+      </div>
+      
+      <!-- Location -->
+      <div style="margin-bottom: 25px;">
+        <p style="
+          margin: 0 0 5px;
+          font-size: 14px;
+          color: #888;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        ">Location</p>
+        <p style="
+          margin: 0;
+          font-size: 20px;
+          font-weight: 600;
+          color: #333;
+        ">Grand Ballroom</p>
+        <p style="
+          margin: 5px 0 0;
+          font-size: 16px;
+          color: #666;
+        ">123 Luxury Avenue, Metropolis</p>
+      </div>
+      
+      <!-- Dress Code -->
+      <div style="
+        background: #f9f9f9;
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 25px;
+      ">
+        <p style="
+          margin: 0 0 5px;
+          font-size: 14px;
+          color: #888;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        ">Dress Code</p>
+        <p style="
+          margin: 0;
+          font-size: 18px;
+          font-weight: 600;
+          color: #764ba2;
+        ">Black Tie Optional</p>
+      </div>
+      
+      <!-- Price -->
+      <div style="
+        background: linear-gradient(135deg, #ff9a9e 0%, #e83561 100%);
+        border-radius: 12px;
+        padding: 15px;
+        text-align: center;
+      ">
+        <p style="
+          margin: 0;
+          font-size: 14px;
+          color: rgba(255,255,255,0.9);
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        ">Ticket Price</p>
+        <p style="
+          margin: 5px 0 0;
+          font-size: 28px;
+          font-weight: 700;
+          color: white;
+        ">$3500</p>
+      </div>
+    </div>
+    
+    <!-- Footer -->
+    <div style="
+      background: #f9f9f9;
+      padding: 20px;
+      text-align: center;
+      font-size: 14px;
+      color: #888;
+    ">
+      <p style="margin: 0;">RSVP by June 1st • Limited Seats Available</p>
+    </div>
+  </div>
+</div>
+</div>
     </body>
   </html>
 `;
