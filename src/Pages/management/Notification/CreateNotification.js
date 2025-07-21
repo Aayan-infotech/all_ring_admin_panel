@@ -18,7 +18,7 @@ import motivationalImage3 from '.././././../management/Notification/images/motiv
 import motivationalImage2 from "./images/motivational-reminder3.jpg";
 // import motivationalImage3 from "./images/motivational-reminder4.jpg";
 import eventTemplateImg from "./images/event-template.jpg";
-import { reminderTemplate1 } from "./template";
+import { reminderTemplate1, reminderTemplate2, reminderTemplate3, reminderTemplate4 } from "./template";
 const NotificationCreator = () => {
   const [notificationType, setNotificationType] = useState("");
   const [selectedTemplate, setSelectedTemplate] = useState(null);
@@ -31,10 +31,18 @@ const NotificationCreator = () => {
     instructor: "",
   });
 
-  const EmailTemplateViewer = () => {
+  const templateMap = {
+    'quote-1': reminderTemplate1,
+    'quote-2': reminderTemplate2,
+    'quote-3': reminderTemplate3,
+    'quote-4': reminderTemplate4,
+  };
+
+  const EmailTemplateViewer = ({ templateId, title }) => {
+    const templateFunction = templateMap[templateId] || reminderTemplate1;
     return (
       <div
-        dangerouslySetInnerHTML={{ __html: reminderTemplate1 }}
+        dangerouslySetInnerHTML={{ __html: templateFunction(title) }}
       />
     );
   };
@@ -67,14 +75,14 @@ const NotificationCreator = () => {
         description: "Boost morale before tests",
         image: motivationalImage3,
       },
-       {
+      {
         id: "quote-3",
         name: "Exam Encouragement",
         description: "Boost morale before tests",
         image: motivationalImage2,
       },
-         {
-        id: "quote-3",
+      {
+        id: "quote-4",
         name: "Exam Encouragement",
         description: "Boost morale before tests",
         image: motivationalImage2,
@@ -132,36 +140,36 @@ const NotificationCreator = () => {
 
       {/* Notification Type Selector */}
       {/* Notification Type Selector as Dropdown */}
-<div className="mb-4">
-  <label className="form-label small text-muted mb-2">
-    SELECT NOTIFICATION TYPE
-  </label>
-  <select
-    className="form-select"
-    value={notificationType}
-    onChange={(e) => {
-      const selected = e.target.value;
-      setNotificationType(selected);
-      setSelectedTemplate(null);
-      setFormData({
-        title: "",
-        message: "",
-        date: "",
-        time: "",
-        className: "",
-        instructor: "",
-      });
-    }}
-    style={{ borderColor: "var(--primary)", maxWidth: "300px" }}
-  >
-    <option value="" disabled selected hidden>
-      Select Notification Type...
-    </option>
-    <option value="class">Class Reminder</option>
-    <option value="quote">Inspirational Quote</option>
-    <option value="event">Upcoming Event Invitation</option>
-  </select>
-</div>
+      <div className="mb-4">
+        <label className="form-label small text-muted mb-2">
+          SELECT NOTIFICATION TYPE
+        </label>
+        <select
+          className="form-select"
+          value={notificationType}
+          onChange={(e) => {
+            const selected = e.target.value;
+            setNotificationType(selected);
+            setSelectedTemplate(null);
+            setFormData({
+              title: "",
+              message: "",
+              date: "",
+              time: "",
+              className: "",
+              instructor: "",
+            });
+          }}
+          style={{ borderColor: "var(--primary)", maxWidth: "300px" }}
+        >
+          <option value="" disabled selected hidden>
+            Select Notification Type...
+          </option>
+          <option value="class">Class Reminder</option>
+          <option value="quote">Inspirational Quote</option>
+          <option value="event">Upcoming Event Invitation</option>
+        </select>
+      </div>
 
       {/* Template Selection */}
       {notificationType && (
@@ -169,29 +177,23 @@ const NotificationCreator = () => {
           <label className="form-label small text-muted mb-2">
             CHOOSE A TEMPLATE
           </label>
-          <div className="d-flex gap-3 flex-wrap">
+          <div className="row">
             {templates[notificationType].map((template) => (
               <div
                 key={template.id}
                 onClick={() => setSelectedTemplate(template)}
-                className={`position-relative overflow-hidden rounded-3 ${
-                  selectedTemplate?.id === template.id
-                    ? "border-primary border-2 shadow-sm"
-                    : "border"
-                }`}
-                style={{
-                  width: "280px",
-                  height: "180px",
-                  cursor: "pointer",
-                  transition: "all 0.2s",
-                }}
+                className={`col-3 ${selectedTemplate?.id === template.id
+                  ? "border-primary border-2 shadow-sm"
+                  : "border"
+                  }`}
+
               >
                 <img
                   src={template.image}
                   alt={template.name}
                   className="w-100 h-100 object-fit-cover"
                 />
-              
+
                 {selectedTemplate?.id === template.id && (
                   <div className="position-absolute top-0 end-0 m-2 bg-primary rounded-circle p-1">
                     <svg
@@ -256,33 +258,33 @@ const NotificationCreator = () => {
 
                   {(notificationType === "class" ||
                     notificationType === "event") && (
-                    <div className="row mb-3">
-                      <div className="col-md-6">
-                        <label className="form-label">Date</label>
-                        <input
-                          type="date"
-                          className="form-control"
-                          name="date"
-                          value={formData.date}
-                          onChange={handleInputChange}
-                          required
-                          style={{ borderColor: "var(--secondary)" }}
-                        />
+                      <div className="row mb-3">
+                        <div className="col-md-6">
+                          <label className="form-label">Date</label>
+                          <input
+                            type="date"
+                            className="form-control"
+                            name="date"
+                            value={formData.date}
+                            onChange={handleInputChange}
+                            required
+                            style={{ borderColor: "var(--secondary)" }}
+                          />
+                        </div>
+                        <div className="col-md-6">
+                          <label className="form-label">Time</label>
+                          <input
+                            type="time"
+                            className="form-control"
+                            name="time"
+                            value={formData.time}
+                            onChange={handleInputChange}
+                            required
+                            style={{ borderColor: "var(--secondary)" }}
+                          />
+                        </div>
                       </div>
-                      <div className="col-md-6">
-                        <label className="form-label">Time</label>
-                        <input
-                          type="time"
-                          className="form-control"
-                          name="time"
-                          value={formData.time}
-                          onChange={handleInputChange}
-                          required
-                          style={{ borderColor: "var(--secondary)" }}
-                        />
-                      </div>
-                    </div>
-                  )}
+                    )}
 
                   {notificationType === "class" && (
                     <>
@@ -355,8 +357,15 @@ const NotificationCreator = () => {
 
           {/* Preview Column */}
           <div className="col-lg-6">
-          
-            <EmailTemplateViewer/>
+
+            <EmailTemplateViewer
+             templateId={selectedTemplate?.id}
+              title={formData.title}
+              message={formData.message}
+              date={formData.date}
+              time={formData.time}
+              className={formData.className}
+              instructor={formData.instructor} />
 
           </div>
         </div>

@@ -4,7 +4,7 @@ import motivationalImage2 from "./images/motivational-reminder3.jpg";
 import motivationalImage3 from "./images/motivational-reminder4.jpg";
 
 
-export const reminderTemplate1 = `
+export const reminderTemplate1 = ({ title }) => `
   <!DOCTYPE html>
   <html>
     <head>
@@ -16,8 +16,10 @@ export const reminderTemplate1 = `
     </head>
     <body>
     <div style="background-image: url('${motivationalImage}');background-size:contain;background-repeat:no-repeat;height:600px">
-        <h1>Hello, Daksh!</h1>
-        <p>Thank you for your interest in our service.</p>
+    <div style="padding-left:140px;padding-top:30px;">
+       <h3>${title || 'Default Title'}</h1>
+        <p>Thank you for your interest in our service. sfsfdsd fsfsdf sdfsdfsd sdfsfsd</p>
+        </div>
       </div>
     </body>
   </html>
