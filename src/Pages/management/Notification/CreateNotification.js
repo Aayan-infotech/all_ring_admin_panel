@@ -14,11 +14,18 @@ import {
 import classTemplateImg from "./images/class-template.jpg";
 import motivationalImage from "./images/motivational-reminder1.jpg";
 // import motivationalImage3 from "./images/motivational-reminder2.jpg";
-import motivationalImage3 from '.././././../management/Notification/images/motivational-reminder2.jpg'
+import motivationalImage3 from ".././././../management/Notification/images/motivational-reminder2.jpg";
 import motivationalImage2 from "./images/motivational-reminder3.jpg";
 // import motivationalImage3 from "./images/motivational-reminder4.jpg";
 import eventTemplateImg from "./images/event-template.jpg";
-import { reminderTemplate1, reminderTemplate2, reminderTemplate3, reminderTemplate4 } from "./template";
+import motivationalImage4 from "./images/motivational-reminder4.jpg";
+
+import {
+  reminderTemplate1,
+  reminderTemplate2,
+  reminderTemplate3,
+  reminderTemplate4,
+} from "./template";
 const NotificationCreator = () => {
   const [notificationType, setNotificationType] = useState("");
   const [selectedTemplate, setSelectedTemplate] = useState(null);
@@ -32,18 +39,16 @@ const NotificationCreator = () => {
   });
 
   const templateMap = {
-    'quote-1': reminderTemplate1,
-    'quote-2': reminderTemplate2,
-    'quote-3': reminderTemplate3,
-    'quote-4': reminderTemplate4,
+    "quote-1": reminderTemplate1,
+    "quote-2": reminderTemplate2,
+    "quote-3": reminderTemplate3,
+    "quote-4": reminderTemplate4,
   };
 
   const EmailTemplateViewer = ({ templateId, title }) => {
     const templateFunction = templateMap[templateId] || reminderTemplate1;
     return (
-      <div
-        dangerouslySetInnerHTML={{ __html: templateFunction(title) }}
-      />
+      <div dangerouslySetInnerHTML={{ __html: templateFunction(title) }} />
     );
   };
 
@@ -85,7 +90,7 @@ const NotificationCreator = () => {
         id: "quote-4",
         name: "Exam Encouragement",
         description: "Boost morale before tests",
-        image: motivationalImage2,
+        image: motivationalImage4,
       },
     ],
     event: [
@@ -182,16 +187,17 @@ const NotificationCreator = () => {
               <div
                 key={template.id}
                 onClick={() => setSelectedTemplate(template)}
-                className={`col-3 ${selectedTemplate?.id === template.id
-                  ? "border-primary border-2 shadow-sm"
-                  : "border"
-                  }`}
-
+                className={`col-3 ${
+                  selectedTemplate?.id === template.id
+                    ? "border-primary border-2 shadow-sm"
+                    : "border"
+                }`}
               >
                 <img
                   src={template.image}
                   alt={template.name}
                   className="w-100 h-100 object-fit-cover"
+                  style={{ maxHeight: "150px", cursor: "pointer" }}
                 />
 
                 {selectedTemplate?.id === template.id && (
@@ -258,33 +264,33 @@ const NotificationCreator = () => {
 
                   {(notificationType === "class" ||
                     notificationType === "event") && (
-                      <div className="row mb-3">
-                        <div className="col-md-6">
-                          <label className="form-label">Date</label>
-                          <input
-                            type="date"
-                            className="form-control"
-                            name="date"
-                            value={formData.date}
-                            onChange={handleInputChange}
-                            required
-                            style={{ borderColor: "var(--secondary)" }}
-                          />
-                        </div>
-                        <div className="col-md-6">
-                          <label className="form-label">Time</label>
-                          <input
-                            type="time"
-                            className="form-control"
-                            name="time"
-                            value={formData.time}
-                            onChange={handleInputChange}
-                            required
-                            style={{ borderColor: "var(--secondary)" }}
-                          />
-                        </div>
+                    <div className="row mb-3">
+                      <div className="col-md-6">
+                        <label className="form-label">Date</label>
+                        <input
+                          type="date"
+                          className="form-control"
+                          name="date"
+                          value={formData.date}
+                          onChange={handleInputChange}
+                          required
+                          style={{ borderColor: "var(--secondary)" }}
+                        />
                       </div>
-                    )}
+                      <div className="col-md-6">
+                        <label className="form-label">Time</label>
+                        <input
+                          type="time"
+                          className="form-control"
+                          name="time"
+                          value={formData.time}
+                          onChange={handleInputChange}
+                          required
+                          style={{ borderColor: "var(--secondary)" }}
+                        />
+                      </div>
+                    </div>
+                  )}
 
                   {notificationType === "class" && (
                     <>
@@ -357,16 +363,15 @@ const NotificationCreator = () => {
 
           {/* Preview Column */}
           <div className="col-lg-6">
-
             <EmailTemplateViewer
-             templateId={selectedTemplate?.id}
+              templateId={selectedTemplate?.id}
               title={formData.title}
               message={formData.message}
               date={formData.date}
               time={formData.time}
               className={formData.className}
-              instructor={formData.instructor} />
-
+              instructor={formData.instructor}
+            />
           </div>
         </div>
       )}
