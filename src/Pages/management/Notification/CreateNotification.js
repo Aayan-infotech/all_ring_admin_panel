@@ -263,7 +263,17 @@ const NotificationCreator = () => {
           },
         }
       );
-      alert("Notification created successfully!");
+      if (res.status === 201) {
+        alert("Notification created successfully!");
+        setFormData({
+          title: "",
+          message: "",
+          date: "",
+          time: "",
+          className: "",
+          instructor: "",
+        });
+      }
     } catch (error) {
       console.log(error);
     }
