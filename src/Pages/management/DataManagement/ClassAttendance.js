@@ -46,7 +46,7 @@ const ClassAttendance = () => {
     const fetchClasses = async () => {
       try {
         setLoading(true);
-        const res = await axios.get('http://98.82.228.18:5010/api/AdminClasses/getAllClasses');
+        const res = await axios.get('http://98.85.246.54:5010/api/AdminClasses/getAllClasses');
         setData(res.data.data || []);
         
         const locations = [...new Set(res.data.data.map(cls => cls.location?.location).filter(Boolean))];
@@ -68,7 +68,7 @@ const ClassAttendance = () => {
       setSessionsLoading(true);
 
       const res = await axios.get(
-        `http://98.82.228.18:5010/api/AdminClasses/getClassByIdAdmin/${cls._id}`
+        `http://98.85.246.54:5010/api/AdminClasses/getClassByIdAdmin/${cls._id}`
       );
 
       setSessionsData(res.data?.data?.sessions || []);
@@ -87,7 +87,7 @@ const handleShowAttendance = async (session) => {
     setAttLoading(true);
 
     const res = await axios.get(
-      `http://98.82.228.18:5010/api/AdminClasses/getSessionAttendence/${selectedClass._id}/${session._id}`
+      `http://98.85.246.54:5010/api/AdminClasses/getSessionAttendence/${selectedClass._id}/${session._id}`
     );
 
     // Get the registered users from the response
@@ -117,7 +117,7 @@ const handleShowAttendance = async (session) => {
   //     setAttLoading(true);
 
   //     const res = await axios.get(
-  //       `http://98.82.228.18:5010/api/register/getRegistredUserWithAttendence/${selectedClass._id}/${session._id}`
+  //       `http://98.85.246.54:5010/api/register/getRegistredUserWithAttendence/${selectedClass._id}/${session._id}`
   //     );
 
   //     const users = res.data?.data?.users || [];

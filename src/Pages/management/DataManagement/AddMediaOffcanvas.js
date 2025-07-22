@@ -31,7 +31,7 @@ const AddMediaOffcanvas = ({ show,onSuccess, handleClose, classId }) => {
       }
 
       const response = await axios.post(
-        `http://98.82.228.18:5010/api/mediaAdmin/addMedia/${classId}`,
+        `http://98.85.246.54:5010/api/mediaAdmin/addMedia/${classId}`,
         formData,
         {
           headers: {

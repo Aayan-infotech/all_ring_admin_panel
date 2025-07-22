@@ -12,7 +12,7 @@ const FeedbackPage = () => {
 
   const fetchFeedbacks = async () => {
     try {
-const res = await axios.get(`http://98.82.228.18:5010/api/feedback/getAllFeedbacks/${classId}`);
+const res = await axios.get(`http://98.85.246.54:5010/api/feedback/getAllFeedbacks/${classId}`);
       setFeedbacks(res.data.data || []);
     } catch (err) {
       setError('Failed to load feedbacks');

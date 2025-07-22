@@ -14,7 +14,7 @@ const AddNotesOffcanvas = ({ show, handleClose, classId }) => {
   const fetchNotes = async () => {
     try {
       setLoadingNotes(true);
-      const response = await axios.get(`http://98.82.228.18:5010/api/notes/getNoteById/${classId}`);
+      const response = await axios.get(`http://98.85.246.54:5010/api/notes/getNoteById/${classId}`);
       setNotes(response.data.data ? [response.data.data] : []);
 
     } catch (error) {
@@ -40,7 +40,7 @@ const AddNotesOffcanvas = ({ show, handleClose, classId }) => {
       }
 
       const response = await axios.post(
-        `http://98.82.228.18:5010/api/notes/addNotes/${classId}`,
+        `http://98.85.246.54:5010/api/notes/addNotes/${classId}`,
         formData,
         {
           headers: {

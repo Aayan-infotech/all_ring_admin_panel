@@ -19,7 +19,7 @@ const AddInstructorOffcanvas = ({ show, handleClose, onInstructorAdded }) => {
 // useEffect(() => {
 //   const fetchLocations = async () => {
 //     try {
-//       const response = await axios.get('http://98.82.228.18:5010/api/location/getAllLocations');
+//       const response = await axios.get('http://98.85.246.54:5010/api/location/getAllLocations');
 //       setLocations(response.data?.data || []); // ✅ fix: use response.data.data instead of response.data.locations
 //     } catch (error) {
 //       console.error('Error fetching locations:', error);
@@ -32,7 +32,7 @@ const AddInstructorOffcanvas = ({ show, handleClose, onInstructorAdded }) => {
 useEffect(() => {
   const fetchLocations = async () => {
     try {
-      const response = await axios.get('http://98.82.228.18:5010/api/location/getAllLocations');
+      const response = await axios.get('http://98.85.246.54:5010/api/location/getAllLocations');
       
       // Filter to only include active locations
       const activeLocations = (response.data?.data || [])
@@ -61,7 +61,7 @@ useEffect(() => {
 
 
     try {
-      await axios.post('http://98.82.228.18:5010/api/auth/adminRegister/instructor', formData, {
+      await axios.post('http://98.85.246.54:5010/api/auth/adminRegister/instructor', formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
