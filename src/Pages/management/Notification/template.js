@@ -1,4 +1,3 @@
-
 import classTemplateImg from "./images/class-template.jpg";
 import motivationalImage from "./images/motivational-reminder1.jpg";
 import motivationalImage1 from "./images/motivational-reminder2.jpg";
@@ -8,7 +7,14 @@ import eventTemplateImg from "./images/event-template.jpg";
 
 // Class Templates
 // Class Reminder Template 1 (Professional Academic Design)
-export const classTemplate1 = ({ title, message, date, time, className, instructor }) => `
+export const classTemplate1 = ({
+  title,
+  message,
+  date,
+  time,
+  className,
+  instructor,
+}) => `
 <!DOCTYPE html>
 <html>
 <head>
@@ -50,24 +56,34 @@ export const classTemplate1 = ({ title, message, date, time, className, instruct
           </svg>
         </div>
         <h2 style="margin: 0; color: #2c3e50;">${title || "Class Reminder"}</h2>
-        <p style="color: #7f8c8d; margin-top: 5px;">${className || "Course Name"}</p>
+        <p style="color: #7f8c8d; margin-top: 5px;">${
+          className || "Course Name"
+        }</p>
       </div>
       
       <div style="background: #f8f9fa; border-radius: 10px; padding: 20px; margin-bottom: 25px;">
-        <p style="margin: 0 0 15px 0; color: #555; line-height: 1.5;">${message || "This is a reminder about your upcoming class session."}</p>
+        <p style="margin: 0 0 15px 0; color: #555; line-height: 1.5;">${
+          message || "This is a reminder about your upcoming class session."
+        }</p>
         
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
           <div>
             <p style="margin: 0 0 5px 0; font-size: 12px; color: #7f8c8d;">DATE</p>
-            <p style="margin: 0; font-weight: 600; color: #2c3e50;">${date || "Not specified"}</p>
+            <p style="margin: 0; font-weight: 600; color: #2c3e50;">${
+              date || "Not specified"
+            }</p>
           </div>
           <div>
             <p style="margin: 0 0 5px 0; font-size: 12px; color: #7f8c8d;">TIME</p>
-            <p style="margin: 0; font-weight: 600; color: #2c3e50;">${time || "Not specified"}</p>
+            <p style="margin: 0; font-weight: 600; color: #2c3e50;">${
+              time || "Not specified"
+            }</p>
           </div>
           <div>
             <p style="margin: 0 0 5px 0; font-size: 12px; color: #7f8c8d;">INSTRUCTOR</p>
-            <p style="margin: 0; font-weight: 600; color: #2c3e50;">${instructor || "Not specified"}</p>
+            <p style="margin: 0; font-weight: 600; color: #2c3e50;">${
+              instructor || "Not specified"
+            }</p>
           </div>
           <div>
             <p style="margin: 0 0 5px 0; font-size: 12px; color: #7f8c8d;">LOCATION</p>
@@ -95,7 +111,14 @@ export const classTemplate1 = ({ title, message, date, time, className, instruct
 `;
 
 // Class Reminder Template 2 (Modern Card Design)
-export const classTemplate2 = ({ title, message, date, time, className, instructor }) => `
+export const classTemplate2 = ({
+  title,
+  message,
+  date,
+  time,
+  className,
+  instructor,
+}) => `
 <!DOCTYPE html>
 <html>
 <head>
@@ -141,13 +164,19 @@ export const classTemplate2 = ({ title, message, date, time, className, instruct
           </svg>
         </div>
         <div>
-          <h2 style="margin: 0; color: #2c3e50; font-size: 22px;">${title || "Class Notification"}</h2>
-          <p style="margin: 5px 0 0 0; color: #7f8c8d; font-size: 14px;">${className || "Course"}</p>
+          <h2 style="margin: 0; color: #2c3e50; font-size: 22px;">${
+            title || "Class Notification"
+          }</h2>
+          <p style="margin: 5px 0 0 0; color: #7f8c8d; font-size: 14px;">${
+            className || "Course"
+          }</p>
         </div>
       </div>
       
       <div style="margin-bottom: 25px;">
-        <p style="color: #555; line-height: 1.6; margin-bottom: 20px;">${message || "Important information about your upcoming class."}</p>
+        <p style="color: #555; line-height: 1.6; margin-bottom: 20px;">${
+          message || "Important information about your upcoming class."
+        }</p>
         
         <div style="
           display: grid;
@@ -161,7 +190,9 @@ export const classTemplate2 = ({ title, message, date, time, className, instruct
             padding: 12px;
           ">
             <p style="margin: 0 0 5px 0; font-size: 12px; color: #7f8c8d;">DATE</p>
-            <p style="margin: 0; font-weight: 600; color: #2c3e50;">${date || "TBD"}</p>
+            <p style="margin: 0; font-weight: 600; color: #2c3e50;">${
+              date || "TBD"
+            }</p>
           </div>
           <div style="
             background: #f8f9fa;
@@ -169,7 +200,9 @@ export const classTemplate2 = ({ title, message, date, time, className, instruct
             padding: 12px;
           ">
             <p style="margin: 0 0 5px 0; font-size: 12px; color: #7f8c8d;">TIME</p>
-            <p style="margin: 0; font-weight: 600; color: #2c3e50;">${time || "TBD"}</p>
+            <p style="margin: 0; font-weight: 600; color: #2c3e50;">${
+              time || "TBD"
+            }</p>
           </div>
         </div>
         
@@ -179,7 +212,9 @@ export const classTemplate2 = ({ title, message, date, time, className, instruct
           padding: 12px;
         ">
           <p style="margin: 0 0 5px 0; font-size: 12px; color: #7f8c8d;">INSTRUCTOR</p>
-          <p style="margin: 0; font-weight: 600; color: #2c3e50;">${instructor || "Not assigned"}</p>
+          <p style="margin: 0; font-weight: 600; color: #2c3e50;">${
+            instructor || "Not assigned"
+          }</p>
         </div>
       </div>
       
@@ -213,7 +248,14 @@ export const classTemplate2 = ({ title, message, date, time, className, instruct
 `;
 
 // Class Reminder Template 3 (Minimalist Design)
-export const classTemplate3 = ({ title, message, date, time, className, instructor }) => `
+export const classTemplate3 = ({
+  title,
+  message,
+  date,
+  time,
+  className,
+  instructor,
+}) => `
 <!DOCTYPE html>
 <html>
 <head>
@@ -240,12 +282,18 @@ export const classTemplate3 = ({ title, message, date, time, className, instruct
       box-shadow: 0 5px 15px rgba(0,0,0,0.05);
     ">
       <div style="text-align: center; margin-bottom: 30px;">
-        <h2 style="margin: 0 0 10px 0; color: #2c3e50; font-size: 24px;">${title || "Class Reminder"}</h2>
-        <p style="margin: 0; color: #7f8c8d; font-size: 14px;">${className || "Course"}</p>
+        <h2 style="margin: 0 0 10px 0; color: #2c3e50; font-size: 24px;">${
+          title || "Class Reminder"
+        }</h2>
+        <p style="margin: 0; color: #7f8c8d; font-size: 14px;">${
+          className || "Course"
+        }</p>
       </div>
       
       <div style="margin-bottom: 30px;">
-        <p style="color: #555; line-height: 1.6; margin-bottom: 25px;">${message || "Don't forget about your upcoming class."}</p>
+        <p style="color: #555; line-height: 1.6; margin-bottom: 25px;">${
+          message || "Don't forget about your upcoming class."
+        }</p>
         
         <div style="
           display: flex;
@@ -255,7 +303,9 @@ export const classTemplate3 = ({ title, message, date, time, className, instruct
           border-bottom: 1px solid #eee;
         ">
           <span style="color: #7f8c8d; font-size: 14px;">Date</span>
-          <span style="font-weight: 500; color: #2c3e50;">${date || "Not scheduled"}</span>
+          <span style="font-weight: 500; color: #2c3e50;">${
+            date || "Not scheduled"
+          }</span>
         </div>
         
         <div style="
@@ -266,7 +316,9 @@ export const classTemplate3 = ({ title, message, date, time, className, instruct
           border-bottom: 1px solid #eee;
         ">
           <span style="color: #7f8c8d; font-size: 14px;">Time</span>
-          <span style="font-weight: 500; color: #2c3e50;">${time || "Not scheduled"}</span>
+          <span style="font-weight: 500; color: #2c3e50;">${
+            time || "Not scheduled"
+          }</span>
         </div>
         
         <div style="
@@ -274,7 +326,9 @@ export const classTemplate3 = ({ title, message, date, time, className, instruct
           justify-content: space-between;
         ">
           <span style="color: #7f8c8d; font-size: 14px;">Instructor</span>
-          <span style="font-weight: 500; color: #2c3e50;">${instructor || "Not assigned"}</span>
+          <span style="font-weight: 500; color: #2c3e50;">${
+            instructor || "Not assigned"
+          }</span>
         </div>
       </div>
       
@@ -298,7 +352,14 @@ export const classTemplate3 = ({ title, message, date, time, className, instruct
 `;
 
 // Class Reminder Template 4 (Elegant Design)
-export const classTemplate4 = ({ title, message, date, time, className, instructor }) => `
+export const classTemplate4 = ({
+  title,
+  message,
+  date,
+  time,
+  className,
+  instructor,
+}) => `
 <!DOCTYPE html>
 <html>
 <head>
@@ -353,7 +414,9 @@ export const classTemplate4 = ({ title, message, date, time, className, instruct
           line-height: 1.8;
           margin-bottom: 25px;
           font-size: 15px;
-        ">${message || "A friendly reminder about your upcoming class session."}</p>
+        ">${
+          message || "A friendly reminder about your upcoming class session."
+        }</p>
         
         <div style="
           display: grid;
@@ -488,25 +551,6 @@ export const eventTemplate1 = ({ title, message, date, time }) => `
               <div>⏰ ${time || "Time not specified"}</div>
             </div>
           </div>
-          
-          <div style="display: flex; justify-content: center; gap: 15px;">
-            <a href="#" style="background-color: #9b59b6;
-                              color: white;
-                              padding: 12px 25px;
-                              text-decoration: none;
-                              border-radius: 30px;
-                              font-weight: bold;">
-              Accept
-            </a>
-            <a href="#" style="background-color: #ecf0f1;
-                              color: #7f8c8d;
-                              padding: 12px 25px;
-                              text-decoration: none;
-                              border-radius: 30px;
-                              font-weight: bold;">
-              Decline
-            </a>
-          </div>
         </div>
       </div>
     </body>
@@ -523,14 +567,8 @@ export const eventTemplate2 = ({ title, message, date, time }) => `
       </style>
     </head>
     <body>
-      <div style="background-image: url('https://img.freepik.com/free-vector/gradient-network-connection-background_23-2148872918.jpg');
-                  background-size: cover;
-                  height: 600px;
-                  position: relative;">
-        <div style="position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
+
+        <div style="margin:auto;
                     width: 80%;
                     max-width: 600px;
                     background: rgba(255,255,255,0.9);
@@ -566,22 +604,8 @@ export const eventTemplate2 = ({ title, message, date, time }) => `
               <span>${time || "Not specified"}</span>
             </div>
           </div>
-          
-          <div style="text-align: center;">
-            <a href="#" style="display: inline-block;
-                              background: linear-gradient(to right, #3498db, #2c3e50);
-                              color: white;
-                              padding: 12px 30px;
-                              text-decoration: none;
-                              border-radius: 30px;
-                              font-weight: bold;
-                              margin-top: 15px;
-                              box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);">
-              Register Now
-            </a>
-          </div>
         </div>
-      </div>
+      
     </body>
   </html>
 `;
@@ -630,7 +654,7 @@ export const eventTemplate3 = ({
         color: #fff;
         margin-bottom: 10px;
         letter-spacing: 1px;
-      ">${title}</h5>
+      ">${title || "Event Title"}</h5>
       <p style="
         font-size: 18px;
         color: #fff;
@@ -681,23 +705,12 @@ export const eventTemplate3 = ({
         font-size: 16px;
         color: #000;
         margin-bottom: 5px;
-      ">VENUE</p>
+      ">Message</p>
       <p style="
         font-size: 18px;
         color: #000;
         font-weight: bold;
-      ">LOCATION NAME</p>
-    </div>
-    
-    <div style="
-      background-color: #4CAF50;
-      color: white;
-      padding: 15px;
-      border-radius: 8px;
-      font-size: 20px;
-      font-weight: bold;
-    ">
-      PRICE: $3500
+      ">${message || "Not specified"}</p>
     </div>
   </div>
 </div>
@@ -746,7 +759,7 @@ export const eventTemplate4 = ({
         font-size: 32px;
         font-weight: 700;
         letter-spacing: 1px;
-      ">EXCLUSIVE EVENT</h1>
+      ">${title || "Event Title"}</h1>
       <p style="
         margin: 10px 0 0;
         font-size: 16px;
@@ -805,74 +818,16 @@ export const eventTemplate4 = ({
           color: #888;
           text-transform: uppercase;
           letter-spacing: 1px;
-        ">Location</p>
-        <p style="
-          margin: 0;
-          font-size: 20px;
-          font-weight: 600;
-          color: #333;
-        ">Grand Ballroom</p>
+        ">Message</p>
+       
         <p style="
           margin: 5px 0 0;
           font-size: 16px;
           color: #666;
-        ">123 Luxury Avenue, Metropolis</p>
+        ">${message || "Not specified"}</p>
       </div>
       
-      <!-- Dress Code -->
-      <div style="
-        background: #f9f9f9;
-        border-radius: 12px;
-        padding: 15px;
-        margin-bottom: 25px;
-      ">
-        <p style="
-          margin: 0 0 5px;
-          font-size: 14px;
-          color: #888;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-        ">Dress Code</p>
-        <p style="
-          margin: 0;
-          font-size: 18px;
-          font-weight: 600;
-          color: #764ba2;
-        ">Black Tie Optional</p>
-      </div>
-      
-      <!-- Price -->
-      <div style="
-        background: linear-gradient(135deg, #ff9a9e 0%, #e83561 100%);
-        border-radius: 12px;
-        padding: 15px;
-        text-align: center;
-      ">
-        <p style="
-          margin: 0;
-          font-size: 14px;
-          color: rgba(255,255,255,0.9);
-          text-transform: uppercase;
-          letter-spacing: 1px;
-        ">Ticket Price</p>
-        <p style="
-          margin: 5px 0 0;
-          font-size: 28px;
-          font-weight: 700;
-          color: white;
-        ">$3500</p>
-      </div>
-    </div>
-    
-    <!-- Footer -->
-    <div style="
-      background: #f9f9f9;
-      padding: 20px;
-      text-align: center;
-      font-size: 14px;
-      color: #888;
-    ">
-      <p style="margin: 0;">RSVP by June 1st • Limited Seats Available</p>
+   
     </div>
   </div>
 </div>
@@ -881,7 +836,6 @@ export const eventTemplate4 = ({
   </html>
 `;
 
-// Quote Templates (same as before)
 export const reminderTemplate1 = ({ title, message }) => `
   <!DOCTYPE html>
   <html>
@@ -893,12 +847,40 @@ export const reminderTemplate1 = ({ title, message }) => `
       </style>
     </head>
     <body>
-    <div style="background-image: url('${motivationalImage}');background-size:contain;background-repeat:no-repeat;height:600px">
-    <div style="padding-left:140px;padding-top:30px;">
-       <h3>${title || "Default Title"}</h3>
-        <p>${message || "Thank you for your interest in our service."}</p>
+    <div style="background-color: #eee; height: 100vh; width: 100%;">
+  <div style="max-width: 1200px; margin: 0 auto; padding: 20px 0; height: 100%;">
+    <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+      <div style="width: 100%; max-width: 800px;margin:30px">
+        <div style="background-color: white; border-radius: 15px;">
+          <div style="padding: 40px;">
+
+            <div style="text-align: center; margin-bottom: 30px; padding-bottom: 20px;">
+              <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-quotes/bulb.webp"
+                alt="Bulb" width="100" style="display: block; margin: 0 auto;">
+            </div>
+
+            <div style="text-align: center; margin-bottom: 0;">
+              <div style="margin-bottom: 20px;">
+               <div style="font-size: 0.875em; color: #6c757d; margin-bottom: 0;">
+                ${title || "Default Title"}
+              </div>
+                <p style="padding-bottom: 20px; margin: 0;">
+                  <i style="font-style: italic; color: #0d6efd;">"</i>
+                  <span style="font-size: 1.25em; font-style: italic; display: inline-block; line-height: 1.5;">${
+                    message || "Thank you for your interest in our service."
+                  }</span>
+                  <i style="font-style: italic; color: #0d6efd;">"</i>
+                </p>
+              </div>
+             
+            </div>
+
+          </div>
         </div>
       </div>
+    </div>
+  </div>
+</div>
     </body>
   </html>
 `;
@@ -914,12 +896,24 @@ export const reminderTemplate2 = ({ title, message }) => `
       </style>
     </head>
     <body>
-    <div style="background-image: url('${motivationalImage1}');background-size:contain;background-repeat:no-repeat;height:600px">
-    <div style="padding-left:140px;padding-top:30px;">
-        <h3>${title || "Default Title"}</h3>
-        <p>${message || "Thank you for your interest in our service."}</p>
+    <div style="background-color: #f5f5f5; padding: 30px 0; font-family: Arial, sans-serif;">
+  <div style="max-width: 600px; margin:auto 20px ; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.1);max-height:400px;height:100%">
+    <!-- Header -->
+    <div style="background: #e83561; padding: 20px; text-align: center;">
+      <h1 style="color: white; margin: 0; font-size: 24px;">${
+        title || "Default Title"
+      }</h1>
+    </div>
+    
+    <!-- Content -->
+    <div style="padding: 30px;">
+      <div style="font-size: 16px; line-height: 1.6; color: #333;">
+       ${message || "Thank you for your interest in our service."}
       </div>
-      </div>
+    </div>
+    
+  </div>
+</div>
     </body>
   </html>
 `;
@@ -935,12 +929,20 @@ export const reminderTemplate3 = ({ title, message }) => `
       </style>
     </head>
     <body>
-    <div style="background-image: url('${motivationalImage2}');background-size:contain;background-repeat:no-repeat;height:600px">
-    <div style="padding-left:140px;padding-top:30px;">
-        <h3>${title || "Default Title"}</h3>
-        <p>${message || "Thank you for your interest in our service."}</p>
-      </div>
-      </div>
+    <div style="background-color: #f5f5f5; font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;flex-direction: column;gap;30px">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-quote" viewBox="0 0 16 16">
+  <path d="M12 12a1 1 0 0 0 1-1V8.558a1 1 0 0 0-1-1h-1.388q0-.527.062-1.054.093-.558.31-.992t.559-.683q.34-.279.868-.279V3q-.868 0-1.52.372a3.3 3.3 0 0 0-1.085.992 4.9 4.9 0 0 0-.62 1.458A7.7 7.7 0 0 0 9 7.558V11a1 1 0 0 0 1 1zm-6 0a1 1 0 0 0 1-1V8.558a1 1 0 0 0-1-1H4.612q0-.527.062-1.054.094-.558.31-.992.217-.434.559-.683.34-.279.868-.279V3q-.868 0-1.52.372a3.3 3.3 0 0 0-1.085.992 4.9 4.9 0 0 0-.62 1.458A7.7 7.7 0 0 0 3 7.558V11a1 1 0 0 0 1 1z"/>
+</svg>
+    <div style="background-color: white;  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); width: 80%; max-width: 250px;height:350px; padding: 30px; text-align: center; position: relative;display:flex;align-items:center;justify-content:center;flex-direction:column">
+        <div style="font-size: 22px; color: #222; margin-bottom: 30px; font-weight: bold;">${
+          title || "Default Title"
+        }</div>
+        <div style="font-size: 18px; font-weight: bold; color: #333; margin-bottom: 20px; line-height: 1.4;">${
+          message || "Thank you for your interest in our service."
+        }</div>
+       
+    </div>
+</div>
     </body>
   </html>
 `;
@@ -957,7 +959,7 @@ export const reminderTemplate4 = ({ title, message }) => `
     </head>
     <body>
     <div style="background-image: url('${motivationalImage3}');background-size:contain;background-repeat:no-repeat;height:600px">
-    <div style="padding-left:140px;padding-top:30px;">
+    <div style="padding-left:120px;padding-top:160px;max-width:400px">
         <h3>${title || "Default Title"}</h3>
         <p>${message || "Thank you for your interest in our service."}</p>
       </div>

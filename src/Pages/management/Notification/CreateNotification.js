@@ -402,6 +402,13 @@ import motivationalImage3 from "./images/motivational-reminder2.jpg";
 import motivationalImage2 from "./images/motivational-reminder3.jpg";
 import motivationalImage4 from "./images/motivational-reminder4.jpg";
 import eventTemplateImg from "./images/event-template.jpg";
+import eventImage1 from "./images/event-template1.png";
+import eventImage2 from "./images/event-template2.png";
+import eventImage3 from "./images/event-template3.png";
+import eventImage4 from "./images/event-template4.png";
+import inspirationImage1 from "./images/inspirationImage1.png";
+import inspirationImage2 from "./images/inspirationImage2.png";
+import inspirationImage3 from "./images/inspirationImage1.png";
 
 import {
   classTemplate1,
@@ -419,7 +426,7 @@ import {
 } from "./template";
 
 const NotificationCreator = () => {
-  const [notificationType, setNotificationType] = useState("");
+  const [notificationType, setNotificationType] = useState("quote");
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [formData, setFormData] = useState({
     title: "",
@@ -432,11 +439,41 @@ const NotificationCreator = () => {
   const [recipientType, setRecipientType] = useState("user");
   const [location, setLocation] = useState("");
   const [users, setUsers] = useState([
-    { id: 1, name: "John Doe", email: "john@example.com", status: "active", selected: false },
-    { id: 2, name: "Jane Smith", email: "jane@example.com", status: "active", selected: false },
-    { id: 3, name: "Bob Johnson", email: "bob@example.com", status: "blocked", selected: false },
-    { id: 4, name: "Alice Williams", email: "alice@example.com", status: "unverified", selected: false },
-    { id: 5, name: "Charlie Brown", email: "charlie@example.com", status: "active", selected: false },
+    {
+      id: 1,
+      name: "John Doe",
+      email: "john@example.com",
+      status: "active",
+      selected: false,
+    },
+    {
+      id: 2,
+      name: "Jane Smith",
+      email: "jane@example.com",
+      status: "active",
+      selected: false,
+    },
+    {
+      id: 3,
+      name: "Bob Johnson",
+      email: "bob@example.com",
+      status: "blocked",
+      selected: false,
+    },
+    {
+      id: 4,
+      name: "Alice Williams",
+      email: "alice@example.com",
+      status: "unverified",
+      selected: false,
+    },
+    {
+      id: 5,
+      name: "Charlie Brown",
+      email: "charlie@example.com",
+      status: "active",
+      selected: false,
+    },
   ]);
 
   const templateMap = {
@@ -454,58 +491,77 @@ const NotificationCreator = () => {
     "event-4": eventTemplate4,
   };
 
-  const EmailTemplateViewer = ({ templateId, title, message, date, time, className, instructor }) => {
+  const EmailTemplateViewer = ({
+    templateId,
+    title,
+    message,
+    date,
+    time,
+    className,
+    instructor,
+  }) => {
     const templateFunction = templateMap[templateId] || reminderTemplate1;
     return (
-      <div dangerouslySetInnerHTML={{ __html: templateFunction({ title, message, date, time, className, instructor }) }} />
+      <div
+        dangerouslySetInnerHTML={{
+          __html: templateFunction({
+            title,
+            message,
+            date,
+            time,
+            className,
+            instructor,
+          }),
+        }}
+      />
     );
   };
 
   const templates = {
-    class: [
-      {
-        id: "class-1",
-        name: "Class Reminder",
-        description: "Notify students about upcoming classes",
-        image: classTemplateImg,
-      },
-      {
-        id: "class-2",
-        name: "Assignment Alert",
-        description: "Reminder for assignment deadlines",
-        image: classTemplateImg,
-      },
-      {
-        id: "class-3",
-        name: "Assignment Alert",
-        description: "Reminder for assignment deadlines",
-        image: classTemplateImg,
-      },
-      {
-        id: "class-4",
-        name: "Assignment Alert",
-        description: "Reminder for assignment deadlines",
-        image: classTemplateImg,
-      },
-    ],
+    // class: [
+    //   {
+    //     id: "class-1",
+    //     name: "Class Reminder",
+    //     description: "Notify students about upcoming classes",
+    //     image: classTemplateImg,
+    //   },
+    //   {
+    //     id: "class-2",
+    //     name: "Assignment Alert",
+    //     description: "Reminder for assignment deadlines",
+    //     image: classTemplateImg,
+    //   },
+    //   {
+    //     id: "class-3",
+    //     name: "Assignment Alert",
+    //     description: "Reminder for assignment deadlines",
+    //     image: classTemplateImg,
+    //   },
+    //   {
+    //     id: "class-4",
+    //     name: "Assignment Alert",
+    //     description: "Reminder for assignment deadlines",
+    //     image: classTemplateImg,
+    //   },
+    // ],
     quote: [
       {
         id: "quote-1",
         name: "Daily Motivation",
         description: "Inspire students with positive quotes",
-        image: motivationalImage,
+        image: inspirationImage1,
       },
       {
         id: "quote-2",
         name: "Exam Encouragement",
         description: "Boost morale before tests",
-        image: motivationalImage3,
+        image: inspirationImage2,
       },
       {
         id: "quote-3",
         name: "Exam Encouragement",
         description: "Boost morale before tests",
-        image: motivationalImage2,
+        image: inspirationImage3,
       },
       {
         id: "quote-4",
@@ -519,25 +575,25 @@ const NotificationCreator = () => {
         id: "event-1",
         name: "Event Invitation",
         description: "Invite students to special events",
-        image: eventTemplateImg,
+        image: eventImage1,
       },
       {
         id: "event-2",
         name: "Workshop Alert",
         description: "Announce skill-building sessions",
-        image: eventTemplateImg,
+        image: eventImage2,
       },
-       {
+      {
         id: "event-3",
         name: "Workshop Alert",
         description: "Announce skill-building sessions",
-        image: eventTemplateImg,
+        image: eventImage3,
       },
-       {
+      {
         id: "event-4",
         name: "Workshop Alert",
         description: "Announce skill-building sessions",
-        image: eventTemplateImg,
+        image: eventImage4,
       },
     ],
   };
@@ -554,29 +610,35 @@ const NotificationCreator = () => {
       template: selectedTemplate,
       recipientType,
       location,
-      selectedUsers: users.filter(user => user.selected),
+      selectedUsers: users.filter((user) => user.selected),
       ...formData,
     });
     alert("Notification created successfully!");
   };
 
   const toggleUserSelection = (id) => {
-    setUsers(users.map(user => 
-      user.id === id ? { ...user, selected: !user.selected } : user
-    ));
+    setUsers(
+      users.map((user) =>
+        user.id === id ? { ...user, selected: !user.selected } : user
+      )
+    );
   };
 
   const toggleSelectAll = (e) => {
     const isChecked = e.target.checked;
-    setUsers(users.map(user => ({ ...user, selected: isChecked })));
+    setUsers(users.map((user) => ({ ...user, selected: isChecked })));
   };
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case 'active': return <ActiveIcon className="text-success" />;
-      case 'blocked': return <BlockedIcon className="text-danger" />;
-      case 'unverified': return <UnverifiedIcon className="text-warning" />;
-      default: return null;
+      case "active":
+        return <ActiveIcon className="text-success" />;
+      case "blocked":
+        return <BlockedIcon className="text-danger" />;
+      case "unverified":
+        return <UnverifiedIcon className="text-warning" />;
+      default:
+        return null;
     }
   };
 
@@ -612,7 +674,7 @@ const NotificationCreator = () => {
           <option value="" disabled selected hidden>
             Select Notification Type...
           </option>
-          <option value="class">Class Reminder</option>
+          {/* <option value="class">Class Reminder</option> */}
           <option value="quote">Inspirational Quote</option>
           <option value="event">Upcoming Event Invitation</option>
         </select>
@@ -629,7 +691,7 @@ const NotificationCreator = () => {
               <div
                 key={template.id}
                 onClick={() => setSelectedTemplate(template)}
-                className={`col-3 ${
+                className={`col-3 mx-2${
                   selectedTemplate?.id === template.id
                     ? "border-primary border-2 shadow-sm"
                     : "border"
@@ -808,7 +870,10 @@ const NotificationCreator = () => {
           {/* Recipient Selection */}
           <div className="card border-0 shadow-sm mt-4">
             <div className="card-body p-4">
-              <h5 className="mb-4 fw-medium" style={{ color: "var(--secondary)" }}>
+              <h5
+                className="mb-4 fw-medium"
+                style={{ color: "var(--secondary)" }}
+              >
                 Recipient Selection
               </h5>
               <div className="row mb-4">
@@ -841,65 +906,64 @@ const NotificationCreator = () => {
                   </select>
                 </div>
               </div>
-
-              {/* Users Table */}
-              <div className="table-responsive">
-                <table className="table table-hover">
-                  <thead>
-                    <tr>
-                      <th>
-                        <input
-                          type="checkbox"
-                          onChange={toggleSelectAll}
-                          checked={users.every(user => user.selected)}
-                        />
-                      </th>
-                      <th>Sr.</th>
-                      <th>Name</th>
-                      <th>Email</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {users.map((user, index) => (
-                      <tr key={user.id}>
-                        <td>
-                          <input
-                            type="checkbox"
-                            checked={user.selected}
-                            onChange={() => toggleUserSelection(user.id)}
-                          />
-                        </td>
-                        <td>{index + 1}</td>
-                        <td>{user.name}</td>
-                        <td>{user.email}</td>
-                        <td>
-                          {getStatusIcon(user.status)}
-                          <span className="ms-2 text-capitalize">{user.status}</span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              <button
-                type="button"
-                onClick={handleSubmit}
-                className="btn w-100 py-2 mt-3"
-                style={{
-                  backgroundColor: "var(--primary)",
-                  color: "white",
-                  border: "none",
-                }}
-              >
-                <SendIcon className="me-2" />
-                Send Notification
-              </button>
             </div>
           </div>
         </>
       )}
+
+      <div className="table-responsive">
+        <table className="table table-hover">
+          <thead>
+            <tr>
+              <th>
+                <input
+                  type="checkbox"
+                  onChange={toggleSelectAll}
+                  checked={users.every((user) => user.selected)}
+                />
+              </th>
+              <th>Sr.</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map((user, index) => (
+              <tr key={user.id}>
+                <td>
+                  <input
+                    type="checkbox"
+                    checked={user.selected}
+                    onChange={() => toggleUserSelection(user.id)}
+                  />
+                </td>
+                <td>{index + 1}</td>
+                <td>{user.name}</td>
+                <td>{user.email}</td>
+                <td>
+                  {getStatusIcon(user.status)}
+                  <span className="ms-2 text-capitalize">{user.status}</span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <button
+        type="button"
+        onClick={handleSubmit}
+        className="btn w-100 py-2 mt-3"
+        style={{
+          backgroundColor: "var(--primary)",
+          color: "white",
+          border: "none",
+        }}
+      >
+        <SendIcon className="me-2" />
+        Send Notification
+      </button>
     </div>
   );
 };
