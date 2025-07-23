@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   ChatQuote as QuoteIcon,
@@ -40,6 +39,10 @@ const NotificationCreator = () => {
     message: "",
     date: "",
     time: "",
+    className: "",
+    instructor: "",
+    location: "",
+    // sessions: "",
   });
   const [recipientType, setRecipientType] = useState("user");
   const [location, setLocation] = useState("");
@@ -117,35 +120,35 @@ const NotificationCreator = () => {
     "event-3": eventTemplate3,
     "event-4": eventTemplate4,
   };
-const EmailTemplateViewer = ({
-  templateId,
-  title,
-  message,
-  date,
-  time,
-  className,
-  instructor,
-  location,
-  sessions
-}) => {
-  const templateFunction = templateMap[templateId] || reminderTemplate1;
-  return (
-    <div
-      dangerouslySetInnerHTML={{
-        __html: templateFunction({
-          title,
-          message,
-          date,
-          time,
-          className,
-          instructor,
-          location,
-          sessions
-        }),
-      }}
-    />
-  );
-};
+  const EmailTemplateViewer = ({
+    templateId,
+    title,
+    message,
+    date,
+    time,
+    className,
+    instructor,
+    location,
+    // sessions,
+  }) => {
+    const templateFunction = templateMap[templateId] || reminderTemplate1;
+    return (
+      <div
+        dangerouslySetInnerHTML={{
+          __html: templateFunction({
+            title,
+            message,
+            date,
+            time,
+            className,
+            instructor,
+            location,
+            // sessions,
+          }),
+        }}
+      />
+    );
+  };
 
   const templates = {
     quote: [
@@ -206,56 +209,61 @@ const EmailTemplateViewer = ({
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-const handleEventChange = (e) => {
-  const eventId = e.target.value;
-  const selected = upcomingEvents.find(event => event._id === eventId);
-  setSelectedEvent(selected);
+  const handleEventChange = (e) => {
+    const eventId = e.target.value;
+    const selected = upcomingEvents.find((event) => event._id === eventId);
+    setSelectedEvent(selected);
 
-  if (selected) {
-    // Get first session details
-    const firstSession = selected.sessions?.[0] || {};
-    
-    // Format date if available
-    const formattedDate = firstSession.date 
-      ? new Date(firstSession.date).toLocaleDateString('en-US', {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
-        })
-      : selected.startDate 
-      ? new Date(selected.startDate).toLocaleDateString('en-US', {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
-        })
-      : "Not specified";
+    if (selected) {
+      // Get first session details
+      const firstSession = selected.sessions?.[0] || {};
 
-    // Format time if available
-    const formattedTime = firstSession.startTime && firstSession.endTime
-      ? `${firstSession.startTime} - ${firstSession.endTime}`
-      : "Not specified";
+      // Format date if available
+      const formattedDate = firstSession.date
+        ? new Date(firstSession.date).toLocaleDateString("en-US", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })
+        : selected.startDate
+        ? new Date(selected.startDate).toLocaleDateString("en-US", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })
+        : "Not specified";
 
-    // Get instructor name
-    const instructorName = selected.Instructor?.name || "Instructor not assigned";
-    
-    // Get location
-    const locationName = selected.location?.location || "Location to be announced";
+      // Format time if available
+      const formattedTime =
+        firstSession.startTime && firstSession.endTime
+          ? `${firstSession.startTime} - ${firstSession.endTime}`
+          : "Not specified";
 
-    setFormData({
-      title: selected.title || "Class Invitation",
-      message: selected.theme || selected.description || `Join us for this special class`,
-      date: formattedDate,
-      time: formattedTime,
-      className: selected.title || "Class details coming soon",
-      instructor: instructorName,
-      location: locationName,
-      sessions: selected.sessions || []
-    });
-  }
-};
+      // Get instructor name
+      const instructorName =
+        selected.Instructor?.name || "Instructor not assigned";
 
+      // Get location
+      const locationName =
+        selected.location?.location || "Location to be announced";
+
+      setFormData({
+        title: selected.title || "Class Invitation",
+        message:
+          selected.theme ||
+          selected.description ||
+          `Join us for this special class`,
+        date: formattedDate,
+        time: formattedTime,
+        className: selected.title || "Class details coming soon",
+        instructor: instructorName,
+        location: locationName,
+        // sessions: selected.sessions || [],
+      });
+    }
+  };
 
   const getNotificationTypeName = (type) => {
     switch (type) {
@@ -272,18 +280,17 @@ const handleEventChange = (e) => {
     const templateNumber = templateId.split("-")[1];
     return `template${templateNumber}`;
   };
-const templateFunction = templateMap[selectedTemplate?.id || "quote-1"];
-const htmlContent = templateFunction({
-  title: formData.title,
-  message: formData.message,
-  date: formData.date,
-  time: formData.time,
-  className: formData.className,
-  instructor: formData.instructor,
-  location: formData.location,
-  sessions: formData.sessions
-});
-
+  const templateFunction = templateMap[selectedTemplate?.id || "quote-1"];
+  const htmlContent = templateFunction({
+    title: formData.title,
+    message: formData.message,
+    date: formData.date,
+    time: formData.time,
+    className: formData.className,
+    instructor: formData.instructor,
+    location: formData.location,
+    // sessions: formData.sessions,
+  });
 
   const handleSubmit = async (e) => {
     try {
@@ -393,10 +400,11 @@ const htmlContent = templateFunction({
               <div
                 key={template.id}
                 onClick={() => setSelectedTemplate(template)}
-                className={`col-3 mx-2${selectedTemplate?.id === template.id
+                className={`col-3 mx-2${
+                  selectedTemplate?.id === template.id
                     ? "border-primary border-2 shadow-sm"
                     : "border"
-                  }`}
+                }`}
               >
                 <img
                   src={template.image}
@@ -443,7 +451,10 @@ const htmlContent = templateFunction({
                   </h5>
                   {loadingEvents ? (
                     <div className="text-center">
-                      <div className="spinner-border text-primary" role="status">
+                      <div
+                        className="spinner-border text-primary"
+                        role="status"
+                      >
                         <span className="visually-hidden">Loading...</span>
                       </div>
                     </div>
@@ -459,14 +470,13 @@ const htmlContent = templateFunction({
                         <option value="">Select an event...</option>
                         {upcomingEvents.map((event) => (
                           <option key={event._id} value={event._id}>
-                            {event.eventName || event.title} - {event.date} at {event.time}
+                            {event.eventName || event.title} - {event.date} at{" "}
+                            {event.time}
                           </option>
                         ))}
                       </select>
                     </div>
                   )}
-
-             
                 </div>
               </div>
             </div>
@@ -479,6 +489,10 @@ const htmlContent = templateFunction({
                 message={formData.message}
                 date={formData.date}
                 time={formData.time}
+                className={formData.className}
+                instructor={formData.instructor}
+                location={formData.location}
+                // sessions={formData.sessions}
               />
             </div>
           </div>
