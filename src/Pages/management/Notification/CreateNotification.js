@@ -435,49 +435,7 @@ const handleSubmit = async (e) => {
     alert("Error creating notification: " + (error.response?.data?.message || error.message));
   }
 };
-  // const handleSubmit = async (e) => {
-  //   try {
-  //     const selectedUserIds = recipients
-  //       .filter((recipient) => recipient.selected)
-  //       .map((recipient) => recipient.id || recipient._id);
-
-  //     if (selectedUserIds.length === 0) {
-  //       alert("Please select at least one recipient");
-  //       return;
-  //     }
-
-  //     const res = await axios.post(
-  //       "http://98.85.246.54:5010/api/notification/send",
-  //       {
-  //         notificationType: getNotificationTypeName(notificationType),
-  //         template: selectedTemplate
-  //           ? getTemplateName(selectedTemplate.id)
-  //           : "template1",
-  //         title: `${formData?.title}`,
-  //         message: `${formData?.message}`,
-  //         html: htmlContent,
-  //         users: selectedUserIds,
-  //       },
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${localStorage.getItem("token")}`,
-  //         },
-  //       }
-  //     );
-  //     if (res.status === 201) {
-  //       alert("Notification created successfully!");
-  //       setFormData({
-  //         title: "",
-  //         message: "",
-  //         date: "",
-  //         time: "",
-  //       });
-  //       setSelectedEvent(null);
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
+ 
 
   return (
     <div className="container py-4" style={{ maxWidth: "1200px" }}>
