@@ -7,6 +7,8 @@ import {
   CheckCircleFill as ActiveIcon,
   XCircleFill as BlockedIcon,
   QuestionCircleFill as UnverifiedIcon,
+  ChevronLeft,
+  ChevronRight
 } from "react-bootstrap-icons";
 import axios from "axios";
 import motivationalImage4 from "./images/motivational-reminder4.jpg";
@@ -34,6 +36,8 @@ const NotificationCreator = () => {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [locations, setLocations] = useState([]);
   const [recipients, setRecipients] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
   const [loading, setLoading] = useState(false);
   const [recipientType, setRecipientType] = useState("user");
   const [location, setLocation] = useState("");
@@ -49,7 +53,9 @@ const NotificationCreator = () => {
     instructor: "",
     location: "",
   });
-
+useEffect(() => {
+  setCurrentPage(1); // Reset to first page when location changes
+}, [location]);
   useEffect(() => {
     if (notificationType === "event") {
       fetchUpcomingEvents();
@@ -122,6 +128,29 @@ setRecipients(recipientsWithSelection);
     fetchRecipients();
   }, [recipientType, location]);
 
+  // Filter recipients based on selected location
+// Safe filtering
+const filteredRecipients = recipients.filter(recipient => {
+  if (!location) return true;
+  
+  const recipientLocation = recipient?.location;
+  if (!recipientLocation) return false;
+  
+  if (typeof recipientLocation === 'object') {
+    return recipientLocation?.location === location;
+  }
+  
+  return recipientLocation === location;
+});
+
+// Pagination logic
+const indexOfLastItem = currentPage * itemsPerPage;
+const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+const currentItems = filteredRecipients.slice(indexOfFirstItem, indexOfLastItem);
+const totalPages = Math.ceil(filteredRecipients.length / itemsPerPage);
+
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
   const fetchUpcomingEvents = async () => {
     try {
       setLoadingEvents(true);
@@ -236,10 +265,10 @@ setRecipients(recipientsWithSelection);
   };
 // Safely handle location rendering
 const getLocationName = (loc) => {
-  if (!loc) return "N/A";
-  if (typeof loc === "object") return loc.location || "N/A";
-  return loc;
+  if (!loc || typeof loc !== 'object') return loc || "N/A";
+  return loc.location || "N/A";
 };
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -335,12 +364,14 @@ const getLocationName = (loc) => {
   const toggleSelectAll = (e) => {
     const isChecked = e.target.checked;
     setRecipients(
-      recipients.map((recipient) => ({
+      recipients.map(recipient => ({
         ...recipient,
-        selected: isChecked,
+        selected: filteredRecipients.some(fr => fr._id === recipient._id) ? isChecked : recipient.selected
       }))
     );
   };
+
+  
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -751,14 +782,14 @@ const handleSubmit = async (e) => {
                   <thead>
                     <tr>
                       <th>
-                        <input
-                          type="checkbox"
-                          onChange={toggleSelectAll}
-                          checked={
-                            recipients.length > 0 &&
-                            recipients.every((r) => r.selected)
-                          }
-                        />
+                    <input
+  type="checkbox"
+  onChange={toggleSelectAll}
+  checked={
+    filteredRecipients.length > 0 &&
+    filteredRecipients.every(r => r.selected)
+  }
+/>
                       </th>
                       {/* <th>ID</th> */}
                       <th>Name</th>
@@ -768,27 +799,24 @@ const handleSubmit = async (e) => {
                       <th>Status</th>
                     </tr>
                   </thead>
-             <tbody>
-  {recipients.length > 0 ? (
-    recipients.map((recipient, index) => (
+
+<tbody>
+  {currentItems.length > 0 ? (
+    currentItems.map((recipient, index) => (
       <tr key={recipient._id || index}>
         <td>
           <input
             type="checkbox"
             checked={recipient.selected || false}
-            onChange={() =>
-              toggleUserSelection(recipient._id)
-            }
+            onChange={() => toggleUserSelection(recipient._id)}
           />
         </td>
-        {/* <td>{recipient._id}</td> */}
         <td>{recipient.name || "N/A"}</td>
         <td>{recipient.email || "N/A"}</td>
         {recipientType !== "user" && (
           <td>{recipient.specialization || recipient.expertise || "N/A"}</td>
         )}
-     <td>{getLocationName(recipient.location)}</td>
-
+        <td>{getLocationName(recipient.location)}</td>
         <td>
           {getStatusIcon(recipient.status || "active")}
           <span className="ms-2 text-capitalize">
@@ -799,15 +827,57 @@ const handleSubmit = async (e) => {
     ))
   ) : (
     <tr>
-      <td colSpan={recipientType !== "user" ? 7 : 6} className="text-center">
-        No {recipientType}s found
-      </td>
+    <td colSpan={recipientType !== "user" ? 6 : 5} className="text-center">
+  No {recipientType}s found{location ? ` in ${location}` : ''}
+</td>
     </tr>
   )}
 </tbody>
 
                 </table>
               </div>
+               {filteredRecipients.length > itemsPerPage && (
+        <div className="d-flex justify-content-center mt-3">
+          <nav aria-label="Page navigation">
+            <ul className="pagination">
+              <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                <button
+                  className="page-link"
+                  onClick={() => paginate(currentPage - 1)}
+                  disabled={currentPage === 1}
+                >
+                  <ChevronLeft />
+                </button>
+              </li>
+              
+              {Array.from({ length: totalPages }, (_, i) => (
+                <li key={i + 1} className={`page-item ${currentPage === i + 1 ? 'active' : ''}`}>
+                  <button
+                    className="page-link"
+                    onClick={() => paginate(i + 1)}
+                    style={{
+                      backgroundColor: currentPage === i + 1 ? 'var(--primary)' : '',
+                      color: currentPage === i + 1 ? 'white' : 'var(--secondary)'
+                    }}
+                  >
+                    {i + 1}
+                  </button>
+                </li>
+              ))}
+              
+              <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                <button
+                  className="page-link"
+                  onClick={() => paginate(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                >
+                  <ChevronRight />
+                </button>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      )}
             </div>
           )}
         </div>

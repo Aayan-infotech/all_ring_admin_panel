@@ -40,6 +40,31 @@
   color: var(--primary) !important;
   border: 1px solid var(--primary) !important;
 }
+/* Add to your CSS file */
+.page-item.active .page-link {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+.page-link {
+  color: var(--secondary);
+}
+
+.page-link:hover {
+  color: var(--primary);
+}
+
+.active-recipient {
+  background-color: var(--primary);
+  color: white;
+}
+
+.inactive-recipient {
+  background-color: white;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+}
+
 
 .inactive-recipient:hover {
   background-color: var(--accent) !important;
