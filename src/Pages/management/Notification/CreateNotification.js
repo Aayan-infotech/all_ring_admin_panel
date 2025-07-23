@@ -660,7 +660,7 @@ const handleSubmit = async (e) => {
           <h5 className="mb-4 fw-medium" style={{ color: "var(--secondary)" }}>
             Recipient Selection
           </h5>
-          <div className="row mb-4">
+          {/* <div className="row mb-4">
             <div className="col-md-6">
               <label className="form-label">Recipient Type</label>
               <select
@@ -692,8 +692,47 @@ const handleSubmit = async (e) => {
       </select>
       {loading && <p>Loading locations...</p>}
     </div>
-          </div>
-
+          </div> */}
+<div className="row mb-4">
+  <div className="col-md-6">
+    <label className="form-label">Recipient Type</label>
+    <div className="d-flex gap-2">
+      {['user', 'mentor', 'instructor'].map((type) => (
+        <button
+          key={type}
+          type="button"
+          className={`btn ${recipientType === type ? 'active-recipient' : 'inactive-recipient'}`}
+          onClick={() => setRecipientType(type)}
+          style={{
+            textTransform: 'capitalize',
+            flex: 1,
+          }}
+        >
+          {type}
+        </button>
+      ))}
+    </div>
+  </div>
+  
+  <div className="col-md-6">
+    <label className="form-label">Location</label>
+    <select
+      className="form-select"
+      value={location}
+      onChange={(e) => setLocation(e.target.value)}
+      style={{ borderColor: "var(--secondary)" }}
+      disabled={loading}
+    >
+      <option value="">All Locations</option>
+      {locations.map((loc) => (
+        <option key={loc._id} value={loc.location}>
+          {loc.location}
+        </option>
+      ))}
+    </select>
+    {loading && <p>Loading locations...</p>}
+  </div>
+</div>
           {/* Recipients Table */}
           {loading ? (
             <div className="text-center py-4">

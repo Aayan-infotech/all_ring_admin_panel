@@ -28,7 +28,22 @@
 .main-content.collapsed {
   margin-left: var(--sidebar-collapsed-width);
 }
+/* Custom Button Styles */
+.active-recipient {
+  background-color: var(--primary) !important;
+  color: white !important;
+  border: 1px solid var(--primary) !important;
+}
 
+.inactive-recipient {
+  background-color: white !important;
+  color: var(--primary) !important;
+  border: 1px solid var(--primary) !important;
+}
+
+.inactive-recipient:hover {
+  background-color: var(--accent) !important;
+}
 .page-content {
   padding: 20px;
   min-height: calc(100vh - 60px);
