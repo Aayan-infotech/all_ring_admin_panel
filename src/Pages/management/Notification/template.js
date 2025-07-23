@@ -507,11 +507,12 @@ export const classTemplate4 = ({
 </html>
 `;
 // Event Templates
-export const eventTemplate1 = ({ title, message, date, time }) => `
+// Updated Event Templates
+export const eventTemplate1 = ({ title, message, date, time, className, instructor, location, sessions }) => `
   <!DOCTYPE html>
   <html>
     <head>
-      <title>Event Invitation</title>
+      <title>Class Invitation</title>
       <style>
         body { margin: 0; padding: 0; font-family: 'Arial', sans-serif; }
       </style>
@@ -533,22 +534,41 @@ export const eventTemplate1 = ({ title, message, date, time }) => `
                     text-align: center;
                     box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
           
-          <h1 style="color: #9b59b6; margin-top: 0;">${
-            title || "You're Invited!"
-          }</h1>
+          <h1 style="color: #9b59b6; margin-top: 0;">${title || "You're Invited!"}</h1>
           <p style="font-size: 16px; color: #555; margin-bottom: 25px;">
-            ${message || "We'd love for you to join us for this special event."}
+            ${message || "We'd love for you to join us for this special class."}
           </p>
           
           <div style="background-color: #f3e6ff;
                       padding: 15px;
                       border-radius: 8px;
-                      margin-bottom: 25px;">
+                      margin-bottom: 15px;">
             <div style="font-size: 18px; font-weight: bold; color: #8e44ad;">
-              <div style="margin-bottom: 8px;">📅 ${
-                date || "Date not specified"
-              }</div>
+              <div style="margin-bottom: 8px;">📅 ${date || "Date not specified"}</div>
               <div>⏰ ${time || "Time not specified"}</div>
+            </div>
+          </div>
+
+          <div style="background-color: #f3e6ff;
+                      padding: 15px;
+                      border-radius: 8px;
+                      margin-bottom: 15px;
+                      text-align: left;">
+            <div style="font-size: 16px; color: #333;">
+              <div style="margin-bottom: 8px;"><strong>Class:</strong> ${className || "Not specified"}</div>
+              <div style="margin-bottom: 8px;"><strong>Instructor:</strong> ${instructor || "Not specified"}</div>
+              <div style="margin-bottom: 8px;"><strong>Location:</strong> ${location || "Not specified"}</div>
+              ${sessions && sessions.length > 0 ? `
+                <div style="margin-top: 10px;">
+                  <strong>Upcoming Sessions:</strong>
+                  <ul style="padding-left: 20px; margin-top: 5px;">
+                    ${sessions.slice(0, 3).map(session => `
+                      <li>${new Date(session.date).toLocaleDateString()} at ${session.startTime}</li>
+                    `).join('')}
+                    ${sessions.length > 3 ? `<li>...and ${sessions.length - 3} more</li>` : ''}
+                  </ul>
+                </div>
+              ` : ''}
             </div>
           </div>
         </div>
@@ -557,11 +577,11 @@ export const eventTemplate1 = ({ title, message, date, time }) => `
   </html>
 `;
 
-export const eventTemplate2 = ({ title, message, date, time }) => `
+export const eventTemplate2 = ({ title, message, date, time, className, instructor, location }) => `
   <!DOCTYPE html>
   <html>
     <head>
-      <title>Workshop Announcement</title>
+      <title>Class Announcement</title>
       <style>
         body { margin: 0; padding: 0; font-family: 'Roboto', sans-serif; }
       </style>
@@ -577,17 +597,12 @@ export const eventTemplate2 = ({ title, message, date, time }) => `
                     box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
           
           <div style="text-align: center; margin-bottom: 25px;">
-            <h2 style="color: #2c3e50; margin-bottom: 10px;">${
-              title || "Workshop Announcement"
-            }</h2>
+            <h2 style="color: #2c3e50; margin-bottom: 10px;">${title || "Class Announcement"}</h2>
             <div style="width: 50px; height: 3px; background: #3498db; margin: 0 auto;"></div>
           </div>
           
           <p style="font-size: 16px; line-height: 1.6; color: #34495e;">
-            ${
-              message ||
-              "Join us for an exciting workshop to enhance your skills!"
-            }
+            ${message || "Join us for an exciting class to enhance your skills!"}
           </p>
           
           <div style="background-color: #f8f9fa;
@@ -596,12 +611,24 @@ export const eventTemplate2 = ({ title, message, date, time }) => `
                       margin: 25px 0;
                       border-left: 4px solid #3498db;">
             <div style="display: flex; align-items: center; margin-bottom: 10px;">
+              <span style="width: 80px; font-weight: bold;">Class:</span>
+              <span>${className || "Not specified"}</span>
+            </div>
+            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+              <span style="width: 80px; font-weight: bold;">Instructor:</span>
+              <span>${instructor || "Not specified"}</span>
+            </div>
+            <div style="display: flex; align-items: center; margin-bottom: 10px;">
               <span style="width: 80px; font-weight: bold;">Date:</span>
               <span>${date || "Not specified"}</span>
             </div>
-            <div style="display: flex; align-items: center;">
+            <div style="display: flex; align-items: center; margin-bottom: 10px;">
               <span style="width: 80px; font-weight: bold;">Time:</span>
               <span>${time || "Not specified"}</span>
+            </div>
+            <div style="display: flex; align-items: center;">
+              <span style="width: 80px; font-weight: bold;">Location:</span>
+              <span>${location || "Not specified"}</span>
             </div>
           </div>
         </div>
@@ -610,14 +637,7 @@ export const eventTemplate2 = ({ title, message, date, time }) => `
   </html>
 `;
 
-export const eventTemplate3 = ({
-  title,
-  message,
-  date,
-  time,
-  className,
-  instructor,
-}) => `
+export const eventTemplate3 = ({ title, message, date, time, className, instructor, location, sessions }) => `
   <!DOCTYPE html>
   <html>
   <body>
@@ -642,7 +662,7 @@ export const eventTemplate3 = ({
       margin-bottom: 30px;
       letter-spacing: 2px;
       text-transform: uppercase;
-    ">EVENT INVITATION</h1>
+    ">CLASS INVITATION</h1>
     
     <div style="
       margin-bottom: 25px;
@@ -654,13 +674,13 @@ export const eventTemplate3 = ({
         color: #fff;
         margin-bottom: 10px;
         letter-spacing: 1px;
-      ">${title || "Event Title"}</h5>
+      ">${title || "Class Title"}</h5>
       <p style="
         font-size: 18px;
         color: #fff;
         margin-bottom: 10px;
         letter-spacing: 1px;
-      ">TIME & ACCOMMODATION</p>
+      ">CLASS DETAILS</p>
     </div>
     
     <div style="
@@ -678,7 +698,7 @@ export const eventTemplate3 = ({
           font-size: 18px;
           color: #fff;
           font-weight: bold;
-        ">00:00</p>
+        ">${time || "Not specified"}</p>
       </div>
       
       <div style="text-align: right;">
@@ -691,7 +711,39 @@ export const eventTemplate3 = ({
           font-size: 18px;
           color: #fff;
           font-weight: bold;
-        ">DD/MM/YYYY</p>
+        ">${date || "Not specified"}</p>
+      </div>
+    </div>
+
+    <div style="
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    ">
+      <div style="text-align: left;">
+        <p style="
+          font-size: 16px;
+          color: #fff;
+          margin-bottom: 8px;
+        ">CLASS</p>
+        <p style="
+          font-size: 18px;
+          color: #fff;
+          font-weight: bold;
+        ">${className || "Not specified"}</p>
+      </div>
+      
+      <div style="text-align: right;">
+        <p style="
+          font-size: 16px;
+          color: #fff;
+          margin-bottom: 8px;
+        ">INSTRUCTOR</p>
+        <p style="
+          font-size: 18px;
+          color: #fff;
+          font-weight: bold;
+        ">${instructor || "Not specified"}</p>
       </div>
     </div>
     
@@ -705,27 +757,45 @@ export const eventTemplate3 = ({
         font-size: 16px;
         color: #000;
         margin-bottom: 5px;
-      ">Message</p>
+      ">Location</p>
       <p style="
         font-size: 18px;
         color: #000;
         font-weight: bold;
-      ">${message || "Not specified"}</p>
+      ">${location || "Not specified"}</p>
     </div>
+
+    ${sessions && sessions.length > 0 ? `
+    <div style="
+      background-color: #f9f9f9;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 25px;
+      text-align: left;
+    ">
+      <p style="
+        font-size: 16px;
+        color: #000;
+        margin-bottom: 5px;
+        font-weight: bold;
+      ">Upcoming Sessions:</p>
+      <ul style="padding-left: 20px; margin-top: 5px;">
+        ${sessions.slice(0, 3).map(session => `
+          <li style="margin-bottom: 5px;">
+            ${new Date(session.date).toLocaleDateString()} - ${session.startTime} to ${session.endTime}
+          </li>
+        `).join('')}
+        ${sessions.length > 3 ? `<li>...and ${sessions.length - 3} more sessions</li>` : ''}
+      </ul>
+    </div>
+    ` : ''}
   </div>
 </div>
     </body>
   </html>
-  `;
+`;
 
-export const eventTemplate4 = ({
-  title,
-  message,
-  date,
-  time,
-  className,
-  instructor,
-}) => `
+export const eventTemplate4 = ({ title, message, date, time, className, instructor, location, sessions }) => `
   <!DOCTYPE html>
   <html>
     <body>
@@ -759,7 +829,7 @@ export const eventTemplate4 = ({
         font-size: 32px;
         font-weight: 700;
         letter-spacing: 1px;
-      ">${title || "Event Title"}</h1>
+      ">${title || "Class Title"}</h1>
       <p style="
         margin: 10px 0 0;
         font-size: 16px;
@@ -768,7 +838,7 @@ export const eventTemplate4 = ({
       ">You're Cordially Invited</p>
     </div>
     
-    <!-- Event Details -->
+    <!-- Class Details -->
     <div style="padding: 30px;">
       <!-- Date/Time -->
       <div style="
@@ -791,7 +861,7 @@ export const eventTemplate4 = ({
             font-size: 20px;
             font-weight: 600;
             color: #333;
-          ">June 15, 2024</p>
+          ">${date || "Not specified"}</p>
         </div>
         <div>
           <p style="
@@ -806,10 +876,44 @@ export const eventTemplate4 = ({
             font-size: 20px;
             font-weight: 600;
             color: #333;
-          ">7:00 PM</p>
+          ">${time || "Not specified"}</p>
         </div>
       </div>
       
+      <!-- Class Info -->
+      <div style="margin-bottom: 25px;">
+        <p style="
+          margin: 0 0 5px;
+          font-size: 14px;
+          color: #888;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        ">Class Name</p>
+        <p style="
+          margin: 0;
+          font-size: 18px;
+          font-weight: 600;
+          color: #333;
+        ">${className || "Not specified"}</p>
+      </div>
+
+      <!-- Instructor -->
+      <div style="margin-bottom: 25px;">
+        <p style="
+          margin: 0 0 5px;
+          font-size: 14px;
+          color: #888;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        ">Instructor</p>
+        <p style="
+          margin: 0;
+          font-size: 18px;
+          font-weight: 600;
+          color: #333;
+        ">${instructor || "Not specified"}</p>
+      </div>
+
       <!-- Location -->
       <div style="margin-bottom: 25px;">
         <p style="
@@ -818,16 +922,66 @@ export const eventTemplate4 = ({
           color: #888;
           text-transform: uppercase;
           letter-spacing: 1px;
+        ">Location</p>
+        <p style="
+          margin: 0;
+          font-size: 18px;
+          font-weight: 600;
+          color: #333;
+        ">${location || "Not specified"}</p>
+      </div>
+
+      ${sessions && sessions.length > 0 ? `
+      <!-- Sessions -->
+      <div style="margin-bottom: 25px;">
+        <p style="
+          margin: 0 0 10px;
+          font-size: 14px;
+          color: #888;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        ">Upcoming Sessions</p>
+        <div style="
+          background-color: #f8f9fa;
+          border-radius: 8px;
+          padding: 15px;
+        ">
+          ${sessions.slice(0, 3).map(session => `
+            <div style="
+              display: flex;
+              justify-content: space-between;
+              margin-bottom: 10px;
+              padding-bottom: 10px;
+              border-bottom: 1px solid #eee;
+            ">
+              <span style="font-weight: 500;">${new Date(session.date).toLocaleDateString()}</span>
+              <span>${session.startTime} - ${session.endTime}</span>
+            </div>
+          `).join('')}
+          ${sessions.length > 3 ? `
+            <div style="text-align: center; color: #666; font-size: 14px;">
+              + ${sessions.length - 3} more sessions
+            </div>
+          ` : ''}
+        </div>
+      </div>
+      ` : ''}
+      
+      <!-- Message -->
+      <div style="margin-bottom: 25px;">
+        <p style="
+          margin: 0 0 5px;
+          font-size: 14px;
+          color: #888;
+          text-transform: uppercase;
+          letter-spacing: 1px;
         ">Message</p>
-       
         <p style="
           margin: 5px 0 0;
           font-size: 16px;
           color: #666;
         ">${message || "Not specified"}</p>
       </div>
-      
-   
     </div>
   </div>
 </div>

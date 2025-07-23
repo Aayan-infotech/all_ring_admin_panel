@@ -1,12 +1,8 @@
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
 import {
-  JournalBookmark as ClassIcon,
   ChatQuote as QuoteIcon,
   CalendarEvent as EventIcon,
-  Book as BookIcon,
-  Person as PersonIcon,
-  Calendar as DateIcon,
-  Clock as TimeIcon,
   Send as SendIcon,
   CheckCircleFill as ActiveIcon,
   XCircleFill as BlockedIcon,
@@ -23,10 +19,6 @@ import inspirationImage2 from "./images/inspirationImage2.png";
 import inspirationImage3 from "./images/inspirationImage1.png";
 
 import {
-  classTemplate1,
-  classTemplate2,
-  classTemplate3,
-  classTemplate4,
   eventTemplate1,
   eventTemplate2,
   eventTemplate3,
@@ -40,17 +32,17 @@ import {
 const NotificationCreator = () => {
   const [notificationType, setNotificationType] = useState("quote");
   const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [upcomingEvents, setUpcomingEvents] = useState([]);
+  const [loadingEvents, setLoadingEvents] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     message: "",
     date: "",
     time: "",
-    className: "",
-    instructor: "",
   });
   const [recipientType, setRecipientType] = useState("user");
   const [location, setLocation] = useState("");
-  const [notificationTemplate, setNotificationTemplate] = useState(null);
   const [users, setUsers] = useState([
     {
       id: 1,
@@ -89,11 +81,33 @@ const NotificationCreator = () => {
     },
   ]);
 
+  useEffect(() => {
+    if (notificationType === "event") {
+      fetchUpcomingEvents();
+    }
+  }, [notificationType]);
+
+  const fetchUpcomingEvents = async () => {
+    try {
+      setLoadingEvents(true);
+      // Replace this with your actual API endpoint for events
+      const response = await axios.get(
+        "http://98.85.246.54:5010/api/AdminClasses/getAllUpcomingClasses", // Adjust this endpoint
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      setUpcomingEvents(response.data.data || []);
+      setLoadingEvents(false);
+    } catch (error) {
+      console.error("Error fetching upcoming events:", error);
+      setLoadingEvents(false);
+    }
+  };
+
   const templateMap = {
-    "class-1": classTemplate1,
-    "class-2": classTemplate2,
-    "class-3": classTemplate3,
-    "class-4": classTemplate4,
     "quote-1": reminderTemplate1,
     "quote-2": reminderTemplate2,
     "quote-3": reminderTemplate3,
@@ -103,60 +117,37 @@ const NotificationCreator = () => {
     "event-3": eventTemplate3,
     "event-4": eventTemplate4,
   };
-
-  const EmailTemplateViewer = ({
-    templateId,
-    title,
-    message,
-    date,
-    time,
-    className,
-    instructor,
-  }) => {
-    const templateFunction = templateMap[templateId] || reminderTemplate1;
-    return (
-      <div
-        dangerouslySetInnerHTML={{
-          __html: templateFunction({
-            title,
-            message,
-            date,
-            time,
-            className,
-            instructor,
-          }),
-        }}
-      />
-    );
-  };
+const EmailTemplateViewer = ({
+  templateId,
+  title,
+  message,
+  date,
+  time,
+  className,
+  instructor,
+  location,
+  sessions
+}) => {
+  const templateFunction = templateMap[templateId] || reminderTemplate1;
+  return (
+    <div
+      dangerouslySetInnerHTML={{
+        __html: templateFunction({
+          title,
+          message,
+          date,
+          time,
+          className,
+          instructor,
+          location,
+          sessions
+        }),
+      }}
+    />
+  );
+};
 
   const templates = {
-    // class: [
-    //   {
-    //     id: "class-1",
-    //     name: "Class Reminder",
-    //     description: "Notify students about upcoming classes",
-    //     image: classTemplateImg,
-    //   },
-    //   {
-    //     id: "class-2",
-    //     name: "Assignment Alert",
-    //     description: "Reminder for assignment deadlines",
-    //     image: classTemplateImg,
-    //   },
-    //   {
-    //     id: "class-3",
-    //     name: "Assignment Alert",
-    //     description: "Reminder for assignment deadlines",
-    //     image: classTemplateImg,
-    //   },
-    //   {
-    //     id: "class-4",
-    //     name: "Assignment Alert",
-    //     description: "Reminder for assignment deadlines",
-    //     image: classTemplateImg,
-    //   },
-    // ],
     quote: [
       {
         id: "quote-1",
@@ -172,14 +163,14 @@ const NotificationCreator = () => {
       },
       {
         id: "quote-3",
-        name: "Exam Encouragement",
-        description: "Boost morale before tests",
+        name: "Weekly Inspiration",
+        description: "Motivational quotes for the week",
         image: inspirationImage3,
       },
       {
         id: "quote-4",
-        name: "Exam Encouragement",
-        description: "Boost morale before tests",
+        name: "Success Tips",
+        description: "Tips for academic success",
         image: motivationalImage4,
       },
     ],
@@ -198,14 +189,14 @@ const NotificationCreator = () => {
       },
       {
         id: "event-3",
-        name: "Workshop Alert",
-        description: "Announce skill-building sessions",
+        name: "Seminar Notification",
+        description: "Information about upcoming seminars",
         image: eventImage3,
       },
       {
         id: "event-4",
-        name: "Workshop Alert",
-        description: "Announce skill-building sessions",
+        name: "Conference Reminder",
+        description: "Reminder for important conferences",
         image: eventImage4,
       },
     ],
@@ -215,6 +206,56 @@ const NotificationCreator = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+const handleEventChange = (e) => {
+  const eventId = e.target.value;
+  const selected = upcomingEvents.find(event => event._id === eventId);
+  setSelectedEvent(selected);
+
+  if (selected) {
+    // Get first session details
+    const firstSession = selected.sessions?.[0] || {};
+    
+    // Format date if available
+    const formattedDate = firstSession.date 
+      ? new Date(firstSession.date).toLocaleDateString('en-US', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        })
+      : selected.startDate 
+      ? new Date(selected.startDate).toLocaleDateString('en-US', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        })
+      : "Not specified";
+
+    // Format time if available
+    const formattedTime = firstSession.startTime && firstSession.endTime
+      ? `${firstSession.startTime} - ${firstSession.endTime}`
+      : "Not specified";
+
+    // Get instructor name
+    const instructorName = selected.Instructor?.name || "Instructor not assigned";
+    
+    // Get location
+    const locationName = selected.location?.location || "Location to be announced";
+
+    setFormData({
+      title: selected.title || "Class Invitation",
+      message: selected.theme || selected.description || `Join us for this special class`,
+      date: formattedDate,
+      time: formattedTime,
+      className: selected.title || "Class details coming soon",
+      instructor: instructorName,
+      location: locationName,
+      sessions: selected.sessions || []
+    });
+  }
+};
+
 
   const getNotificationTypeName = (type) => {
     switch (type) {
@@ -222,26 +263,27 @@ const NotificationCreator = () => {
         return "Inspirational Quote";
       case "event":
         return "Upcoming Event Invitation";
-      case "class":
-        return "Class Reminder";
       default:
         return type;
     }
   };
+
   const getTemplateName = (templateId) => {
     const templateNumber = templateId.split("-")[1];
     return `template${templateNumber}`;
   };
+const templateFunction = templateMap[selectedTemplate?.id || "quote-1"];
+const htmlContent = templateFunction({
+  title: formData.title,
+  message: formData.message,
+  date: formData.date,
+  time: formData.time,
+  className: formData.className,
+  instructor: formData.instructor,
+  location: formData.location,
+  sessions: formData.sessions
+});
 
-  const templateFunction = templateMap[selectedTemplate?.id || "quote-1"];
-  const htmlContent = templateFunction({
-    title: formData.title,
-    message: formData.message,
-    date: formData.date,
-    time: formData.time,
-    className: formData.className,
-    instructor: formData.instructor,
-  });
 
   const handleSubmit = async (e) => {
     try {
@@ -270,9 +312,8 @@ const NotificationCreator = () => {
           message: "",
           date: "",
           time: "",
-          className: "",
-          instructor: "",
         });
+        setSelectedEvent(null);
       }
     } catch (error) {
       console.log(error);
@@ -323,13 +364,12 @@ const NotificationCreator = () => {
             const selected = e.target.value;
             setNotificationType(selected);
             setSelectedTemplate(null);
+            setSelectedEvent(null);
             setFormData({
               title: "",
               message: "",
               date: "",
               time: "",
-              className: "",
-              instructor: "",
             });
           }}
           style={{ borderColor: "var(--primary)", maxWidth: "300px" }}
@@ -337,7 +377,6 @@ const NotificationCreator = () => {
           <option value="" disabled selected hidden>
             Select Notification Type...
           </option>
-          {/* <option value="class">Class Reminder</option> */}
           <option value="quote">Inspirational Quote</option>
           <option value="event">Upcoming Event Invitation</option>
         </select>
@@ -354,11 +393,10 @@ const NotificationCreator = () => {
               <div
                 key={template.id}
                 onClick={() => setSelectedTemplate(template)}
-                className={`col-3 mx-2${
-                  selectedTemplate?.id === template.id
+                className={`col-3 mx-2${selectedTemplate?.id === template.id
                     ? "border-primary border-2 shadow-sm"
                     : "border"
-                }`}
+                  }`}
               >
                 <img
                   src={template.image}
@@ -389,8 +427,108 @@ const NotificationCreator = () => {
         </div>
       )}
 
-      {/* Form and Preview */}
-      {selectedTemplate && (
+      {/* Event Selection and Preview */}
+      {selectedTemplate && notificationType === "event" && (
+        <>
+          <div className="row g-4">
+            {/* Event Selection Column */}
+            <div className="col-lg-6">
+              <div className="card border-0 shadow-sm">
+                <div className="card-body p-4">
+                  <h5
+                    className="mb-4 fw-medium"
+                    style={{ color: "var(--secondary)" }}
+                  >
+                    Select Event
+                  </h5>
+                  {loadingEvents ? (
+                    <div className="text-center">
+                      <div className="spinner-border text-primary" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="mb-3">
+                      <label className="form-label">Upcoming Events</label>
+                      <select
+                        className="form-select"
+                        value={selectedEvent?._id || ""}
+                        onChange={handleEventChange}
+                        style={{ borderColor: "var(--secondary)" }}
+                      >
+                        <option value="">Select an event...</option>
+                        {upcomingEvents.map((event) => (
+                          <option key={event._id} value={event._id}>
+                            {event.eventName || event.title} - {event.date} at {event.time}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
+             
+                </div>
+              </div>
+            </div>
+
+            {/* Preview Column */}
+            <div className="col-lg-6">
+              <EmailTemplateViewer
+                templateId={selectedTemplate?.id}
+                title={formData.title}
+                message={formData.message}
+                date={formData.date}
+                time={formData.time}
+              />
+            </div>
+          </div>
+
+          {/* Recipient Selection */}
+          <div className="card border-0 shadow-sm mt-4">
+            <div className="card-body p-4">
+              <h5
+                className="mb-4 fw-medium"
+                style={{ color: "var(--secondary)" }}
+              >
+                Recipient Selection
+              </h5>
+              <div className="row mb-4">
+                <div className="col-md-6">
+                  <label className="form-label">Recipient Type</label>
+                  <select
+                    className="form-select"
+                    value={recipientType}
+                    onChange={(e) => setRecipientType(e.target.value)}
+                    style={{ borderColor: "var(--secondary)" }}
+                  >
+                    <option value="user">User</option>
+                    <option value="mentor">Mentor</option>
+                    <option value="instructor">Instructor</option>
+                  </select>
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label">Location</label>
+                  <select
+                    className="form-select"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    style={{ borderColor: "var(--secondary)" }}
+                  >
+                    <option value="">All Locations</option>
+                    <option value="delhi">Delhi</option>
+                    <option value="mumbai">Mumbai</option>
+                    <option value="bangalore">Bangalore</option>
+                    <option value="hyderabad">Hyderabad</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* For quote notifications */}
+      {selectedTemplate && notificationType === "quote" && (
         <>
           <div className="row g-4">
             {/* Form Column */}
@@ -429,88 +567,6 @@ const NotificationCreator = () => {
                         style={{ borderColor: "var(--secondary)" }}
                       ></textarea>
                     </div>
-
-                    {(notificationType === "class" ||
-                      notificationType === "event") && (
-                      <div className="row mb-3">
-                        <div className="col-md-6">
-                          <label className="form-label">Date</label>
-                          <input
-                            type="date"
-                            className="form-control"
-                            name="date"
-                            value={formData.date}
-                            onChange={handleInputChange}
-                            required
-                            style={{ borderColor: "var(--secondary)" }}
-                          />
-                        </div>
-                        <div className="col-md-6">
-                          <label className="form-label">Time</label>
-                          <input
-                            type="time"
-                            className="form-control"
-                            name="time"
-                            value={formData.time}
-                            onChange={handleInputChange}
-                            required
-                            style={{ borderColor: "var(--secondary)" }}
-                          />
-                        </div>
-                      </div>
-                    )}
-
-                    {notificationType === "class" && (
-                      <>
-                        <div className="mb-3">
-                          <label className="form-label">Class Name</label>
-                          <div className="input-group">
-                            <span
-                              className="input-group-text"
-                              style={{
-                                backgroundColor: "var(--accent)",
-                                borderColor: "var(--secondary)",
-                              }}
-                            >
-                              <BookIcon style={{ color: "var(--primary)" }} />
-                            </span>
-                            <input
-                              type="text"
-                              className="form-control"
-                              name="className"
-                              value={formData.className}
-                              onChange={handleInputChange}
-                              required
-                              style={{ borderColor: "var(--secondary)" }}
-                            />
-                          </div>
-                        </div>
-
-                        <div className="mb-3">
-                          <label className="form-label">Instructor</label>
-                          <div className="input-group">
-                            <span
-                              className="input-group-text"
-                              style={{
-                                backgroundColor: "var(--accent)",
-                                borderColor: "var(--secondary)",
-                              }}
-                            >
-                              <PersonIcon style={{ color: "var(--primary)" }} />
-                            </span>
-                            <input
-                              type="text"
-                              className="form-control"
-                              name="instructor"
-                              value={formData.instructor}
-                              onChange={handleInputChange}
-                              required
-                              style={{ borderColor: "var(--secondary)" }}
-                            />
-                          </div>
-                        </div>
-                      </>
-                    )}
                   </form>
                 </div>
               </div>
@@ -524,8 +580,6 @@ const NotificationCreator = () => {
                 message={formData.message}
                 date={formData.date}
                 time={formData.time}
-                className={formData.className}
-                instructor={formData.instructor}
               />
             </div>
           </div>
@@ -623,6 +677,7 @@ const NotificationCreator = () => {
           color: "white",
           border: "none",
         }}
+        disabled={notificationType === "event" && !selectedEvent}
       >
         <SendIcon className="me-2" />
         Send Notification
