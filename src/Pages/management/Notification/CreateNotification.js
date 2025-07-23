@@ -32,10 +32,6 @@
 //   const [notificationType, setNotificationType] = useState("quote");
 //   const [selectedTemplate, setSelectedTemplate] = useState(null);
 
-
-
-
-
 // const [locations, setLocations] = useState([]);
 // const [recipients, setRecipients] = useState([]);
 // const [loading, setLoading] = useState(false);
@@ -54,7 +50,6 @@
 //     location: "",
 //     // sessions: "",
 //   });
-  
 
 //   const [users, setUsers] = useState([
 //     {
@@ -100,9 +95,6 @@
 //     }
 //   }, [notificationType]);
 
-
-
-
 //     // Fetch all locations when component mounts
 //   useEffect(() => {
 // // Update the fetchLocations function
@@ -128,11 +120,11 @@
 //  // Update the fetchRecipients function
 // const fetchRecipients = async () => {
 //   if (!recipientType) return;
-  
+
 //   try {
 //     setLoading(true);
 //     let url = `http://98.85.246.54:5010/api/admin/getRegister/${recipientType}`;
-    
+
 //     if (location) {
 //       url += `?location=${location}`;
 //     }
@@ -909,10 +901,12 @@ const NotificationCreator = () => {
     const fetchLocations = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://98.85.246.54:5010/api/location/getAllLocations');
+        const response = await axios.get(
+          "http://98.85.246.54:5010/api/location/getAllLocations"
+        );
         setLocations(Array.isArray(response.data) ? response.data : []);
       } catch (error) {
-        console.error('Error fetching locations:', error);
+        console.error("Error fetching locations:", error);
         setLocations([]);
       } finally {
         setLoading(false);
@@ -925,30 +919,34 @@ const NotificationCreator = () => {
   useEffect(() => {
     const fetchRecipients = async () => {
       if (!recipientType) return;
-      
+
       try {
         setLoading(true);
-        
-      // Get token from localStorage (or your preferred storage)
-      const token = localStorage.getItem("adminToken"); // Adjust key if needed
-      console .log(token, '.....')
-      if (!token) {
-        console.error("Token not found.");
-        return;
-      }
+
+        // Get token from localStorage (or your preferred storage)
+        const token = localStorage.getItem("adminToken"); // Adjust key if needed
+        console.log(token, ".....");
+        if (!token) {
+          console.error("Token not found.");
+          return;
+        }
 
         let url = `http://98.85.246.54:5010/api/admin/getRegister/${recipientType}`;
-        
+
         if (location) {
           url += `?location=${location}`;
         }
 
-        const response = await axios.get(url);
-        const recipientsWithSelection = Array.isArray(response.data) 
-          ? response.data.map(recipient => ({
+        const response = await axios.get(url, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const recipientsWithSelection = Array.isArray(response.data)
+          ? response.data.map((recipient) => ({
               ...recipient,
               selected: false,
-              status: 'active' // Default status
+              status: "active", // Default status
             }))
           : [];
         setRecipients(recipientsWithSelection);
@@ -1157,19 +1155,23 @@ const NotificationCreator = () => {
   });
 
   const toggleUserSelection = (id) => {
-    setRecipients(recipients.map(recipient => 
-      (recipient.id || recipient._id) === id 
-        ? { ...recipient, selected: !recipient.selected } 
-        : recipient
-    ));
+    setRecipients(
+      recipients.map((recipient) =>
+        (recipient.id || recipient._id) === id
+          ? { ...recipient, selected: !recipient.selected }
+          : recipient
+      )
+    );
   };
 
   const toggleSelectAll = (e) => {
     const isChecked = e.target.checked;
-    setRecipients(recipients.map(recipient => ({ 
-      ...recipient, 
-      selected: isChecked 
-    })));
+    setRecipients(
+      recipients.map((recipient) => ({
+        ...recipient,
+        selected: isChecked,
+      }))
+    );
   };
 
   const getStatusIcon = (status) => {
@@ -1188,8 +1190,8 @@ const NotificationCreator = () => {
   const handleSubmit = async (e) => {
     try {
       const selectedUserIds = recipients
-        .filter(recipient => recipient.selected)
-        .map(recipient => recipient.id || recipient._id);
+        .filter((recipient) => recipient.selected)
+        .map((recipient) => recipient.id || recipient._id);
 
       if (selectedUserIds.length === 0) {
         alert("Please select at least one recipient");
@@ -1462,11 +1464,15 @@ const NotificationCreator = () => {
                 style={{ borderColor: "var(--secondary)" }}
               >
                 <option value="">All Locations</option>
-                {Array.isArray(locations) && locations.map((loc) => (
-                  <option key={loc.id || loc._id} value={loc.name || loc.location}>
-                    {loc.name || loc.location}
-                  </option>
-                ))}
+                {Array.isArray(locations) &&
+                  locations.map((loc) => (
+                    <option
+                      key={loc.id || loc._id}
+                      value={loc.name || loc.location}
+                    >
+                      {loc.name || loc.location}
+                    </option>
+                  ))}
               </select>
             </div>
           </div>
@@ -1480,7 +1486,10 @@ const NotificationCreator = () => {
             </div>
           ) : (
             <div className="mt-4">
-              <h6 className="mb-3">{recipientType.charAt(0).toUpperCase() + recipientType.slice(1)} List</h6>
+              <h6 className="mb-3">
+                {recipientType.charAt(0).toUpperCase() + recipientType.slice(1)}{" "}
+                List
+              </h6>
               <div className="table-responsive">
                 <table className="table table-striped table-hover">
                   <thead>
@@ -1489,13 +1498,16 @@ const NotificationCreator = () => {
                         <input
                           type="checkbox"
                           onChange={toggleSelectAll}
-                          checked={recipients.length > 0 && recipients.every(r => r.selected)}
+                          checked={
+                            recipients.length > 0 &&
+                            recipients.every((r) => r.selected)
+                          }
                         />
                       </th>
                       <th>ID</th>
                       <th>Name</th>
                       <th>Email</th>
-                      {recipientType !== 'user' && <th>Specialization</th>}
+                      {recipientType !== "user" && <th>Specialization</th>}
                       <th>Location</th>
                       <th>Status</th>
                     </tr>
@@ -1508,25 +1520,40 @@ const NotificationCreator = () => {
                             <input
                               type="checkbox"
                               checked={recipient.selected || false}
-                              onChange={() => toggleUserSelection(recipient.id || recipient._id)}
+                              onChange={() =>
+                                toggleUserSelection(
+                                  recipient.id || recipient._id
+                                )
+                              }
                             />
                           </td>
                           <td>{recipient.id || recipient._id || index + 1}</td>
-                          <td>{recipient.name || recipient.fullName || 'N/A'}</td>
-                          <td>{recipient.email || 'N/A'}</td>
-                          {recipientType !== 'user' && (
-                            <td>{recipient.specialization || recipient.expertise || 'N/A'}</td>
-                          )}
-                          <td>{recipient.location || 'N/A'}</td>
                           <td>
-                            {getStatusIcon(recipient.status || 'active')}
-                            <span className="ms-2 text-capitalize">{recipient.status || 'active'}</span>
+                            {recipient.name || recipient.fullName || "N/A"}
+                          </td>
+                          <td>{recipient.email || "N/A"}</td>
+                          {recipientType !== "user" && (
+                            <td>
+                              {recipient.specialization ||
+                                recipient.expertise ||
+                                "N/A"}
+                            </td>
+                          )}
+                          <td>{recipient.location || "N/A"}</td>
+                          <td>
+                            {getStatusIcon(recipient.status || "active")}
+                            <span className="ms-2 text-capitalize">
+                              {recipient.status || "active"}
+                            </span>
                           </td>
                         </tr>
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={recipientType !== 'user' ? 7 : 6} className="text-center">
+                        <td
+                          colSpan={recipientType !== "user" ? 7 : 6}
+                          className="text-center"
+                        >
                           No {recipientType}s found
                         </td>
                       </tr>
