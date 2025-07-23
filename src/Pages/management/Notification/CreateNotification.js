@@ -53,9 +53,7 @@ const NotificationCreator = () => {
     instructor: "",
     location: "",
   });
-useEffect(() => {
-  setCurrentPage(1); // Reset to first page when location changes
-}, [location]);
+
   useEffect(() => {
     if (notificationType === "event") {
       fetchUpcomingEvents();
