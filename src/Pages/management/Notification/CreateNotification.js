@@ -1544,7 +1544,8 @@ const NotificationCreator = () => {
                 Recipient Type
               </label>
               <div className="d-flex gap-2">
-                {['user', 'mentor', 'instructor'].map((type) => (
+                {/* {['user', 'mentor', 'instructor'].map((type) => ( */}
+                     {['user', 'instructor'].map((type) => (
                   <button
                     key={type}
                     type="button"
