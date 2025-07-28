@@ -10,7 +10,9 @@ import {
   Row,       
   Col,      
   Modal,
-  ListGroup
+  ListGroup,
+
+  Pagination
 } from 'react-bootstrap';
 import {
   PencilSquare,
