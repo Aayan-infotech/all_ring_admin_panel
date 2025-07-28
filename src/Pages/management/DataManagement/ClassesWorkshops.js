@@ -51,7 +51,11 @@ const [itemToDelete, setItemToDelete] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [editingQuestion, setEditingQuestion] = useState(null);
 const [instructors, setInstructors] = useState([]);
-
+const [pagination, setPagination] = useState({
+  page: 1,
+  limit: 10,
+  total: 0
+});
 // 2. Add a function to fetch instructors
 const fetchInstructors = async () => {
   try {
@@ -65,22 +69,36 @@ const fetchInstructors = async () => {
     setInstructors([]);
   }
 };
-  const fetchClasses = async () => {
-    try {
-      setLoading(true);
-      const token = localStorage.getItem('adminToken');
-      const res = await axios.get('http://98.85.246.54:5010/api/AdminClasses/getAllClasses', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const apiData = Array.isArray(res.data?.data) ? res.data.data : res.data;
-      setClasses(apiData || []);
-    } catch (err) {
-      console.error('Error fetching classes:', err);
-      setClasses([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+const fetchClasses = async () => {
+  try {
+    setLoading(true);
+    const token = localStorage.getItem('adminToken');
+    const params = {
+      page: pagination.page,
+      limit: pagination.limit,
+      ...(filterLocation && { filterLocation: filterLocation }), // Changed from filterLocation to location
+      ...(filterStatus && { status: filterStatus }),
+      ...(search && { search })
+    };
+
+    const res = await axios.get('http://98.85.246.54:5010/api/AdminClasses/getAllClasses', {
+      headers: { Authorization: `Bearer ${token}` },
+      params
+    });
+
+    const apiData = Array.isArray(res.data?.data) ? res.data.data : res.data;
+    setClasses(apiData || []);
+    setPagination(prev => ({
+      ...prev,
+      total: res.data?.total || 0
+    }));
+  } catch (err) {
+    console.error('Error fetching classes:', err);
+    setClasses([]);
+  } finally {
+    setLoading(false);
+  }
+};
 const handleUpdateClass = async () => {
   const form = document.getElementById('editClassForm');
   const formData = new FormData();
@@ -197,12 +215,11 @@ const fetchQuestions = async (classId) => {
     setQuestions([]);
   }
 };
-  useEffect(() => {
-    fetchClasses();
-    fetchLocations();
-      fetchInstructors(); 
-
-  }, []);
+useEffect(() => {
+  fetchClasses();
+  fetchLocations();
+  fetchInstructors();
+}, [pagination.page, pagination.limit, filterLocation, filterStatus, search]);
 const toggleStatus = async (id) => {
   try {
     const token = localStorage.getItem('adminToken');
@@ -291,7 +308,8 @@ const handleDelete = async () => {
   };
 const filtered = classes.filter(cls => {
   const matchesTitle = cls.title?.toLowerCase().includes(search.toLowerCase());
-  const matchesLocation = filterLocation ? cls.location?.location === filterLocation : true;
+  // Compare location _id instead of location name
+  const matchesLocation = filterLocation ? cls.location?._id === filterLocation : true;
   const matchesStatus = filterStatus ? cls.status?.toLowerCase() === filterStatus.toLowerCase() : true;
   return matchesTitle && matchesLocation && matchesStatus;
 });
@@ -337,30 +355,29 @@ const convertTo24Hour = (timeStr) => {
   </Col>
 
   <Col md={4}>
-    <Form.Select
-      value={filterLocation}
-      onChange={(e) => setFilterLocation(e.target.value)}
-      style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
-    >
-      <option value="">All Locations</option>
-      {allLocations.map(loc => (
-        <option key={loc._id} value={loc.location}>
-          {loc.location}
-        </option>
-      ))}
-    </Form.Select>
+<Form.Select
+  value={filterLocation}
+  onChange={(e) => setFilterLocation(e.target.value)}
+>
+  <option value="">All Locations</option>
+  {allLocations.map(loc => (
+    <option key={loc._id} value={loc._id}>  {/* This is correct */}
+      {loc.location}
+    </option>
+  ))}
+</Form.Select>
   </Col>
 
   <Col md={4}>
-    <Form.Select
-      value={filterStatus}
-      onChange={(e) => setFilterStatus(e.target.value)}
-      style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
-    >
-      <option value="">All Status</option>
-      <option value="active">Active</option>
-      <option value="inactive">Inactive</option>
-    </Form.Select>
+<Form.Select
+  value={filterStatus}
+  onChange={(e) => setFilterStatus(e.target.value)}
+  style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
+>
+  <option value="">All Status</option>
+  <option value="Active">Active</option>
+  <option value="Blocked">Blocked</option>
+</Form.Select>
   </Col>
 </Row>
 
@@ -646,6 +663,32 @@ const convertTo24Hour = (timeStr) => {
                       ))}
                     </tbody>
                   </table>
+                  {filtered.length > 0 && (
+  <div className="d-flex justify-content-between align-items-center mt-3">
+    <div>
+      Showing {(pagination.page - 1) * pagination.limit + 1} to{' '}
+      {Math.min(pagination.page * pagination.limit, pagination.total)} of{' '}
+      {pagination.total} entries
+    </div>
+    <div>
+      <Button
+        variant="outline-secondary"
+        disabled={pagination.page === 1}
+        onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
+        className="me-2"
+      >
+        Previous
+      </Button>
+      <Button
+        variant="outline-secondary"
+        disabled={pagination.page * pagination.limit >= pagination.total}
+        onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
+      >
+        Next
+      </Button>
+    </div>
+  </div>
+)}
                 </div>
               </div>
             )}
