@@ -10,8 +10,7 @@ import {
   Row,       
   Col,      
   Modal,
-  ListGroup,
-  Pagination  
+  ListGroup
 } from 'react-bootstrap';
 import {
   PencilSquare,
@@ -77,7 +76,7 @@ const fetchClasses = async () => {
     const params = {
       page: pagination.page,
       limit: pagination.limit,
-      ...(filterLocation && { filterLocation: filterLocation }),
+      ...(filterLocation && { filterLocation: filterLocation }), // Changed from filterLocation to location
       ...(filterStatus && { status: filterStatus }),
       ...(search && { search })
     };
@@ -87,7 +86,8 @@ const fetchClasses = async () => {
       params
     });
 
-    setClasses(res.data.data || []);
+    const apiData = Array.isArray(res.data?.data) ? res.data.data : res.data;
+    setClasses(apiData || []);
     setPagination(prev => ({
       ...prev,
       total: res.data?.total || 0
@@ -381,85 +381,118 @@ const convertTo24Hour = (timeStr) => {
   </Col>
 </Row>
 
-{loading ? (
-  <div className="text-center"><Spinner animation="border" /></div>
-) : classes.length === 0 ? (
-  <div className="text-center text-muted fw-bold mt-5">No classes or workshops found.</div>
-) : (
-  <div className="table-responsive">
-    <Table bordered hover>
-      <thead style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
-        <tr>
-          <th>#</th>
-          <th>Image</th>
-          <th>Title</th>
-          <th>Theme</th>
-          <th>Type</th>
-          <th>Location</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {classes.map((item, idx) => (
-          <tr key={item._id}>
-            <td>{(pagination.page - 1) * pagination.limit + idx + 1}</td>
-            <td><img src={item.Image || 'https://via.placeholder.com/40'} width="40" height="40" alt="img" style={{ borderRadius: '4px' }} /></td>
-            <td>{item.title}</td>
-            <td>{item.theme}</td>
-            <td>{item.Type}</td>
-            <td>{item.location?.location || 'N/A'}</td>
-            <td>
-              <Badge 
-                bg={item.status === 'Active' ? 'success' : 'danger'} 
-                style={{ textTransform: 'capitalize' }}
-              >
-                {item.status}
-              </Badge>
-            </td>
-            <td>
-              <div className="d-flex flex-wrap gap-2 justify-content-center">
-                {/* ... your action buttons ... */}
-              </div>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </Table>
-    
-    {/* Add this pagination control */}
-    {pagination.total > 0 && (
-      <div className="d-flex justify-content-between align-items-center mt-3">
-        <div>
-          Showing {(pagination.page - 1) * pagination.limit + 1} to{' '}
-          {Math.min(pagination.page * pagination.limit, pagination.total)} of{' '}
-          {pagination.total} entries
+      {loading ? (
+        <div className="text-center"><Spinner animation="border" /></div>
+      ) : filtered.length === 0 ? (
+        <div className="text-center text-muted fw-bold mt-5">No classes or workshops found.</div>
+      ) : (
+        <div className="table-responsive">
+          <Table bordered hover>
+            <thead style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
+              <tr>
+                <th>#</th>
+                <th>Image</th>
+                <th>Title</th>
+                <th>Theme</th>
+                <th>Type</th>
+                <th>Location</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((item, idx) => (
+                <tr key={item._id}>
+                  <td>{idx + 1}</td>
+                  <td><img src={item.Image || 'https://via.placeholder.com/40'} width="40" height="40" alt="img" style={{ borderRadius: '4px' }} /></td>
+                  <td>{item.title}</td>
+                  <td>{item.theme}</td>
+                  <td>{item.Type}</td>
+                  <td>{item.location?.location || 'N/A'}</td>
+               
+                  <td>
+  <Badge 
+    bg={item.status === 'Active' ? 'success' : 'danger'} 
+    style={{ textTransform: 'capitalize' }}
+  >
+    {item.status}
+  </Badge>
+</td>
+                  <td>
+                    <div className="d-flex flex-wrap gap-2 justify-content-center">
+                     
+                      <Button
+  variant="light"
+  className={`icon-btn border-0 ${item.status === 'Active' ? 'bg-light border-danger text-danger' : 'bg-light border-success text-success'}`}
+  size="sm"
+  onClick={() => toggleStatus(item._id)}
+  title={item.status === 'Active' ? 'Deactivate' : 'Activate'}
+>
+  {item.status === 'Active' ? <XCircleFill size={16} /> : <CheckCircleFill size={16} />}
+</Button>
+                      <Button
+                        variant="light"
+                        className="icon-btn border-warning text-warning"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedClass(item);
+                          setShowEditModal(true);
+                        }}
+                      >
+                        <PencilSquare size={16} />
+                      </Button>
+                     
+                      <Button
+  variant="light"
+  className="icon-btn border-danger text-danger"
+  size="sm"
+  onClick={() => handleDeleteClick(item._id)}
+>
+  <Trash size={16} />
+</Button>
+                      <Button
+                        variant="light"
+                        className="icon-btn border-dark text-dark"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedClass(item);
+                          setShowNotesForm(true);
+                        }}
+                      >
+                        <FileEarmarkText size={16} />
+                      </Button>
+                      <Button
+                        variant="light"
+                        className="icon-btn border-primary text-primary"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedClass(item);
+                          setShowAddQuestionModal(true);
+                          setQuestionText('');
+                        }}
+                      >
+                        <PlusCircle size={16} />
+                      </Button>
+                          <Button
+        variant="light"
+        className="icon-btn border-info text-info"
+        size="sm"
+        onClick={() => {
+          setSelectedClass(item);
+          setShowDetailsModal(true);
+        }}
+      >
+        <InfoCircle size={16} />
+      </Button>
+
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
         </div>
-        <div>
-          <Pagination>
-            <Pagination.Prev
-              disabled={pagination.page === 1}
-              onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
-            />
-            {[...Array(Math.ceil(pagination.total / pagination.limit)).keys()].map(number => (
-              <Pagination.Item
-                key={number + 1}
-                active={number + 1 === pagination.page}
-                onClick={() => setPagination(prev => ({ ...prev, page: number + 1 }))}
-              >
-                {number + 1}
-              </Pagination.Item>
-            ))}
-            <Pagination.Next
-              disabled={pagination.page === Math.ceil(pagination.total / pagination.limit)}
-              onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
-            />
-          </Pagination>
-        </div>
-      </div>
-    )}
-  </div>
-)}
+      )}
 
   
 
