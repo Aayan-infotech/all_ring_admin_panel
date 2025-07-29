@@ -90,7 +90,7 @@
 //   try {
 //     const token = localStorage.getItem('adminToken');
 //     await axios.put(
-//       `http://98.85.246.54:5010/api/admin/changeUserPassword/${selectedUserId}`,
+//       `http://54.205.149.77:5010/api/admin/changeUserPassword/${selectedUserId}`,
 //       {
 //         newPassword,
 //         confirmPassword,
@@ -120,7 +120,7 @@
 //   //   try {
 //   //     const token = localStorage.getItem('adminToken');
 //   //     await axios.put(
-//   //       `http://98.85.246.54:5010/api/admin/changeUserPassword/${selectedUserId}`,
+//   //       `http://54.205.149.77:5010/api/admin/changeUserPassword/${selectedUserId}`,
 //   //       {
 //   //         newPassword: formData.newPassword,
 //   //         confirmPassword: formData.confirmPassword,
@@ -143,7 +143,7 @@
 //     const token = localStorage.getItem('adminToken');
 //     try {
 //       setLoading(true);
-//       const res = await axios.get('http://98.85.246.54:5010/api/admin/getRegister/user', {
+//       const res = await axios.get('http://54.205.149.77:5010/api/admin/getRegister/user', {
 //         headers: { Authorization: `Bearer ${token}` },
 //       });
 //       setUsers(res.data.users);
@@ -168,7 +168,7 @@
 // const fetchLocations = async () => {
 //   try {
 //     const token = localStorage.getItem('adminToken');
-//     const res = await axios.get('http://98.85.246.54:5010/api/location/getAllLocations', {
+//     const res = await axios.get('http://54.205.149.77:5010/api/location/getAllLocations', {
 //       headers: { Authorization: `Bearer ${token}` }
 //     });
     
@@ -211,7 +211,7 @@
 // //     }
 
 // //     const response = await axios.put(
-// //       `http://98.85.246.54:5010/api/auth/update-user/${editingUser._id}`,
+// //       `http://54.205.149.77:5010/api/auth/update-user/${editingUser._id}`,
 // //       formDataToSend,
 // //       {
 // //         headers: {
@@ -256,7 +256,7 @@
 //     }
 
 //     const response = await axios.put(
-//       `http://98.85.246.54:5010/api/auth/update-user/${editingUser._id}`,
+//       `http://54.205.149.77:5010/api/auth/update-user/${editingUser._id}`,
 //       formDataToSend,
 //       {
 //         headers: {
@@ -295,7 +295,7 @@
 
 //     try {
 //       await axios.patch(
-//         `http://98.85.246.54:5010/api/admin/editUserStatus/${user._id}`,
+//         `http://54.205.149.77:5010/api/admin/editUserStatus/${user._id}`,
 //         { user_status: newStatus },
 //         {
 //           headers: {
@@ -1054,7 +1054,7 @@ const Users = () => {
     try {
       const token = localStorage.getItem('adminToken');
       await axios.put(
-        `http://98.85.246.54:5010/api/admin/changeUserPassword/${selectedUserId}`,
+        `http://54.205.149.77:5010/api/admin/changeUserPassword/${selectedUserId}`,
         {
           newPassword,
           confirmPassword,
@@ -1077,7 +1077,7 @@ const Users = () => {
     const token = localStorage.getItem('adminToken');
     try {
       setLoading(true);
-      const res = await axios.get('http://98.85.246.54:5010/api/admin/getRegister/user', {
+      const res = await axios.get('http://54.205.149.77:5010/api/admin/getRegister/user', {
         headers: { Authorization: `Bearer ${token}` },
         params: {
           page: currentPage,
@@ -1101,7 +1101,7 @@ const Users = () => {
   const fetchLocations = async () => {
     try {
       const token = localStorage.getItem('adminToken');
-      const res = await axios.get('http://98.85.246.54:5010/api/location/getAllLocations', {
+      const res = await axios.get('http://54.205.149.77:5010/api/location/getAllLocations', {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -1138,7 +1138,7 @@ const Users = () => {
       formDataToSend.append('location', selectedLocation ? selectedLocation._id : formData.location || '');
 
       const response = await axios.put(
-        `http://98.85.246.54:5010/api/auth/update-user/${editingUser._id}`,
+        `http://54.205.149.77:5010/api/auth/update-user/${editingUser._id}`,
         formDataToSend,
         {
           headers: {
@@ -1178,7 +1178,7 @@ const Users = () => {
 
     try {
       await axios.patch(
-        `http://98.85.246.54:5010/api/admin/editUserStatus/${user._id}`,
+        `http://54.205.149.77:5010/api/admin/editUserStatus/${user._id}`,
         { user_status: newStatus },
         {
           headers: {

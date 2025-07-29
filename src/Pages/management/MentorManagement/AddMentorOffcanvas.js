@@ -25,7 +25,7 @@ const AddMentorOffcanvas = ({ show, handleClose, onMentorAdded }) => {
 useEffect(() => {
   const fetchLocations = async () => {
     try {
-      const response = await axios.get('http://98.85.246.54:5010/api/location/getAllLocations');
+      const response = await axios.get('http://54.205.149.77:5010/api/location/getAllLocations');
       
       // Filter only active locations
       const activeLocations = (response.data?.data || [])
@@ -48,7 +48,7 @@ useEffect(() => {
 //   useEffect(() => {
 //   const fetchLocations = async () => {
 //     try {
-//       const response = await axios.get('http://98.85.246.54:5010/api/location/getAllLocations');
+//       const response = await axios.get('http://54.205.149.77:5010/api/location/getAllLocations');
 //       setLocations(response.data?.data || []); // ✅ fix: use response.data.data instead of response.data.locations
 //     } catch (error) {
 //       console.error('Error fetching locations:', error);
@@ -73,7 +73,7 @@ useEffect(() => {
 
     try {
       await axios.post(
-        'http://98.85.246.54:5010/api/auth/adminRegister/mentor',
+        'http://54.205.149.77:5010/api/auth/adminRegister/mentor',
         formData,
         { headers: { 'Content-Type': 'multipart/form-data' } }
       );

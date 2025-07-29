@@ -62,7 +62,7 @@ const [pagination, setPagination] = useState({
 const fetchInstructors = async () => {
   try {
     const token = localStorage.getItem('adminToken');
-    const res = await axios.get('http://98.85.246.54:5010/api/admin/getRegister/instructor', {
+    const res = await axios.get('http://54.205.149.77:5010/api/admin/getRegister/instructor', {
       headers: { Authorization: `Bearer ${token}` }
     });
     setInstructors(res.data?.users || []);
@@ -71,6 +71,36 @@ const fetchInstructors = async () => {
     setInstructors([]);
   }
 };
+// const fetchClasses = async () => {
+//   try {
+//     setLoading(true);
+//     const token = localStorage.getItem('adminToken');
+//     const params = {
+//       page: pagination.page,
+//       limit: pagination.limit,
+//       ...(filterLocation && { filterLocation: filterLocation }), // Changed from filterLocation to location
+//       ...(filterStatus && { status: filterStatus }),
+//       ...(search && { search })
+//     };
+
+//     const res = await axios.get('http://54.205.149.77:5010/api/AdminClasses/getAllClasses', {
+//       headers: { Authorization: `Bearer ${token}` },
+//       params
+//     });
+
+//     const apiData = Array.isArray(res.data?.data) ? res.data.data : res.data;
+//     setClasses(apiData || []);
+//     setPagination(prev => ({
+//       ...prev,
+//       total: res.data?.total || 0
+//     }));
+//   } catch (err) {
+//     console.error('Error fetching classes:', err);
+//     setClasses([]);
+//   } finally {
+//     setLoading(false);
+//   }
+// };
 const fetchClasses = async () => {
   try {
     setLoading(true);
@@ -78,25 +108,27 @@ const fetchClasses = async () => {
     const params = {
       page: pagination.page,
       limit: pagination.limit,
-      ...(filterLocation && { filterLocation: filterLocation }), // Changed from filterLocation to location
+      ...(filterLocation && { filterLocation: filterLocation }),
       ...(filterStatus && { status: filterStatus }),
       ...(search && { search })
     };
 
-    const res = await axios.get('http://98.85.246.54:5010/api/AdminClasses/getAllClasses', {
+    const res = await axios.get('http://54.205.149.77:5010/api/AdminClasses/getAllClasses', {
       headers: { Authorization: `Bearer ${token}` },
       params
     });
 
-    const apiData = Array.isArray(res.data?.data) ? res.data.data : res.data;
-    setClasses(apiData || []);
+    setClasses(res.data?.data || []);
     setPagination(prev => ({
       ...prev,
-      total: res.data?.total || 0
+      total: res.data?.total || 0,
+      page: res.data?.page || 1,
+      limit: res.data?.limit || 10
     }));
   } catch (err) {
     console.error('Error fetching classes:', err);
     setClasses([]);
+    toast.error('Failed to fetch classes');
   } finally {
     setLoading(false);
   }
@@ -154,7 +186,7 @@ formData.append('endTime', formatTime(form.sessionEndTime.value || '13:00'));
   try {
     const token = localStorage.getItem('adminToken');
     const response = await axios.put(
-      `http://98.85.246.54:5010/api/AdminClasses/updateClass/${selectedClass._id}`,
+      `http://54.205.149.77:5010/api/AdminClasses/updateClass/${selectedClass._id}`,
       formData,
       {
         headers: { 
@@ -175,7 +207,7 @@ formData.append('endTime', formatTime(form.sessionEndTime.value || '13:00'));
 
   const fetchLocations = async () => {
     try {
-      const response = await axios.get('http://98.85.246.54:5010/api/location/getAllLocations');
+      const response = await axios.get('http://54.205.149.77:5010/api/location/getAllLocations');
       
       // Filter to only include active locations
       const activeLocations = (response.data?.data || [])
@@ -190,7 +222,7 @@ formData.append('endTime', formatTime(form.sessionEndTime.value || '13:00'));
 
   // const fetchLocations = async () => {
   //   try {
-  //     const res = await axios.get('http://98.85.246.54:5010/api/location/getAllLocations');
+  //     const res = await axios.get('http://54.205.149.77:5010/api/location/getAllLocations');
   //     setAllLocations(res.data?.data || []);
   //   } catch (err) {
   //     console.error('Error fetching locations:', err);
@@ -201,7 +233,7 @@ const fetchQuestions = async (classId) => {
   try {
     const token = localStorage.getItem('adminToken');
     const res = await axios.get(
-      `http://98.85.246.54:5010/api/questionaire/getQuestions/${classId}`,
+      `http://54.205.149.77:5010/api/questionaire/getQuestions/${classId}`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
     
@@ -226,7 +258,7 @@ const toggleStatus = async (id) => {
   try {
     const token = localStorage.getItem('adminToken');
     const response = await axios.patch(
-      `http://98.85.246.54:5010/api/AdminClasses/blockClass/${id}`, 
+      `http://54.205.149.77:5010/api/AdminClasses/blockClass/${id}`, 
       {}, 
       {
         headers: { Authorization: `Bearer ${token}` },
@@ -258,7 +290,7 @@ const handleDeleteClick = (id) => {
 const handleDelete = async () => {
   try {
     const token = localStorage.getItem('adminToken');
-    await axios.delete(`http://98.85.246.54:5010/api/AdminClasses/deleteClass/${itemToDelete}`, {
+    await axios.delete(`http://54.205.149.77:5010/api/AdminClasses/deleteClass/${itemToDelete}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
@@ -277,7 +309,7 @@ const handleDelete = async () => {
     try {
       const token = localStorage.getItem('adminToken');
       await axios.post(
-        `http://98.85.246.54:5010/api/questionaire/addQuestions/${classId}`,
+        `http://54.205.149.77:5010/api/questionaire/addQuestions/${classId}`,
         { questionText },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -295,7 +327,7 @@ const handleDelete = async () => {
     try {
       const token = localStorage.getItem('adminToken');
       await axios.put(
-        `http://98.85.246.54:5010/api/questionaire/editQuestion/${classId}/${questionId}`,
+        `http://54.205.149.77:5010/api/questionaire/editQuestion/${classId}/${questionId}`,
         { questionText },
         { headers: { Authorization: `Bearer ${token}` } }
       );

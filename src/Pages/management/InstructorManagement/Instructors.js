@@ -188,7 +188,7 @@
 //   try {
 //     setLoading(true);
 //     const token = localStorage.getItem('adminToken');
-//     const res = await axios.get('http://98.85.246.54:5010/api/admin/getRegister/instructor', {
+//     const res = await axios.get('http://54.205.149.77:5010/api/admin/getRegister/instructor', {
 //       headers: { Authorization: `Bearer ${token}` }
 //     });
 //     const allUsers = (res.data.users || []).map(user => ({
@@ -207,7 +207,7 @@
 // };
 // const fetchLocations = async () => {
 //   try {
-//     const res = await axios.get('http://98.85.246.54:5010/api/location/getAllLocations');
+//     const res = await axios.get('http://54.205.149.77:5010/api/location/getAllLocations');
 //     const locations = res.data?.data || [];
 //     const activeLocations = locations
 //       .filter(loc => loc.status === 'Active')
@@ -239,7 +239,7 @@
 //     formDataToSend.append('location', editForm.location); // This should be the location ID
 
 //     const response = await axios.put(
-//       `http://98.85.246.54:5010/api/auth/update-user/${selectedInstructor._id}`,
+//       `http://54.205.149.77:5010/api/auth/update-user/${selectedInstructor._id}`,
 //       formDataToSend,
 //       {
 //         headers: {
@@ -279,7 +279,7 @@
 
 //   try {
 //     await axios.patch(
-//       `http://98.85.246.54:5010/api/admin/editUserStatus/${instructor._id}`,
+//       `http://54.205.149.77:5010/api/admin/editUserStatus/${instructor._id}`,
 //       { user_status: newStatus },
 //       { headers: { Authorization: `Bearer ${token}` } }
 //     );
@@ -315,7 +315,7 @@
 
 // //   try {
 // //     await axios.patch(
-// //       `http://98.85.246.54:5010/api/admin/editUserStatus/${instructor._id}`,
+// //       `http://54.205.149.77:5010/api/admin/editUserStatus/${instructor._id}`,
 // //       { user_status: newStatus },
 // //       { headers: { Authorization: `Bearer ${token}` } }
 // //     );
@@ -343,7 +343,7 @@
 //     if (passwords.newPassword !== passwords.confirmPassword) return toast.error('Passwords do not match');
 //     try {
 //       const token = localStorage.getItem('adminToken');
-//       await axios.put(`http://98.85.246.54:5010/api/admin/changeUserPassword/${selectedInstructor._id}`, passwords, {
+//       await axios.put(`http://54.205.149.77:5010/api/admin/changeUserPassword/${selectedInstructor._id}`, passwords, {
 //         headers: { Authorization: `Bearer ${token}` }
 //       });
 
@@ -885,7 +885,7 @@ const InstructorManagement = () => {
         status: statusFilter
       };
 
-      const res = await axios.get('http://98.85.246.54:5010/api/admin/getRegister/instructor', {
+      const res = await axios.get('http://54.205.149.77:5010/api/admin/getRegister/instructor', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -905,7 +905,7 @@ const InstructorManagement = () => {
   const fetchLocations = async () => {
     try {
       const token = localStorage.getItem('adminToken');
-      const res = await axios.get('http://98.85.246.54:5010/api/location/getAllLocations', {
+      const res = await axios.get('http://54.205.149.77:5010/api/location/getAllLocations', {
         headers: {
           Authorization: `Bearer ${token}`,
         }
@@ -956,7 +956,7 @@ const InstructorManagement = () => {
       const newStatus = instructor.user_status === 1 ? 2 : 1;
 
       await axios.patch(
-        `http://98.85.246.54:5010/api/admin/editUserStatus/${instructor._id}`,
+        `http://54.205.149.77:5010/api/admin/editUserStatus/${instructor._id}`,
         { user_status: newStatus },
         {
           headers: {
@@ -988,7 +988,7 @@ const InstructorManagement = () => {
       const token = localStorage.getItem('adminToken');
 
       await axios.put(
-        `http://98.85.246.54:5010/api/admin/changeUserPassword/${selectedInstructor._id}`,
+        `http://54.205.149.77:5010/api/admin/changeUserPassword/${selectedInstructor._id}`,
         passwords,
         {
           headers: {
@@ -1020,7 +1020,7 @@ const InstructorManagement = () => {
       formDataToSend.append('location', formData.locationId);
 
       await axios.put(
-        `http://98.85.246.54:5010/api/auth/update-user/${selectedInstructor._id}`,
+        `http://54.205.149.77:5010/api/auth/update-user/${selectedInstructor._id}`,
         formDataToSend,
         {
           headers: {
