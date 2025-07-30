@@ -349,7 +349,7 @@ const onSubmit = async (data) => {
                 </Form.Control.Feedback>
               </Form.Group>
             </Row>
-            <Row className="mb-3">
+            {/* <Row className="mb-3">
 
 <Form.Group as={Col} md={6} controlId="startTime">
   <Form.Label>Start Time <span className="text-danger">*</span></Form.Label>
@@ -443,9 +443,118 @@ const onSubmit = async (data) => {
     <div className="text-danger small mt-1">End time is required</div>
   )}
 </Form.Group>
+</Row> */}
+
+
+<Row className="mb-3">
+  {/* START TIME */}
+  <Form.Group as={Col} md={6} controlId="startTime">
+    <Form.Label>Start Time <span className="text-danger">*</span></Form.Label>
+    <div className="d-flex gap-2 align-items-start">
+      <div>
+        <Form.Label className="small">Hour</Form.Label>
+        <Form.Select
+          {...register('startTimeHour', { required: 'Start hour is required' })}
+          isInvalid={!!errors.startTimeHour}
+        >
+          <option value="">Hour</option>
+          {Array.from({ length: 12 }, (_, i) => i + 1).map(hour => (
+            <option key={`start-hour-${hour}`} value={hour}>{hour}</option>
+          ))}
+        </Form.Select>
+      </div>
+
+      <div>
+        <Form.Label className="small">Minute</Form.Label>
+        <Form.Select
+          {...register('startTimeMinute', { required: 'Start minute is required' })}
+          isInvalid={!!errors.startTimeMinute}
+        >
+          <option value="">Min</option>
+          {Array.from({ length: 12 }, (_, i) => (i * 5).toString().padStart(2, '0')).map(min => (
+            <option key={`start-min-${min}`} value={min}>{min}</option>
+          ))}
+        </Form.Select>
+      </div>
+
+      <div>
+        <Form.Label className="small">AM/PM</Form.Label>
+        <Form.Select
+          {...register('startTimeAmPm', { required: 'Start AM/PM is required' })}
+          isInvalid={!!errors.startTimeAmPm}
+        >
+          <option value="">AM/PM</option>
+          <option value="AM">AM</option>
+          <option value="PM">PM</option>
+        </Form.Select>
+      </div>
+    </div>
+
+    {(errors.startTimeHour || errors.startTimeMinute || errors.startTimeAmPm) && (
+      <div className="text-danger small mt-1">Start time is required</div>
+    )}
+
+    {/* 🟢 Start Time Preview */}
+    <div className="mt-2 small text-muted">
+      Selected: {watch('startTimeHour') || '--'}:
+      {watch('startTimeMinute') || '--'} {watch('startTimeAmPm') || '--'}
+    </div>
+  </Form.Group>
+
+  {/* END TIME */}
+  <Form.Group as={Col} md={6} controlId="endTime">
+    <Form.Label>End Time <span className="text-danger">*</span></Form.Label>
+    <div className="d-flex gap-2 align-items-start">
+      <div>
+        <Form.Label className="small">Hour</Form.Label>
+        <Form.Select
+          {...register('endTimeHour', { required: 'End hour is required' })}
+          isInvalid={!!errors.endTimeHour}
+        >
+          <option value="">Hour</option>
+          {Array.from({ length: 12 }, (_, i) => i + 1).map(hour => (
+            <option key={`end-hour-${hour}`} value={hour}>{hour}</option>
+          ))}
+        </Form.Select>
+      </div>
+
+      <div>
+        <Form.Label className="small">Minute</Form.Label>
+        <Form.Select
+          {...register('endTimeMinute', { required: 'End minute is required' })}
+          isInvalid={!!errors.endTimeMinute}
+        >
+          <option value="">Min</option>
+          {Array.from({ length: 12 }, (_, i) => (i * 5).toString().padStart(2, '0')).map(min => (
+            <option key={`end-min-${min}`} value={min}>{min}</option>
+          ))}
+        </Form.Select>
+      </div>
+
+      <div>
+        <Form.Label className="small">AM/PM</Form.Label>
+        <Form.Select
+          {...register('endTimeAmPm', { required: 'End AM/PM is required' })}
+          isInvalid={!!errors.endTimeAmPm}
+        >
+          <option value="">AM/PM</option>
+          <option value="AM">AM</option>
+          <option value="PM">PM</option>
+        </Form.Select>
+      </div>
+    </div>
+
+    {(errors.endTimeHour || errors.endTimeMinute || errors.endTimeAmPm) && (
+      <div className="text-danger small mt-1">End time is required</div>
+    )}
+
+    {/* 🟢 End Time Preview */}
+    <div className="mt-2 small text-muted">
+      Selected: {watch('endTimeHour') || '--'}:
+      {watch('endTimeMinute') || '--'} {watch('endTimeAmPm') || '--'}
+    </div>
+  </Form.Group>
 </Row>
-
-
 
 
             <Row className="mb-3">
