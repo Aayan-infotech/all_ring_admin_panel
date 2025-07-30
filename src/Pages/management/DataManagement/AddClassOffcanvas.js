@@ -315,33 +315,7 @@ const onSubmit = async (data) => {
               </Form.Group>
             </Row>
 
-            {/* <Row className="mb-3">
-              <Form.Group as={Col} md={6} controlId="startDate">
-                <Form.Label>Start Date <span className="text-danger">*</span></Form.Label>
-                <Form.Control
-                  type="date"
-                  {...register('startDate', { required: 'Start date is required' })}
-                  isInvalid={!!errors.startDate}
-                  // style={{ borderColor: 'var(--secondary)' }}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {errors.startDate?.message}
-                </Form.Control.Feedback>
-              </Form.Group>
-
-              <Form.Group as={Col} md={6} controlId="endDate">
-                <Form.Label>End Date <span className="text-danger">*</span></Form.Label>
-                <Form.Control
-                  type="date"
-                  {...register('endDate', { required: 'End date is required' })}
-                  isInvalid={!!errors.endDate}
-                  // style={{ borderColor: 'var(--secondary)' }}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {errors.endDate?.message}
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Row> */}
+           
 
             <Row className="mb-3">
               <Form.Group as={Col} md={12} controlId="sessionType">
@@ -570,7 +544,7 @@ const onSubmit = async (data) => {
 </Row>
 
 
-            <Row className="mb-3">
+            {/* <Row className="mb-3">
               <Form.Group as={Col} md={12} controlId="instructor">
                 <Form.Label>Instructor <span className="text-danger">*</span></Form.Label>
                 <Form.Select
@@ -587,7 +561,7 @@ const onSubmit = async (data) => {
                   {errors.instructor?.message}
                 </Form.Control.Feedback>
               </Form.Group>
-            </Row>
+            </Row> */}
 
             <Row className="mb-3">
               <Form.Group as={Col} md={12} controlId="type">
@@ -623,6 +597,25 @@ const onSubmit = async (data) => {
                 </Form.Select>
                 <Form.Control.Feedback type="invalid">
                   {errors.location?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Row>
+
+                <Row className="mb-3">
+              <Form.Group as={Col} md={12} controlId="instructor">
+                <Form.Label>Instructor <span className="text-danger">*</span></Form.Label>
+                <Form.Select
+                  {...register('instructor', { required: 'Instructor is required' })}
+                  isInvalid={!!errors.instructor}
+                  // style={{ borderColor: 'var(--secondary)' }}
+                >
+                  <option value="">Select Instructor</option>
+                  {instructors.map(inst => (
+                    <option key={inst._id} value={inst._id}>{inst.name}</option>
+                  ))}
+                </Form.Select>
+                <Form.Control.Feedback type="invalid">
+                  {errors.instructor?.message}
                 </Form.Control.Feedback>
               </Form.Group>
             </Row>
