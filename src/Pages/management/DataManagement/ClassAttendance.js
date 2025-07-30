@@ -51,7 +51,7 @@ const ClassAttendance = () => {
 
       if (search) url += `&search=${search}`;
       if (filterLocation) url += `&filterLocation=${filterLocation}`;
-      if (filterStatus) url += `&status=${filterStatus}`;
+      if (filterStatus) url += `&classStatus=${filterStatus}`;
 
       const res = await axios.get(url);
       setData(res.data.data || []);
