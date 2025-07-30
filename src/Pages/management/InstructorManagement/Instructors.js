@@ -1418,10 +1418,10 @@ const InstructorManagement = () => {
                 <Col md={8}>{selectedInstructor.email}</Col>
               </Row>
 
-              <Row className="mb-2">
+              {/* <Row className="mb-2">
                 <Col md={4}><strong>Phone:</strong></Col>
                 <Col md={8}>{selectedInstructor.number || 'N/A'}</Col>
-              </Row>
+              </Row> */}
 
               <Row className="mb-2">
                 <Col md={4}><strong>Location:</strong></Col>
