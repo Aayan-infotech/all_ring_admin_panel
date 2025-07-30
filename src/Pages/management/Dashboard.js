@@ -277,7 +277,7 @@ const Dashboard = () => {
                           <td>{idx + 1}</td>
                           <td>{item.name || 'N/A'}</td>
                           <td>{item.location || 'N/A'}</td>
-                          <td>{item.sessions || 0}</td>
+                          <td>{item.totalSessions || 0}</td>
                         </tr>
                       ))}
                     </tbody>

@@ -123,6 +123,17 @@ const timeOptions = generateTimeOptions();
     setTags(tags.filter(tag => tag !== tagToRemove));
   };
 
+  const convertTo24HourFormat = (time12h) => {
+    if (!time12h) return '';
+    const [timePart, modifier] = time12h.split(' ');
+    let [hours, minutes] = timePart.split(':').map(Number);
+    if (modifier === 'PM' && hours < 12) hours += 12;
+    if (modifier === 'AM' && hours === 12) hours = 0;
+    const hh = String(hours).padStart(2, '0');
+    const mm = String(minutes).padStart(2, '0');
+    return `${hh}:${mm}`;
+  };
+ 
 const onSubmit = async (data) => {
   const formData = new FormData(); // Changed from formdata to FormData
   // Combine time fields
@@ -143,8 +154,10 @@ const onSubmit = async (data) => {
   formData.append('startDate', data.startDate);
   formData.append('endDate', data.endDate);
   formData.append('sessionType', data.sessionType);
-  formData.append('startTime', startTime);
-  formData.append('endTime', endTime);
+  // formData.append('startTime', startTime);
+  // formData.append('endTime', endTime);
+  formData.append('startTime', convertTo24HourFormat(startTime));
+  formData.append('endTime', convertTo24HourFormat(endTime))
   formData.append('location', data.location);
   formData.append('Instructor', data.instructor); // Note capital 'I'
   formData.append('Type', data.type); // Note capital 'T'
@@ -342,7 +355,7 @@ const onSubmit = async (data) => {
                   <option value="weekly">Weekly</option>
                   <option value="daily">Daily</option>
                   <option value="monthly">Monthly</option>
-                  <option value="one-time">One-time</option>
+                 
                 </Form.Select>
                 <Form.Control.Feedback type="invalid">
                   {errors.sessionType?.message}
