@@ -526,9 +526,39 @@ const convertTo24Hour = (timeStr) => {
             </tbody>
           </Table>
         </div>
+        
       )}
 
-  
+  <div className="d-flex justify-content-between align-items-center mt-3">
+      <div className="text-muted">
+        Showing {(pagination.page - 1) * pagination.limit + 1} to{' '}
+        {Math.min(pagination.page * pagination.limit, pagination.total)} of{' '}
+        {pagination.total} entries
+      </div>
+      
+      <Pagination>
+        <Pagination.Prev 
+          onClick={() => setPagination(prev => ({ ...prev, page: Math.max(prev.page - 1, 1) }))}
+          disabled={pagination.page === 1}
+        />
+        
+        {Array.from({ length: Math.ceil(pagination.total / pagination.limit) }, (_, i) => (
+          <Pagination.Item
+            key={i + 1}
+            active={i + 1 === pagination.page}
+            onClick={() => setPagination(prev => ({ ...prev, page: i + 1 }))}
+          >
+            {i + 1}
+          </Pagination.Item>
+        ))}
+        
+        <Pagination.Next
+          onClick={() => setPagination(prev => ({ ...prev, page: Math.min(prev.page + 1, Math.ceil(pagination.total / pagination.limit)) }))}
+          disabled={pagination.page === Math.ceil(pagination.total / pagination.limit)}
+        />
+      </Pagination>
+    </div>
+ 
 
 
      {/* Delete Confirmation Modal */}
