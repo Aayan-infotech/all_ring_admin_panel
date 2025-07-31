@@ -31,7 +31,7 @@ import AddClassOffcanvas from './AddClassOffcanvas';
 import AddMediaOffcanvas from './AddMediaOffcanvas';
 import AddNotesOffcanvas from './AddNotesOffcanvas';
 import { toast } from 'react-toastify';
-
+import { useForm } from 'react-hook-form';
 const ClassesWorkshops = () => {
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -58,6 +58,14 @@ const [pagination, setPagination] = useState({
   limit: 10,
   total: 0
 });
+ const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+    watch,
+    setValue,
+  } = useForm();
 // 2. Add a function to fetch instructors
 const fetchInstructors = async () => {
   try {
@@ -71,36 +79,8 @@ const fetchInstructors = async () => {
     setInstructors([]);
   }
 };
-// const fetchClasses = async () => {
-//   try {
-//     setLoading(true);
-//     const token = localStorage.getItem('adminToken');
-//     const params = {
-//       page: pagination.page,
-//       limit: pagination.limit,
-//       ...(filterLocation && { filterLocation: filterLocation }), // Changed from filterLocation to location
-//       ...(filterStatus && { status: filterStatus }),
-//       ...(search && { search })
-//     };
 
-//     const res = await axios.get('http://54.205.149.77:5010/api/AdminClasses/getAllClasses', {
-//       headers: { Authorization: `Bearer ${token}` },
-//       params
-//     });
-
-//     const apiData = Array.isArray(res.data?.data) ? res.data.data : res.data;
-//     setClasses(apiData || []);
-//     setPagination(prev => ({
-//       ...prev,
-//       total: res.data?.total || 0
-//     }));
-//   } catch (err) {
-//     console.error('Error fetching classes:', err);
-//     setClasses([]);
-//   } finally {
-//     setLoading(false);
-//   }
-// };
+ 
 const fetchClasses = async () => {
   try {
     setLoading(true);
@@ -137,50 +117,54 @@ const handleUpdateClass = async () => {
   const form = document.getElementById('editClassForm');
   const formData = new FormData();
 
-  // Append all fields exactly as in the curl example
+  // Get time values from react-hook-form
+  const startTimeHour = form.startTimeHour.value;
+  const startTimeMinute = form.startTimeMinute.value;
+  const startTimeAmPm = form.startTimeAmPm.value;
+  
+  const endTimeHour = form.endTimeHour.value;
+  const endTimeMinute = form.endTimeMinute.value;
+  const endTimeAmPm = form.endTimeAmPm.value;
+
+  // Format times
+  const formatTime = (hour, minute, ampm) => {
+    if (!hour || !minute || !ampm) return '';
+    return `${hour}:${minute} ${ampm}`;
+  };
+
+  const startTime = formatTime(startTimeHour, startTimeMinute, startTimeAmPm);
+  const endTime = formatTime(endTimeHour, endTimeMinute, endTimeAmPm);
+
+  // Convert to 24-hour format for API
+  const convertTo24HourFormat = (time12h) => {
+    if (!time12h) return '';
+    const [timePart, modifier] = time12h.split(' ');
+    let [hours, minutes] = timePart.split(':').map(Number);
+    if (modifier === 'PM' && hours < 12) hours += 12;
+    if (modifier === 'AM' && hours === 12) hours = 0;
+    const hh = String(hours).padStart(2, '0');
+    const mm = String(minutes).padStart(2, '0');
+    return `${hh}:${mm}`;
+  };
+
+  // Append all fields
   formData.append('title', form.title.value);
   formData.append('theme', form.theme.value);
-  
-  // Handle tags - you'll need to add tags input to your form
-  // For now, I'll add empty tags array since your form doesn't have tags input
   formData.append('tags', JSON.stringify([]));
-  
-  // Date fields - you'll need to add these to your form
   formData.append('startDate', form.startDate.value || new Date().toISOString().split('T')[0]);
   formData.append('endDate', form.endDate.value || new Date().toISOString().split('T')[0]);
-  
-  // Session type - you'll need to add this to your form
   formData.append('sessionType', form.sessionType.value || 'weekly');
-  
-
-const formatTime = (time) => {
-  const [hours, minutes] = time.split(':');
-  const hourInt = parseInt(hours, 10);
-  const period = hourInt >= 12 ? 'PM' : 'AM';
-  const displayHour = hourInt % 12 || 12;
-  return `${displayHour}:${minutes} ${period}`;
-};
-
-// Add startTime and endTime from sessions[0] edit fields
-formData.append('startTime', formatTime(form.startTime.value || '12:00'));
-formData.append('endTime', formatTime(form.sessionEndTime.value || '13:00'));
-
- 
+  formData.append('startTime', convertTo24HourFormat(startTime));
+  formData.append('endTime', convertTo24HourFormat(endTime));
   formData.append('location', form.location.value);
   formData.append('Instructor', form.instructor.value);
-  formData.append('Type', form.Type.value); // You'll need to add Type field
-  
+  formData.append('Type', form.Type.value);
+
   // Handle image upload
   if (form.image.files[0]) {
     formData.append('Image', form.image.files[0]);
   } else if (selectedClass.Image) {
-    // If no new image, include the existing image URL
     formData.append('Image', selectedClass.Image);
-  }
-
-  // Debug: Log form data before sending
-  for (let [key, value] of formData.entries()) {
-    console.log(key, value);
   }
 
   try {
@@ -204,7 +188,6 @@ formData.append('endTime', formatTime(form.sessionEndTime.value || '13:00'));
     toast.error(err.response?.data?.message || 'Failed to update class');
   }
 };
-
   const fetchLocations = async () => {
     try {
       const response = await axios.get('http://54.205.149.77:5010/api/location/getAllLocations');
@@ -669,7 +652,8 @@ const convertTo24Hour = (timeStr) => {
           </div>
         </div>
         
-        {/* Main Details Section */}
+        {/* Main Details Section */}Edit Class
+
         <div className="col-md-8">
           <div className="card p-3 h-100">
             {/* Theme and Description */}
@@ -800,14 +784,29 @@ const convertTo24Hour = (timeStr) => {
   </Form.Group>
 
   {/* Theme Field */}
-  <Form.Group className="mb-3">
+  {/* <Form.Group className="mb-3">
     <Form.Label>Theme</Form.Label>
     <Form.Control 
       name="theme" 
       defaultValue={selectedClass.theme} 
       required 
     />
-  </Form.Group>
+  </Form.Group> */}
+  {/* Theme Field - Textarea Version */}
+<Form.Group className="mb-3">
+  <Form.Label>Theme</Form.Label>
+  <Form.Control 
+    as="textarea" 
+    rows={3}  // Adjust number of visible rows
+    name="theme" 
+    defaultValue={selectedClass.theme} 
+    required
+    style={{ 
+      minHeight: '100px',  // Minimum height
+      resize: 'vertical'   // Allow vertical resizing
+    }}
+  />
+</Form.Group>
 
    <Form.Group className="mb-3">
     <Form.Label>Start Date</Form.Label>
@@ -843,7 +842,7 @@ const convertTo24Hour = (timeStr) => {
   </Form.Group>
 
  {/* Start Time Field from Sessions[0] */}
-<Form.Group className="mb-3">
+{/* <Form.Group className="mb-3">
   <Form.Label>Start Time</Form.Label>
   <Form.Control
     type="time"
@@ -855,10 +854,10 @@ const convertTo24Hour = (timeStr) => {
     }
     required
   />
-</Form.Group>
+</Form.Group> */}
 
 {/* End Time Field from Sessions[0] */}
-<Form.Group className="mb-3">
+{/* <Form.Group className="mb-3">
   <Form.Label>End Time</Form.Label>
   <Form.Control
     type="time"
@@ -870,8 +869,116 @@ const convertTo24Hour = (timeStr) => {
     }
     required
   />
-</Form.Group>
+</Form.Group> */}
+<Row className="mb-3">
+  {/* START TIME */}
+  <Form.Group as={Col} md={6} controlId="startTime">
+    <Form.Label>Start Time <span className="text-danger">*</span></Form.Label>
+    <div className="d-flex gap-2 align-items-start">
+      <div>
+        <Form.Label className="small">Hour</Form.Label>
+        <Form.Select
+          {...register('startTimeHour', { required: 'Start hour is required' })}
+          isInvalid={!!errors.startTimeHour}
+        >
+          <option value="">Hour</option>
+          {Array.from({ length: 12 }, (_, i) => i + 1).map(hour => (
+            <option key={`start-hour-${hour}`} value={hour}>{hour}</option>
+          ))}
+        </Form.Select>
+      </div>
 
+      <div>
+        <Form.Label className="small">Minute</Form.Label>
+        <Form.Select
+          {...register('startTimeMinute', { required: 'Start minute is required' })}
+          isInvalid={!!errors.startTimeMinute}
+        >
+          <option value="">Min</option>
+          {Array.from({ length: 12 }, (_, i) => (i * 5).toString().padStart(2, '0')).map(min => (
+            <option key={`start-min-${min}`} value={min}>{min}</option>
+          ))}
+        </Form.Select>
+      </div>
+
+      <div>
+        <Form.Label className="small">AM/PM</Form.Label>
+        <Form.Select
+          {...register('startTimeAmPm', { required: 'Start AM/PM is required' })}
+          isInvalid={!!errors.startTimeAmPm}
+        >
+          <option value="">AM/PM</option>
+          <option value="AM">AM</option>
+          <option value="PM">PM</option>
+        </Form.Select>
+      </div>
+    </div>
+
+    {(errors.startTimeHour || errors.startTimeMinute || errors.startTimeAmPm) && (
+      <div className="text-danger small mt-1">Start time is required</div>
+    )}
+
+    {/* 🟢 Start Time Preview */}
+    <div className="mt-2 small text-muted">
+      Selected: {watch('startTimeHour') || '--'}:
+      {watch('startTimeMinute') || '--'} {watch('startTimeAmPm') || '--'}
+    </div>
+  </Form.Group>
+
+  {/* END TIME */}
+  <Form.Group as={Col} md={6} controlId="endTime">
+    <Form.Label>End Time <span className="text-danger">*</span></Form.Label>
+    <div className="d-flex gap-2 align-items-start">
+      <div>
+        <Form.Label className="small">Hour</Form.Label>
+        <Form.Select
+          {...register('endTimeHour', { required: 'End hour is required' })}
+          isInvalid={!!errors.endTimeHour}
+        >
+          <option value="">Hour</option>
+          {Array.from({ length: 12 }, (_, i) => i + 1).map(hour => (
+            <option key={`end-hour-${hour}`} value={hour}>{hour}</option>
+          ))}
+        </Form.Select>
+      </div>
+
+      <div>
+        <Form.Label className="small">Minute</Form.Label>
+        <Form.Select
+          {...register('endTimeMinute', { required: 'End minute is required' })}
+          isInvalid={!!errors.endTimeMinute}
+        >
+          <option value="">Min</option>
+          {Array.from({ length: 12 }, (_, i) => (i * 5).toString().padStart(2, '0')).map(min => (
+            <option key={`end-min-${min}`} value={min}>{min}</option>
+          ))}
+        </Form.Select>
+      </div>
+
+      <div>
+        <Form.Label className="small">AM/PM</Form.Label>
+        <Form.Select
+          {...register('endTimeAmPm', { required: 'End AM/PM is required' })}
+          isInvalid={!!errors.endTimeAmPm}
+        >
+          <option value="">AM/PM</option>
+          <option value="AM">AM</option>
+          <option value="PM">PM</option>
+        </Form.Select>
+      </div>
+    </div>
+
+    {(errors.endTimeHour || errors.endTimeMinute || errors.endTimeAmPm) && (
+      <div className="text-danger small mt-1">End time is required</div>
+    )}
+
+    {/* 🟢 End Time Preview */}
+    <div className="mt-2 small text-muted">
+      Selected: {watch('endTimeHour') || '--'}:
+      {watch('endTimeMinute') || '--'} {watch('endTimeAmPm') || '--'}
+    </div>
+  </Form.Group>
+</Row>
 
   <Form.Group className="mb-3">
     <Form.Label>Type</Form.Label>
