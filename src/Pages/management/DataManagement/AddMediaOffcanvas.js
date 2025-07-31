@@ -90,7 +90,7 @@ const AddMediaOffcanvas = ({ show,onSuccess, handleClose, classId }) => {
             {errors.Description && <span className="text-danger small">{errors.Description.message}</span>}
           </Form.Group>
 
-          <Form.Group className="mb-3">
+          {/* <Form.Group className="mb-3">
             <Form.Label>Upload Video (Max 2 minutes)</Form.Label>
             <Form.Control 
               type="file" 
@@ -99,7 +99,7 @@ const AddMediaOffcanvas = ({ show,onSuccess, handleClose, classId }) => {
                 validate: validateMediaSource
               })} 
             />
-          </Form.Group>
+          </Form.Group> */}
 
           <Form.Group className="mb-4">
             <Form.Label>OR YouTube Video Link</Form.Label>
