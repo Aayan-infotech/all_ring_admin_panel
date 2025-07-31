@@ -59,6 +59,9 @@ const ClassesWorkshops = () => {
     total: 0
   });
 
+  const [sessionPage, setSessionPage] = useState(1);
+const [sessionsPerPage] = useState(5); // You can adjust this number
+
   const [editModalInstructors, setEditModalInstructors] = useState([]);
   const [loadingInstructors, setLoadingInstructors] = useState(false);
   const [noInstructorsAvailable, setNoInstructorsAvailable] = useState(false);
@@ -644,6 +647,7 @@ const ClassesWorkshops = () => {
       <AddClassOffcanvas show={showAddForm} handleClose={() => { setShowAddForm(false); setSelectedClass(null); }} onSaved={fetchClasses} selected={selectedClass} />
       <AddMediaOffcanvas show={showMediaForm} handleClose={() => setShowMediaForm(false)} classId={selectedClass?._id} />
       <AddNotesOffcanvas show={showNotesForm} handleClose={() => setShowNotesForm(false)} classId={selectedClass?._id} />
+
       <Modal show={showDetailsModal} onHide={() => setShowDetailsModal(false)} size="lg" centered>
         <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white', padding: '1rem' }}>
           <Modal.Title style={{ fontSize: '1.25rem' }}>Class Details</Modal.Title>
@@ -749,7 +753,7 @@ const ClassesWorkshops = () => {
                   </div>
 
                   {/* Sessions Section */}
-                  {selectedClass.sessions?.length > 0 && (
+                  {/* {selectedClass.sessions?.length > 0 && (
                     <div className="mb-3">
                       <h6 className="text-muted mb-2">Sessions</h6>
                       <div className="table-responsive">
@@ -806,7 +810,88 @@ const ClassesWorkshops = () => {
                         )}
                       </div>
                     </div>
-                  )}
+                  )} */}
+                  {selectedClass.sessions?.length > 0 && (
+  <div className="mb-3">
+    <h6 className="text-muted mb-2">Sessions</h6>
+    <div className="table-responsive">
+      <table className="table table-sm table-hover">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {selectedClass.sessions
+            .slice(
+              (sessionPage - 1) * sessionsPerPage,
+              sessionPage * sessionsPerPage
+            )
+            .map((session, index) => (
+              <tr key={index}>
+                <td>{new Date(session.date).toLocaleDateString()}</td>
+                <td>{session.startTime}</td>
+                <td>{session.endTime}</td>
+                <td>
+                  <Badge 
+                    bg={session.sessionStatus === 'live' ? 'success' : 'warning'} 
+                    className="text-capitalize"
+                  >
+                    {session.sessionStatus || 'N/A'}
+                  </Badge>
+                </td>
+              </tr>
+            ))}
+        </tbody>
+      </table>
+      
+      {/* Pagination controls */}
+      <div className="d-flex justify-content-between align-items-center mt-3">
+        <div className="text-muted small">
+          Showing {Math.min(
+            (sessionPage - 1) * sessionsPerPage + 1, 
+            selectedClass.sessions.length
+          )} to {Math.min(
+            sessionPage * sessionsPerPage, 
+            selectedClass.sessions.length
+          )} of {selectedClass.sessions.length} sessions
+        </div>
+        
+        <div>
+          <Pagination size="sm">
+            <Pagination.Prev 
+              onClick={() => setSessionPage(prev => Math.max(prev - 1, 1))}
+              disabled={sessionPage === 1}
+            />
+            
+            {Array.from(
+              { length: Math.ceil(selectedClass.sessions.length / sessionsPerPage) }, 
+              (_, i) => (
+                <Pagination.Item
+                  key={i + 1}
+                  active={i + 1 === sessionPage}
+                  onClick={() => setSessionPage(i + 1)}
+                >
+                  {i + 1}
+                </Pagination.Item>
+              )
+            )}
+            
+            <Pagination.Next
+              onClick={() => setSessionPage(prev => 
+                Math.min(prev + 1, Math.ceil(selectedClass.sessions.length / sessionsPerPage))
+              )}
+              disabled={sessionPage >= Math.ceil(selectedClass.sessions.length / sessionsPerPage)}
+            />
+          </Pagination>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
 
                   {/* Additional Information */}
                   <div className="row">
