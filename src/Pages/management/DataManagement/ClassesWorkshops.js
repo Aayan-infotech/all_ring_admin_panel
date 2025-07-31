@@ -362,7 +362,7 @@ const ClassesWorkshops = () => {
       );
       toast.success('Question added successfully!');
       setQuestionText('');
-      setShowAddQuestionModal(false);
+      // setShowAddQuestionModal(false);
       fetchQuestions(classId);
     } catch (err) {
       console.error('Error adding question:', err);
