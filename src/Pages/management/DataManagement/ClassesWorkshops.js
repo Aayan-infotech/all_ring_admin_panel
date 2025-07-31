@@ -672,34 +672,36 @@ const ClassesWorkshops = () => {
                 <div className="card p-3" style={{ backgroundColor: 'var(--accent)' }}>
                   <div className="d-flex justify-content-between align-items-center mb-2">
                     <h5 style={{ fontSize: '1.1rem', margin: 0, fontWeight: '600' }}>{selectedClass.title}</h5>
-                    <Badge
-                      bg={selectedClass.status === 'active' ? 'success' : 'danger'}
-                      pill
-                      style={{ fontSize: '0.75rem' }}
-                    >
-                      {selectedClass.status}
-                    </Badge>
+                  
                   </div>
 
-                  <div className="mb-2">
-                    <span className="badge bg-primary me-2" style={{ fontSize: '0.75rem' }}>
-                      {selectedClass.Type}
-                    </span>
-                    <span className="badge bg-info text-dark" style={{ fontSize: '0.75rem' }}>
-                      {selectedClass.sessionType}
-                    </span>
-                  </div>
+                <div className="mb-2 d-flex flex-wrap gap-2">
+  <span className="badge bg-primary" style={{ fontSize: '0.75rem' }}>
+    {selectedClass.Type}
+  </span>
+  <span className="badge bg-info text-dark" style={{ fontSize: '0.75rem' }}>
+    {selectedClass.sessionType}
+  </span>
+  <span className="badge bg-danger text-white" style={{ fontSize: '0.75rem' }}>
+    {selectedClass.status}
+  </span>
+</div>
 
-                  <div className="small mb-2">
-                    <div className="d-flex align-items-center mb-1">
-                      <i className="bi bi-geo-alt me-2"></i>
-                      <span>{selectedClass.location?.location || 'N/A'}</span>
-                    </div>
-                    <div className="d-flex align-items-center">
-                      <i className="bi bi-person me-2"></i>
-                      <span>{selectedClass.Instructor?.name || 'N/A'}</span>
-                    </div>
-                  </div>
+
+<div className="small mb-2">
+  {/* Location */}
+  <div className="d-flex align-items-center mb-2">
+    <i className="bi bi-geo-alt-fill text-danger me-2 fs-5"></i>
+    <span className="text-muted">{selectedClass.location?.location || 'N/A'}</span>
+  </div>
+
+  {/* Instructor */}
+  <div className="d-flex align-items-center">
+    <i className="bi bi-person-fill text-primary me-2 fs-5"></i>
+    <span className="text-muted">{selectedClass.Instructor?.name || 'N/A'}</span>
+  </div>
+</div>
+
 
                   {selectedClass.tags?.length > 0 && (
                     <div className="mt-2">
