@@ -769,9 +769,10 @@ const ClassesWorkshops = () => {
                                 <td>{session.startTime}</td>
                                 <td>{session.endTime}</td>
                                 <td>
-                                  <Badge bg={session.status === 'Active' ? 'success' : 'secondary'} pill>
-                                    {session.status}
-                                  </Badge>
+                               
+                                   <Badge bg={session.sessionStatus === 'live' ? 'success' : 'warning'} className="text-capitalize">
+                      {session.sessionStatus || 'N/A'}
+                    </Badge>
                                 </td>
                               </tr>
                             ))}
