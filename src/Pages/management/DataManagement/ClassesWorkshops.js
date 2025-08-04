@@ -722,7 +722,7 @@ const [sessionsPerPage] = useState(5); // You can adjust this number
                 </div>
               </div>
 
-              {/* Main Details Section */}Edit Class
+              {/* Main Details Section */}
 
               <div className="col-md-8">
                 <div className="card p-3 h-100">
