@@ -745,12 +745,12 @@ const [sessionsPerPage] = useState(5); // You can adjust this number
                   </div>
 
                   {/* Class Status */}
-                  <div className="mb-3">
+                  {/* <div className="mb-3">
                     <h6 className="text-muted mb-2">Class Status</h6>
                     <Badge bg={selectedClass.classStatus === 'Live' ? 'success' : 'warning'} className="text-capitalize">
                       {selectedClass.classStatus || 'N/A'}
                     </Badge>
-                  </div>
+                  </div> */}
 
                   {/* Sessions Section */}
                   {/* {selectedClass.sessions?.length > 0 && (
