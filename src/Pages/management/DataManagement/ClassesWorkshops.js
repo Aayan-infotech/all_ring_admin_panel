@@ -648,114 +648,110 @@ const [sessionsPerPage] = useState(5); // You can adjust this number
       <AddMediaOffcanvas show={showMediaForm} handleClose={() => setShowMediaForm(false)} classId={selectedClass?._id} />
       <AddNotesOffcanvas show={showNotesForm} handleClose={() => setShowNotesForm(false)} classId={selectedClass?._id} />
 
-      <Modal show={showDetailsModal} onHide={() => setShowDetailsModal(false)} size="lg" centered>
-        <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white', padding: '1rem' }}>
-          <Modal.Title style={{ fontSize: '1.25rem' }}>Class Details</Modal.Title>
-        </Modal.Header>
-        <Modal.Body style={{ padding: '1.5rem' }}>
-          {selectedClass && (
-            <div className="row g-3">
-              {/* Header Section with Image and Basic Info */}
-              <div className="col-md-4">
-                {selectedClass.Image && (
-                  <div className="text-center mb-3">
-                    <img
-                      src={selectedClass.Image}
-                      alt="Class"
-                      style={{
-                        width: '100%',
-                        maxHeight: '200px',
-                        borderRadius: '8px',
-                        objectFit: 'cover',
-                        border: '1px solid #eee'
-                      }}
-                    />
-                  </div>
-                )}
+<Modal show={showDetailsModal} onHide={() => setShowDetailsModal(false)} size="lg" centered>
+  <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white', padding: '1rem' }}>
+    <Modal.Title style={{ fontSize: '1.25rem' }}>Class Details</Modal.Title>
+  </Modal.Header>
+  <Modal.Body style={{ padding: '1.5rem' }}>
+    {selectedClass && (
+      <div className="row g-3">
+        {/* Header Section with Image and Basic Info */}
+        <div className="col-md-4">
+          {selectedClass.Image && (
+            <div className="text-center mb-3">
+              <img
+                src={selectedClass.Image}
+                alt="Class"
+                style={{
+                  width: '100%',
+                  maxHeight: '200px',
+                  borderRadius: '8px',
+                  objectFit: 'cover',
+                  border: '1px solid #eee'
+                }}
+              />
+            </div>
+          )}
 
-                <div className="card p-3" style={{ backgroundColor: 'var(--accent)' }}>
-                  <div className="d-flex justify-content-between align-items-center mb-2">
-                    <h5 style={{ fontSize: '1.1rem', margin: 0, fontWeight: '600' }}>{selectedClass.title}</h5>
-                  
-                  </div>
+          <div className="card p-3" style={{ backgroundColor: 'var(--accent)' }}>
+            <div className="d-flex justify-content-between align-items-center mb-2">
+              <h5 style={{ fontSize: '1.1rem', margin: 0, fontWeight: '600' }}>{selectedClass.title}</h5>
+            </div>
 
-                <div className="mb-2 d-flex flex-wrap gap-2">
-  <span className="badge bg-primary" style={{ fontSize: '0.75rem' }}>
-    {selectedClass.Type}
-  </span>
-  <span className="badge bg-info text-dark" style={{ fontSize: '0.75rem' }}>
-    {selectedClass.sessionType}
-  </span>
-  <span className="badge bg-danger text-white" style={{ fontSize: '0.75rem' }}>
-    {selectedClass.status}
-  </span>
-</div>
+            <div className="mb-2 d-flex flex-wrap gap-2">
+              <span className="badge bg-primary" style={{ fontSize: '0.75rem' }}>
+                {selectedClass.Type}
+              </span>
+              <span className="badge bg-info text-dark" style={{ fontSize: '0.75rem' }}>
+                {selectedClass.sessionType}
+              </span>
+              <span className="badge bg-danger text-white" style={{ fontSize: '0.75rem' }}>
+                {selectedClass.status}
+              </span>
+            </div>
 
-
-<div className="small mb-2">
-  {/* Location */}
-  <div className="d-flex align-items-center mb-2">
-    <i className="bi bi-geo-alt-fill text-danger me-2 fs-5"></i>
-    <span className="text-muted">{selectedClass.location?.location || 'N/A'}</span>
-  </div>
-
-  {/* Instructor */}
-  <div className="d-flex align-items-center">
-    <i className="bi bi-person-fill text-primary me-2 fs-5"></i>
-    <span className="text-muted">{selectedClass.Instructor?.name || 'N/A'}</span>
-  </div>
-</div>
-
-
-                  {selectedClass.tags?.length > 0 && (
-                    <div className="mt-2">
-                      <div className="text-muted small mb-1">Tags:</div>
-                      <div className="d-flex flex-wrap gap-1">
-                        {selectedClass.tags.map(tag => (
-                          <span key={tag} className="badge bg-secondary" style={{ fontSize: '0.7rem' }}>
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
+            <div className="small mb-2">
+              {/* Location */}
+              <div className="d-flex align-items-center mb-2">
+                <i className="bi bi-geo-alt-fill text-danger me-2 fs-5"></i>
+                <span className="text-muted">{selectedClass.location?.location || 'N/A'}</span>
               </div>
 
-              {/* Main Details Section */}
+              {/* Instructor */}
+              <div className="d-flex align-items-center">
+                <i className="bi bi-person-fill text-primary me-2 fs-5"></i>
+                <span className="text-muted">{selectedClass.Instructor?.name || 'N/A'}</span>
+              </div>
+            </div>
 
-              <div className="col-md-8">
-                <div className="card p-3 h-100">
-                  {/* Theme and Description */}
-                  <div className="mb-3">
-                    <h6 className="text-muted mb-2">Theme</h6>
-                    <p style={{ fontSize: '0.95rem' }}>{selectedClass.theme || '-'}</p>
-                  </div>
+            {selectedClass.tags?.length > 0 && (
+              <div className="mt-2">
+                <div className="text-muted small mb-1">Tags:</div>
+                <div className="d-flex flex-wrap gap-1">
+                  {selectedClass.tags.map(tag => (
+                    <span key={tag} className="badge bg-secondary" style={{ fontSize: '0.7rem' }}>
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
 
-                  {/* Date and Time Information */}
-                  <div className="row mb-3">
-                    <div className="col-md-6">
-                      <h6 className="text-muted mb-2">Start Date</h6>
-                      <p>{new Date(selectedClass.startDate || selectedClass.Date).toLocaleDateString()}</p>
-                    </div>
-                    <div className="col-md-6">
-                      <h6 className="text-muted mb-2">End Date</h6>
-                      <p>{new Date(selectedClass.endDate || selectedClass.Date).toLocaleDateString()}</p>
-                    </div>
-                  </div>
+        {/* Main Details Section */}
+        <div className="col-md-8">
+          <div className="card p-3 h-100">
+            {/* Theme and Description */}
+            <div className="mb-3">
+              <h6 className="text-muted mb-2">Theme</h6>
+              <p style={{ fontSize: '0.95rem' }}>{selectedClass.theme || '-'}</p>
+            </div>
 
-              
-                  {selectedClass.sessions?.length > 0 && (
+            {/* Date and Time Information */}
+            <div className="row mb-3">
+              <div className="col-md-6">
+                <h6 className="text-muted mb-2">Start Date</h6>
+                <p>{new Date(selectedClass.startDate || selectedClass.Date).toLocaleDateString()}</p>
+              </div>
+              <div className="col-md-6">
+                <h6 className="text-muted mb-2">End Date</h6>
+                <p>{new Date(selectedClass.endDate || selectedClass.Date).toLocaleDateString()}</p>
+              </div>
+            </div>
+
+            {/* Sessions Section */}
+        {selectedClass.sessions?.length > 0 && (
   <div className="mb-3">
     <h6 className="text-muted mb-2">Sessions</h6>
     <div className="table-responsive">
-      <table className="table table-sm table-hover">
-        <thead>
+      <table className="table table-sm table-hover align-middle">
+        <thead className="table-light">
           <tr>
             <th>Date</th>
             <th>Start Time</th>
             <th>End Time</th>
-            <th>Status</th>
+            <th className="text-center">Status</th>
           </tr>
         </thead>
         <tbody>
@@ -766,13 +762,24 @@ const [sessionsPerPage] = useState(5); // You can adjust this number
             )
             .map((session, index) => (
               <tr key={index}>
-                <td>{new Date(session.date).toLocaleDateString()}</td>
+                <td>{new Date(session.date).toLocaleDateString('en-US', { 
+                  year: 'numeric', 
+                  month: 'short', 
+                  day: 'numeric' 
+                })}</td>
                 <td>{session.startTime}</td>
                 <td>{session.endTime}</td>
-                <td>
+                <td className="text-center">
                   <Badge 
-                    bg={session.sessionStatus === 'live' ? 'success' : 'warning'} 
-                    className="text-capitalize"
+                    bg={
+                      session.sessionStatus === 'live' ? 'success' : 
+                      session.sessionStatus === 'completed' ? 'secondary' : 'warning'
+                    } 
+                    className="text-capitalize px-2 py-1"
+                    style={{ 
+                      fontSize: '0.75rem',
+                      minWidth: '70px'
+                    }}
                   >
                     {session.sessionStatus || 'N/A'}
                   </Badge>
@@ -782,77 +789,103 @@ const [sessionsPerPage] = useState(5); // You can adjust this number
         </tbody>
       </table>
       
-      {/* Pagination controls */}
-      <div className="d-flex justify-content-between align-items-center mt-3">
+      {/* Corrected Pagination */}
+      <div className="d-flex flex-column flex-md-row justify-content-between align-items-center mt-3 gap-2">
         <div className="text-muted small">
-          Showing {Math.min(
-            (sessionPage - 1) * sessionsPerPage + 1, 
-            selectedClass.sessions.length
-          )} to {Math.min(
-            sessionPage * sessionsPerPage, 
-            selectedClass.sessions.length
-          )} of {selectedClass.sessions.length} sessions
+          Showing <span className="fw-semibold">{(sessionPage - 1) * sessionsPerPage + 1}</span> to{' '}
+          <span className="fw-semibold">
+            {Math.min(sessionPage * sessionsPerPage, selectedClass.sessions.length)}
+          </span> of{' '}
+          <span className="fw-semibold">{selectedClass.sessions.length}</span> sessions
         </div>
         
-        <div>
-          <Pagination size="sm">
-            <Pagination.Prev 
-              onClick={() => setSessionPage(prev => Math.max(prev - 1, 1))}
-              disabled={sessionPage === 1}
-            />
-            
+        <div className="d-flex align-items-center gap-1">
+          <Button
+            variant="light"
+            size="sm"
+            onClick={() => setSessionPage(prev => Math.max(prev - 1, 1))}
+            disabled={sessionPage === 1}
+            style={{ 
+              border: '1px solid #dee2e6',
+              padding: '0.25rem 0.5rem'
+            }}
+          >
+            Previous
+          </Button>
+          
+          <div className="mx-1 d-flex gap-1">
             {Array.from(
               { length: Math.ceil(selectedClass.sessions.length / sessionsPerPage) }, 
               (_, i) => (
-                <Pagination.Item
+                <Button
                   key={i + 1}
-                  active={i + 1 === sessionPage}
+                  variant={i + 1 === sessionPage ? "primary" : "light"}
+                  size="sm"
                   onClick={() => setSessionPage(i + 1)}
+                  style={{ 
+                    border: '1px solid #dee2e6',
+                    padding: '0.25rem 0.5rem',
+                    minWidth: '32px'
+                  }}
                 >
                   {i + 1}
-                </Pagination.Item>
+                </Button>
+              )
+            ).slice(
+              Math.max(0, sessionPage - 2),
+              Math.min(
+                Math.ceil(selectedClass.sessions.length / sessionsPerPage),
+                sessionPage + 1
               )
             )}
-            
-            <Pagination.Next
-              onClick={() => setSessionPage(prev => 
-                Math.min(prev + 1, Math.ceil(selectedClass.sessions.length / sessionsPerPage))
-              )}
-              disabled={sessionPage >= Math.ceil(selectedClass.sessions.length / sessionsPerPage)}
-            />
-          </Pagination>
+          </div>
+          
+          <Button
+            variant="light"
+            size="sm"
+            onClick={() => setSessionPage(prev => 
+              Math.min(prev + 1, Math.ceil(selectedClass.sessions.length / sessionsPerPage))
+            )}
+            disabled={sessionPage >= Math.ceil(selectedClass.sessions.length / sessionsPerPage)}
+            style={{ 
+              border: '1px solid #dee2e6',
+              padding: '0.25rem 0.5rem'
+            }}
+          >
+            Next
+          </Button>
         </div>
       </div>
     </div>
   </div>
 )}
 
-                  {/* Additional Information */}
-                  <div className="row">
-                    <div className="col-md-6">
-                      <h6 className="text-muted mb-2">Created</h6>
-                      <p>{new Date(selectedClass.createdAt).toLocaleString()}</p>
-                    </div>
-                    <div className="col-md-6">
-                      <h6 className="text-muted mb-2">Last Updated</h6>
-                      <p>{new Date(selectedClass.updatedAt).toLocaleString()}</p>
-                    </div>
-                  </div>
-                </div>
+            {/* Additional Information */}
+            <div className="row">
+              <div className="col-md-6">
+                <h6 className="text-muted mb-2">Created</h6>
+                <p>{new Date(selectedClass.createdAt).toLocaleString()}</p>
+              </div>
+              <div className="col-md-6">
+                <h6 className="text-muted mb-2">Last Updated</h6>
+                <p>{new Date(selectedClass.updatedAt).toLocaleString()}</p>
               </div>
             </div>
-          )}
-        </Modal.Body>
-        <Modal.Footer style={{ padding: '1rem', justifyContent: 'flex-end' }}>
-          <Button
-            variant="outline-secondary"
-            onClick={() => setShowDetailsModal(false)}
-            style={{ padding: '0.375rem 0.75rem' }}
-          >
-            Close
-          </Button>
-        </Modal.Footer>
-      </Modal>
+          </div>
+        </div>
+      </div>
+    )}
+  </Modal.Body>
+  <Modal.Footer style={{ padding: '1rem', justifyContent: 'flex-end' }}>
+    <Button
+      variant="outline-secondary"
+      onClick={() => setShowDetailsModal(false)}
+      style={{ padding: '0.375rem 0.75rem' }}
+    >
+      Close
+    </Button>
+  </Modal.Footer>
+</Modal>
       <Modal show={showEditModal} onHide={() => { setShowEditModal(false); setSelectedClass(null); }} centered>
         <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
           <Modal.Title>Edit Class</Modal.Title>
