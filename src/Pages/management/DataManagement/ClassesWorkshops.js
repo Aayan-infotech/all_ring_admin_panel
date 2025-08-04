@@ -744,73 +744,7 @@ const [sessionsPerPage] = useState(5); // You can adjust this number
                     </div>
                   </div>
 
-                  {/* Class Status */}
-                  {/* <div className="mb-3">
-                    <h6 className="text-muted mb-2">Class Status</h6>
-                    <Badge bg={selectedClass.classStatus === 'Live' ? 'success' : 'warning'} className="text-capitalize">
-                      {selectedClass.classStatus || 'N/A'}
-                    </Badge>
-                  </div> */}
-
-                  {/* Sessions Section */}
-                  {/* {selectedClass.sessions?.length > 0 && (
-                    <div className="mb-3">
-                      <h6 className="text-muted mb-2">Sessions</h6>
-                      <div className="table-responsive">
-                        <table className="table table-sm table-hover">
-                          <thead>
-                            <tr>
-                              <th>Date</th>
-                              <th>Start Time</th>
-                              <th>End Time</th>
-                              <th>Status</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {selectedClass.sessions.map((session, index) => (
-                              <tr key={index}>
-                                <td>{new Date(session.date).toLocaleDateString()}</td>
-                                <td>{session.startTime}</td>
-                                <td>{session.endTime}</td>
-                                <td>
-                               
-                                   <Badge bg={session.sessionStatus === 'live' ? 'success' : 'warning'} className="text-capitalize">
-                      {session.sessionStatus || 'N/A'}
-                    </Badge>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                        {filtered.length > 0 && (
-                          <div className="d-flex justify-content-between align-items-center mt-3">
-                            <div>
-                              Showing {(pagination.page - 1) * pagination.limit + 1} to{' '}
-                              {Math.min(pagination.page * pagination.limit, pagination.total)} of{' '}
-                              {pagination.total} entries
-                            </div>
-                            <div>
-                              <Button
-                                variant="outline-secondary"
-                                disabled={pagination.page === 1}
-                                onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
-                                className="me-2"
-                              >
-                                Previous
-                              </Button>
-                              <Button
-                                variant="outline-secondary"
-                                disabled={pagination.page * pagination.limit >= pagination.total}
-                                onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
-                              >
-                                Next
-                              </Button>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )} */}
+              
                   {selectedClass.sessions?.length > 0 && (
   <div className="mb-3">
     <h6 className="text-muted mb-2">Sessions</h6>
