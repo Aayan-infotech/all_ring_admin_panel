@@ -222,8 +222,7 @@ const AddClassOffcanvas = ({ show, handleClose, onSaved }) => {
           <Form onSubmit={handleSubmit(onSubmit)}>
             <Row className="mb-3">
               <Form.Group as={Col} md={12} controlId="title">
-                <Form.Label>Title <span className="text-danger">*</span></Form.Label>
-                <Form.Control
+n                 <Form.Control
                   type="text"
                   {...register('title', { required: 'Title is required' })}
                   isInvalid={!!errors.title}
