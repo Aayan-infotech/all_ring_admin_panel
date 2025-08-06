@@ -14,6 +14,7 @@ import AddInstructorOffcanvas from './AddInstructorOffcanvas';
 import AddPrisonerOffcanvas from './AddPrisonerOffcanvas';
 const InstructorManagement = () => {
   const [instructors, setInstructors] = useState([]);
+  
   const [loading, setLoading] = useState(true);
   const [showAddInstructor, setShowAddInstructor] = useState(false);
   const [showResetModal, setShowResetModal] = useState(false);
