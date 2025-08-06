@@ -144,7 +144,7 @@ const ParticipantsJournals = () => {
               <th>User</th>
               <th>Instructor</th>
               <th>Shared With</th>
-              <th>Status</th>
+              {/* <th>Status</th> */}
               <th>Action</th>
             </tr>
           </thead>
