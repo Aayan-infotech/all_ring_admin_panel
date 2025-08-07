@@ -16,6 +16,8 @@ import {
   FileEarmarkPlayFill,
   ChevronDown,
   ChevronUp,
+  QuestionCircleFill,
+  TicketFill,
   BellFill,
 } from 'react-bootstrap-icons';
 
@@ -42,6 +44,17 @@ const Sidebar = ({ collapsed, mobileVisible, onMobileClose, setSidebarCollapsed 
         // { label: 'Add User', path: '/users/add', icon: <PeopleFill /> },
       ],
     },
+
+{
+      label: 'Help and Support',
+      icon: <QuestionCircleFill />, // Add this import at the top: import { QuestionCircleFill } from 'react-bootstrap-icons';
+      module: 'support',
+      children: [
+        { label: 'Support Tickets', path: '/support/tickets', icon: <TicketFill /> }, // Add TicketFill to imports
+      ],
+    },
+
+
     {
       label: 'Mentor Management',
       icon: <PersonCheckFill />,

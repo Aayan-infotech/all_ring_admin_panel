@@ -29,6 +29,7 @@ import AssignTeam from './Pages/management/InstructorManagement/AssignTeam';
 import AssignMentorTeam from './Pages/management/MentorManagement/AssignMentorTeam';
 import CreateNotification from './Pages/management/Notification/CreateNotification';
 import ParticipantsJournals from './Pages/management/DataManagement/ParticipantsJournals';
+import Tickets from './Pages/management/Support/Tickets';
 function App() {
   return (
     <Router>
@@ -43,6 +44,8 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/users" element={<Users />} />
           <Route path="/mentors" element={<Mentors />} />
+          <Route path="/support/tickets" element={<Tickets />} />
+
           <Route path="/instructors" element={<Instructors />} />
                     <Route path="/assignteam" element={<AssignTeam />} />
      <Route path="/reminders" element={<CreateNotification />} />

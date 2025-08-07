@@ -10,8 +10,59 @@
   --sidebar-width: 280px;
   --sidebar-collapsed-width: 70px;
 }
+.support-tickets {
+  padding: 20px;
+  background-color: white;
+}
 
+.ticket-conversation {
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 10px;
+  background-color: var(--accent);
+  border-radius: 5px;
+  margin-bottom: 15px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
 
+.message {
+  margin-bottom: 15px;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.user-message {
+  background-color: white;
+  border-left: 3px solid var(--primary);
+}
+
+.support-message {
+  background-color: var(--secondary);
+  color: white;
+  border-left: 3px solid var(--primary);
+}
+
+/* Status badges */
+.badge.bg-warning {
+  background-color: var(--warning) !important;
+  color: var(--text-primary);
+}
+
+.badge.bg-success {
+  background-color: var(--success) !important;
+  color: white;
+}
+
+/* Table styling */
+.table thead th {
+  background-color: var(--secondary);
+  color: white;
+}
+
+.table-hover tbody tr:hover {
+  background-color: var(--accent);
+}
 .admin-container {
   display: flex;
   min-height: 100vh;
