@@ -45,14 +45,7 @@ const Sidebar = ({ collapsed, mobileVisible, onMobileClose, setSidebarCollapsed 
       ],
     },
 
-{
-      label: 'Help and Support',
-      icon: <QuestionCircleFill />, // Add this import at the top: import { QuestionCircleFill } from 'react-bootstrap-icons';
-      module: 'support',
-      children: [
-        { label: 'Support Tickets', path: '/support/tickets', icon: <TicketFill /> }, // Add TicketFill to imports
-      ],
-    },
+
 
 
     {
@@ -92,6 +85,15 @@ const Sidebar = ({ collapsed, mobileVisible, onMobileClose, setSidebarCollapsed 
       children: [
         { label: 'All Reminders', path: '/reminders', icon: <BellFill /> },
         // { label: 'Create Reminder', path: '/reminders/create', icon: <BellFill /> },
+      ],
+    },
+
+    {
+      label: 'Help and Support',
+      icon: <QuestionCircleFill />, // Add this import at the top: import { QuestionCircleFill } from 'react-bootstrap-icons';
+      module: 'support',
+      children: [
+        { label: 'Support Tickets', path: '/support/tickets', icon: <TicketFill /> }, // Add TicketFill to imports
       ],
     },
   ];
