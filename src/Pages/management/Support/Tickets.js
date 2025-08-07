@@ -10,7 +10,7 @@ const Tickets = () => {
   const [replyText, setReplyText] = useState('');
   
   // Sample data - replace with your actual data source
-  const [tickets, setTickets] = useState([
+  const [tickets, setTickets] = useState([  
     {
       id: 1,
       subject: 'Login issues',
