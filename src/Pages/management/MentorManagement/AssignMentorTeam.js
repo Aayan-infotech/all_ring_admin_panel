@@ -73,7 +73,7 @@ const AssignMentorTeam = () => {
         filterLocation: filters.location,
         status: statusFilter
       };
-      const res = await axios.get('http://localhost:5010/api/admin/getRegister/mentor', {
+      const res = await axios.get('http://3.228.185.94:5010/api/admin/getRegister/mentor', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -92,7 +92,7 @@ const AssignMentorTeam = () => {
   const fetchLocations = async () => {
     try {
       const token = localStorage.getItem('adminToken');
-      const res = await axios.get('http://localhost:5010/api/location/getAllLocations', {
+      const res = await axios.get('http://3.228.185.94:5010/api/location/getAllLocations', {
         headers: {
           Authorization: `Bearer ${token}`,
         }
@@ -140,7 +140,7 @@ const AssignMentorTeam = () => {
       setLoadingInstructors(true);
       const token = localStorage.getItem('adminToken');
       const res = await axios.get(
-        `http://localhost:5010/api/assignInstructor/getInstructorByLocation/${mentorId}`,
+        `http://3.228.185.94:5010/api/assignInstructor/getInstructorByLocation/${mentorId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -167,7 +167,7 @@ const AssignMentorTeam = () => {
       const token = localStorage.getItem('adminToken');
       const usersPromises = instructorIds.map(async (instructorId) => {
         const res = await axios.get(
-          `http://localhost:5010/api/assignInstructor/getUsersByInstructor/${instructorId}`,
+          `http://3.228.185.94:5010/api/assignInstructor/getUsersByInstructor/${instructorId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -248,7 +248,7 @@ const AssignMentorTeam = () => {
         }))
       };
       await axios.post(
-        `http://localhost:5010/api/assignInstructor/assignInstructorAndUsers/${selectedUser._id}`,
+        `http://3.228.185.94:5010/api/assignInstructor/assignInstructorAndUsers/${selectedUser._id}`,
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
