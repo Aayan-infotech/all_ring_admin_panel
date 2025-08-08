@@ -80,13 +80,21 @@ const Tickets = () => {
     return ref.scrollHeight - ref.scrollTop - ref.clientHeight <= 10;
   };
 
+  // Always scroll to bottom when modal opens (activeTicket changes)
+  useEffect(() => {
+    if (conversationRef.current && activeTicket) {
+      setTimeout(() => {
+        conversationRef.current.scrollTop = conversationRef.current.scrollHeight;
+      }, 0);
+    }
+  }, [activeTicket]);
+
   // Scroll to bottom only if new message comes and user is not scrolling
   useEffect(() => {
     if (
       conversationRef.current &&
       thread.length > prevThreadLength.current
     ) {
-      // Find if last message is from admin
       const lastMsg = thread[thread.length - 1];
       const isAdminMsg = lastMsg && lastMsg.sender && lastMsg.sender.role === 'admin';
 
@@ -96,8 +104,8 @@ const Tickets = () => {
         setShowNewMsgTooltip(false);
         setNewMsgIndex(null);
       } else {
-        // If not at bottom and user sent message, show tooltip at page bottom right
-        setShowNewMsgTooltip(true);
+        // Only show tooltip if last message is from user
+        setShowNewMsgTooltip(lastMsg && lastMsg.sender && lastMsg.sender.role !== 'admin');
         setNewMsgIndex(thread.length - 1);
       }
     }
