@@ -396,39 +396,77 @@ const Tickets = () => {
           <div style={{
             padding: '16px',
             background: 'rgba(255,255,255,0.95)',
-            borderTop: '1px solid #ddd'
+            borderTop: '1px solid #ddd',
+            minHeight: '70px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
           }}>
-            <Form.Group className="mb-0">
-              <Form.Control
-                as="textarea"
-                rows={2}
-                value={replyText}
-                onChange={(e) => setReplyText(e.target.value)}
-                placeholder="Type your reply here..."
-                style={{ borderColor: 'var(--primary)', resize: 'none' }}
-              />
-              {activeTicket?.status === 'Open' && (
-              <Button
-                variant="danger"
-                className="mt-2"
-                onClick={() => closeTicket(activeTicket.id)}
-                style={{ backgroundColor: 'black', borderColor: 'var(--dark)', float: 'left' }}
-                onMouseDown={e => e.currentTarget.style.transform = 'scale(0.97)'}
-                onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
-              >
-                <XCircleFill style={{ marginRight: 2, fontSize: '1em', color: '#fff' }} />
-                <span style={{ color: '#fff' }}>Close Ticket</span>
-              </Button>
+            {activeTicket?.status === 'Open' ? (
+              <Form.Group className="mb-0" style={{ width: '100%' }}>
+                <Form.Control
+                  as="textarea"
+                  rows={2}
+                  value={replyText}
+                  onChange={(e) => setReplyText(e.target.value)}
+                  placeholder="Type your reply here..."
+                  style={{ borderColor: 'var(--primary)', resize: 'none' }}
+                />
+                <Button 
+                  variant="primary" 
+                  className="mt-2"
+                  onClick={() => handleReply(activeTicket?.id)}
+                  style={{ backgroundColor: 'var(--primary)', borderColor: 'var(--primary)', float: 'right' }}
+                >
+                  Send Reply
+                </Button>
+              </Form.Group>
+            ) : (
+              <div style={{
+                width: '100%',
+                textAlign: 'center',
+                padding: '24px 0',
+                background: 'linear-gradient(90deg, #1c4229ff 0%, #1a9982ff 100%)',
+                borderRadius: '14px',
+                boxShadow: '0 4px 16px rgba(44,62,80,0.10)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px'
+              }}>
+                <div style={{
+                  width: 56,
+                  height: 56,
+                  background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: 8,
+                  boxShadow: '0 2px 8px rgba(44,62,80,0.10)'
+                }}>
+                  <span style={{ fontSize: '2em', color: '#fff' }}>✔️</span>
+                </div>
+                <div style={{
+                  color: '#fff',
+                  fontWeight: 700,
+                  fontSize: '1.15em',
+                  letterSpacing: '0.5px',
+                  textShadow: '0 1px 4px rgba(44,62,80,0.10)'
+                }}>
+                  Ticket has been closed successfully
+                </div>
+                <div style={{
+                  color: '#e0f7fa',
+                  fontWeight: 400,
+                  fontSize: '1em',
+                  marginTop: 2
+                }}>
+                  No further replies are allowed.
+                </div>
+              </div>
             )}
-              <Button 
-                variant="primary" 
-                className="mt-2"
-                onClick={() => handleReply(activeTicket?.id)}
-                style={{ backgroundColor: 'var(--primary)', borderColor: 'var(--primary)', float: 'right' }}
-              >
-                Send Reply
-              </Button>
-            </Form.Group>
           </div>
         </Modal.Body>
       </Modal>
