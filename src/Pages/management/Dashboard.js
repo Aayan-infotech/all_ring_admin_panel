@@ -29,7 +29,7 @@ const Dashboard = () => {
     const fetchStats = async () => {
       try {
         const token = localStorage.getItem('adminToken');
-        const res = await axios.get('http://54.205.149.77:5010/api/admin/stats/overview', {
+        const res = await axios.get('http://localhost:5010/api/admin/stats/overview', {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.data.success) {
@@ -44,7 +44,7 @@ const Dashboard = () => {
 
     const fetchParticipationData = async () => {
       try {
-        const res = await axios.get('http://54.205.149.77:5010/api/register/getParticipationOverview');
+        const res = await axios.get('http://localhost:5010/api/register/getParticipationOverview');
         if (res.data.success) {
           const data = res.data.data;
           
@@ -78,7 +78,7 @@ const Dashboard = () => {
 
     const fetchDashboardCounts = async () => {
       try {
-        const res = await axios.get('http://54.205.149.77:5010/api/register/dashboardCounts');
+        const res = await axios.get('http://localhost:5010/api/register/dashboardCounts');
         if (res.data.success) {
           setDashboardCounts(res.data.data);
         }
@@ -90,7 +90,7 @@ const Dashboard = () => {
     const fetchTrendingInstructors = async () => {
       try {
         const token = localStorage.getItem('adminToken');
-        const res = await axios.get('http://54.205.149.77:5010/api/instructor/getTrendingInstructors', {
+        const res = await axios.get('http://localhost:5010/api/instructor/getTrendingInstructors', {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.data.success) {

@@ -77,7 +77,7 @@ const [sessionsPerPage] = useState(5); // You can adjust this number
   const fetchInstructors = async () => {
     try {
       const token = localStorage.getItem('adminToken');
-      const res = await axios.get('http://54.205.149.77:5010/api/admin/getRegister/instructor', {
+      const res = await axios.get('http://localhost:5010/api/admin/getRegister/instructor', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setInstructors(res.data?.users || []);
@@ -106,7 +106,7 @@ const [sessionsPerPage] = useState(5); // You can adjust this number
         // Try the location-specific endpoint first
         try {
           const response = await axios.get(
-            `http://54.205.149.77:5010/api/instructor/getByLocation/${selectedClass.location._id}`,
+            `http://localhost:5010/api/instructor/getByLocation/${selectedClass.location._id}`,
             { headers: { Authorization: `Bearer ${token}` } }
           );
 
@@ -120,7 +120,7 @@ const [sessionsPerPage] = useState(5); // You can adjust this number
 
         // Fallback: get all instructors and filter
         const allInstructorsRes = await axios.get(
-          'http://54.205.149.77:5010/api/admin/getRegister/instructor',
+          'http://localhost:5010/api/admin/getRegister/instructor',
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
@@ -160,7 +160,7 @@ const [sessionsPerPage] = useState(5); // You can adjust this number
         ...(search && { search })
       };
 
-      const res = await axios.get('http://54.205.149.77:5010/api/AdminClasses/getAllClasses', {
+      const res = await axios.get('http://localhost:5010/api/AdminClasses/getAllClasses', {
         headers: { Authorization: `Bearer ${token}` },
         params
       });
@@ -237,7 +237,7 @@ const [sessionsPerPage] = useState(5); // You can adjust this number
     try {
       const token = localStorage.getItem('adminToken');
       const response = await axios.put(
-        `http://54.205.149.77:5010/api/AdminClasses/updateClass/${selectedClass._id}`,
+        `http://localhost:5010/api/AdminClasses/updateClass/${selectedClass._id}`,
         formData,
         {
           headers: {
@@ -257,7 +257,7 @@ const [sessionsPerPage] = useState(5); // You can adjust this number
   };
   const fetchLocations = async () => {
     try {
-      const response = await axios.get('http://54.205.149.77:5010/api/location/getAllLocations');
+      const response = await axios.get('http://localhost:5010/api/location/getAllLocations');
 
       // Filter to only include active locations
       const activeLocations = (response.data?.data || [])
@@ -272,7 +272,7 @@ const [sessionsPerPage] = useState(5); // You can adjust this number
 
   // const fetchLocations = async () => {
   //   try {
-  //     const res = await axios.get('http://54.205.149.77:5010/api/location/getAllLocations');
+  //     const res = await axios.get('http://localhost:5010/api/location/getAllLocations');
   //     setAllLocations(res.data?.data || []);
   //   } catch (err) {
   //     console.error('Error fetching locations:', err);
@@ -283,7 +283,7 @@ const [sessionsPerPage] = useState(5); // You can adjust this number
     try {
       const token = localStorage.getItem('adminToken');
       const res = await axios.get(
-        `http://54.205.149.77:5010/api/questionaire/getQuestions/${classId}`,
+        `http://localhost:5010/api/questionaire/getQuestions/${classId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -308,7 +308,7 @@ const [sessionsPerPage] = useState(5); // You can adjust this number
     try {
       const token = localStorage.getItem('adminToken');
       const response = await axios.patch(
-        `http://54.205.149.77:5010/api/AdminClasses/blockClass/${id}`,
+        `http://localhost:5010/api/AdminClasses/blockClass/${id}`,
         {},
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -340,7 +340,7 @@ const [sessionsPerPage] = useState(5); // You can adjust this number
   const handleDelete = async () => {
     try {
       const token = localStorage.getItem('adminToken');
-      await axios.delete(`http://54.205.149.77:5010/api/AdminClasses/deleteClass/${itemToDelete}`, {
+      await axios.delete(`http://localhost:5010/api/AdminClasses/deleteClass/${itemToDelete}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -359,7 +359,7 @@ const [sessionsPerPage] = useState(5); // You can adjust this number
     try {
       const token = localStorage.getItem('adminToken');
       await axios.post(
-        `http://54.205.149.77:5010/api/questionaire/addQuestions/${classId}`,
+        `http://localhost:5010/api/questionaire/addQuestions/${classId}`,
         { questionText },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -377,7 +377,7 @@ const [sessionsPerPage] = useState(5); // You can adjust this number
     try {
       const token = localStorage.getItem('adminToken');
       await axios.put(
-        `http://54.205.149.77:5010/api/questionaire/editQuestion/${classId}/${questionId}`,
+        `http://localhost:5010/api/questionaire/editQuestion/${classId}/${questionId}`,
         { questionText },
         { headers: { Authorization: `Bearer ${token}` } }
       );

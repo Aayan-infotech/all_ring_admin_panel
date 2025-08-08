@@ -32,7 +32,7 @@ const AddClassOffcanvas = ({ show, handleClose, onSaved }) => {
 
       setIsLoading(true);
       try {
-        const locationsRes = await axios.get('http://54.205.149.77:5010/api/location/getAllLocations');
+        const locationsRes = await axios.get('http://localhost:5010/api/location/getAllLocations');
         
         const activeLocations = (locationsRes.data?.data || [])
           .filter(location => location.status === 'Active');
@@ -66,7 +66,7 @@ const AddClassOffcanvas = ({ show, handleClose, onSaved }) => {
         // Try the location-specific endpoint first
         try {
           const response = await axios.get(
-            `http://54.205.149.77:5010/api/instructor/getByLocation/${selectedLocation}`,
+            `http://localhost:5010/api/instructor/getByLocation/${selectedLocation}`,
             { headers: { Authorization: `Bearer ${token}` } }
           );
           
@@ -84,7 +84,7 @@ const AddClassOffcanvas = ({ show, handleClose, onSaved }) => {
         
         // Fallback: get all instructors and filter
         const allInstructorsRes = await axios.get(
-          'http://54.205.149.77:5010/api/admin/getRegister/instructor',
+          'http://localhost:5010/api/admin/getRegister/instructor',
           { headers: { Authorization: `Bearer ${token}` } }
         );
         
@@ -169,7 +169,7 @@ const AddClassOffcanvas = ({ show, handleClose, onSaved }) => {
 
     try {
       const token = localStorage.getItem('adminToken');
-      await axios.post('http://54.205.149.77:5010/api/AdminClasses/addClass', formData, {
+      await axios.post('http://localhost:5010/api/AdminClasses/addClass', formData, {
         headers: { 
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`

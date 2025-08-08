@@ -60,7 +60,7 @@ const ParticipantsJournals = () => {
   useEffect(() => {
     const fetchJournals = async () => {
       try {
-        const response = await axios.get('http://54.205.149.77:5010/api/journel/getJournalForAdmin');
+        const response = await axios.get('http://localhost:5010/api/journel/getJournalForAdmin');
         setApiResponse(response.data);
         setFilteredJournals(response.data.data);
         setLoading(false);

@@ -1,59 +1,133 @@
-
-
-
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Table, Button, Form, Modal, Badge } from 'react-bootstrap';
 import { ReplyFill, XCircleFill } from 'react-bootstrap-icons';
 
 const Tickets = () => {
   const [activeTicket, setActiveTicket] = useState(null);
   const [replyText, setReplyText] = useState('');
-  
-  // Sample data - replace with your actual data source
-  const [tickets, setTickets] = useState([  
-    {
-      id: 1,
-      subject: 'Login issues',
-      name: 'John Doe',
-      userType: 'Participant',
-      location: 'New York',
-      status: 'Open',
-      messages: [
-        { sender: 'John Doe', text: 'I cannot login to my account', time: '2023-05-01 10:00' },
-        { sender: 'Support', text: 'Have you tried resetting your password?', time: '2023-05-01 10:30' }
-      ]
-    },
-    {
-      id: 2,
-      subject: 'Payment problem',
-      name: 'Jane Smith',
-      userType: 'Mentor',
-      location: 'Chicago',
-      status: 'Open',
-      messages: [
-        { sender: 'Jane Smith', text: 'My payment was not processed', time: '2023-05-02 09:00' }
-      ]
-    }
-  ]);
+  const [tickets, setTickets] = useState([]);
+  const [thread, setThread] = useState([]);
+  const [loadingThread, setLoadingThread] = useState(false);
+  const conversationRef = useRef(null);
+  const [isUserScrolling, setIsUserScrolling] = useState(false);
+  const prevThreadLength = useRef(0);
+  const [showNewMsgTooltip, setShowNewMsgTooltip] = useState(false);
+  const [newMsgIndex, setNewMsgIndex] = useState(null);
+  const [lastThreadLength, setLastThreadLength] = useState(0);
 
-  const handleReply = (ticketId) => {
-    if (!replyText.trim()) return;
-    
-    const updatedTickets = tickets.map(ticket => {
-      if (ticket.id === ticketId) {
-        return {
-          ...ticket,
-          messages: [
-            ...ticket.messages,
-            { sender: 'Support', text: replyText, time: new Date().toISOString() }
-          ]
-        };
+  useEffect(() => {
+    fetch('http://localhost:5010/api/support/tickets')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && Array.isArray(data.data)) {
+          // Map API data to UI format
+          setTickets(
+            data.data.map((ticket, idx) => ({
+              id: idx + 1,
+              ticketId: ticket.ticketId, // <-- add ticketId from API
+              subject: ticket.subject,
+              name: ticket.user?.name || '',
+              userType: ticket.user?.role || '',
+              location: ticket.user?.location || '',
+              status: ticket.status,
+              profilePicture: ticket.user?.profilePicture || `https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg`,
+              messages: ticket.messages || []
+            }))
+          );
+        }
+      });
+  }, []);
+
+  // Detect user scroll
+  useEffect(() => {
+    const ref = conversationRef.current;
+    if (!ref) return;
+    const handleScroll = () => {
+      // If user is not at the bottom, set isUserScrolling truewwwwww
+      if (ref.scrollHeight - ref.scrollTop - ref.clientHeight > 10) {
+        setIsUserScrolling(true);
+      } else {
+        setIsUserScrolling(false);
       }
-      return ticket;
+    };
+    ref.addEventListener('scroll', handleScroll);
+    return () => ref.removeEventListener('scroll', handleScroll);
+  }, [activeTicket]);
+
+  // Poll for new messages
+  useEffect(() => {
+    let interval;
+    if (activeTicket) {
+      interval = setInterval(() => {
+        fetch(`http://localhost:5010/api/support/thread/${activeTicket.ticketId}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data.success && Array.isArray(data.thread)) {
+              setThread(data.thread);
+            }
+          });
+      }, 3000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [activeTicket]);
+
+  // Helper to check if user is at bottom
+  const isAtBottom = () => {
+    const ref = conversationRef.current;
+    if (!ref) return false;
+    return ref.scrollHeight - ref.scrollTop - ref.clientHeight <= 10;
+  };
+
+  // Scroll to bottom only if new message comes and user is not scrolling
+  useEffect(() => {
+    if (
+      conversationRef.current &&
+      thread.length > prevThreadLength.current
+    ) {
+      // Find if last message is from admin
+      const lastMsg = thread[thread.length - 1];
+      const isAdminMsg = lastMsg && lastMsg.sender && lastMsg.sender.role === 'admin';
+
+      if (isAtBottom() || isAdminMsg) {
+        // If already at bottom or admin sent message, scroll and do not show tooltip
+        conversationRef.current.scrollTop = conversationRef.current.scrollHeight;
+        setShowNewMsgTooltip(false);
+        setNewMsgIndex(null);
+      } else {
+        // If not at bottom and user sent message, show tooltip at page bottom right
+        setShowNewMsgTooltip(true);
+        setNewMsgIndex(thread.length - 1);
+      }
+    }
+    prevThreadLength.current = thread.length;
+    setLastThreadLength(thread.length);
+  }, [thread, activeTicket]);
+
+  // Hide tooltip if user scrolls to bottom
+  useEffect(() => {
+    if (isAtBottom()) {
+      setShowNewMsgTooltip(false);
+      setNewMsgIndex(null);
+    }
+  }, [isUserScrolling, thread]);
+
+  const handleReply = async (ticketId) => {
+    if (!replyText.trim()) return;
+
+    const formData = new FormData();
+    formData.append('ticketId', activeTicket.ticketId);
+    formData.append('message', replyText);
+    formData.append('isAdmin', true);
+
+    await fetch(`http://localhost:5010/api/support/message/${activeTicket.name?._id || activeTicket.ticketId}`, {
+      method: 'POST',
+      body: formData,
     });
-    
-    setTickets(updatedTickets);
+
     setReplyText('');
+    openTicketThread(activeTicket);
   };
 
   const closeTicket = (ticketId) => {
@@ -68,6 +142,34 @@ const Tickets = () => {
     setActiveTicket(null);
   };
 
+  const openTicketThread = (ticket) => {
+    setLoadingThread(true);
+    fetch(`http://localhost:5010/api/support/thread/${ticket.ticketId}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && Array.isArray(data.thread)) {
+          setThread(data.thread);
+        } else {
+          setThread([]);
+        }
+        setActiveTicket(ticket);
+        setLoadingThread(false);
+      })
+      .catch(() => {
+        setThread([]);
+        setActiveTicket(ticket);
+        setLoadingThread(false);
+      });
+  };
+
+  const handleNewMsgClick = () => {
+    if (conversationRef.current) {
+      conversationRef.current.scrollTop = conversationRef.current.scrollHeight;
+    }
+    setShowNewMsgTooltip(false);
+    setNewMsgIndex(null);
+  };
+
   return (
     <div className="support-tickets">
       <h2 style={{ color: 'var(--secondary)' }}>Support Tickets</h2>
@@ -76,18 +178,30 @@ const Tickets = () => {
         <thead style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
           <tr>
             <th>Sr.no</th>
+            <th>Profile Picture</th>
             <th>Subject</th>
             <th>Name</th>
-            <th>User Type</th>
+            <th>User Role</th>
             <th>Location</th>
             <th>Status</th>
-            <th>Action</th>
+            <th>Action1</th>
           </tr>
         </thead>
         <tbody>
           {tickets.map((ticket, index) => (
             <tr key={ticket.id}>
               <td>{index + 1}</td>
+              <td style={{ width: '60px', textAlign: 'center' }}>
+                <img
+                  src={ticket.profilePicture}
+                  onError={(e) => { e.target.onerror = null; e.target.src = 'https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg'; }}
+                  alt="Profile"
+                  width={40}
+                  height={40}
+                  className="rounded-circle"
+                  style={{ objectFit: 'cover' }}
+                />
+              </td>
               <td>{ticket.subject}</td>
               <td>{ticket.name}</td>
               <td>{ticket.userType}</td>
@@ -104,7 +218,7 @@ const Tickets = () => {
                 <Button 
                   variant="primary" 
                   size="sm" 
-                  onClick={() => setActiveTicket(ticket)}
+                  onClick={() => openTicketThread(ticket)}
                   style={{ backgroundColor: 'var(--primary)', borderColor: 'var(--primary)' }}
                 >
                   <ReplyFill /> Reply
@@ -118,66 +232,196 @@ const Tickets = () => {
       {/* Ticket Conversation Modal */}
       <Modal 
         show={!!activeTicket} 
-        onHide={() => setActiveTicket(null)}
+        onHide={() => { setActiveTicket(null); setThread([]); }}
         size="lg"
+        style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
       >
         <Modal.Header 
           closeButton 
-          style={{ backgroundColor: 'var(--secondary)', color: 'white' }}
+          style={{ backgroundColor: 'var(--secondary)', color: 'white', borderRadius: '12px 12px 0 0' }}
         >
-          <Modal.Title>
-            {activeTicket?.subject} - {activeTicket?.status}
-            {activeTicket?.status === 'Open' && (
-              <Button 
-                variant="danger" 
-                size="sm" 
-                className="ms-2"
-                onClick={() => closeTicket(activeTicket.id)}
-                style={{ backgroundColor: 'var(--danger)', borderColor: 'var(--danger)' }}
-              >
-                <XCircleFill /> Close Ticket
-              </Button>
-            )}
+          <Modal.Title style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '18px',
+            fontWeight: 600,
+            fontSize: '1.25rem',
+            letterSpacing: '0.5px',
+            color: 'var(--secondary)'
+          }}>
+            <span>
+              <span style={{
+                background: 'linear-gradient(90deg, #ff6a88 0%, #ffb86c 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                fontWeight: 700,
+                fontSize: '1.15em'
+              }}>
+                {activeTicket?.subject}
+              </span>
+              <span style={{
+                marginLeft: 12,
+                padding: '2px 10px',
+                borderRadius: '8px',
+                background: activeTicket?.status === 'Open'
+                  ? 'linear-gradient(90deg, #ffe259 0%, #ffa751 100%)'
+                  : 'linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)',
+                color: '#222',
+                fontWeight: 500,
+                fontSize: '0.95em',
+                boxShadow: '0 1px 4px rgba(0,0,0,0.07)'
+              }}>
+                {activeTicket?.status}
+              </span>
+            </span>
+            
           </Modal.Title>
         </Modal.Header>
-        <Modal.Body style={{ backgroundColor: 'var(--accent)' }}>
-          <div className="ticket-conversation">
-            {activeTicket?.messages.map((msg, index) => (
-              <div 
-                key={index} 
-                className={`message ${msg.sender === 'Support' ? 'support-message' : 'user-message'}`}
+        <Modal.Body style={{
+          background: '#ffedf0',
+          height: 'calc(80vh - 56px)',
+          overflowY: 'auto',
+          padding: '0',
+          borderRadius: '0 0 12px 12px',
+          display: 'flex',
+          flexDirection: 'column',
+          boxShadow: '0 4px 24px rgba(44,62,80,0.10)'
+        }}>
+          <div
+            className="ticket-conversation"
+            ref={conversationRef}
+            style={{
+              flex: 1,
+              padding: '24px 16px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '18px',
+              overflowY: 'auto',
+              position: 'relative'
+            }}
+          >
+            {loadingThread ? (
+              <div>Loading...</div>
+            ) : (
+              thread.length > 0 ? (
+                thread.map((msg, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      display: 'flex',
+                      flexDirection: msg.sender.role === 'admin' ? 'row-reverse' : 'row',
+                      alignItems: 'flex-end',
+                      gap: '10px'
+                    }}
+                  >
+                    <img
+                      src={msg.sender.profilePicture || 'https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg'}
+                      alt={msg.sender.name}
+                      width={36}
+                      height={36}
+                      className="rounded-circle"
+                      style={{ objectFit: 'cover', border: '2px solid #ddd' }}
+                      onError={(e) => { e.target.onerror = null; e.target.src = 'https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg'; }}
+                    />
+                    <div
+                      style={{
+                        backgroundColor: msg.sender.role === 'admin' ? '#dcf8c6' : 'white',
+                        color: '#222',
+                        borderRadius: '12px',
+                        padding: '10px 16px',
+                        maxWidth: '70%',
+                        boxShadow: '0 1px 4px rgba(0,0,0,0.07)',
+                        position: 'relative'
+                      }}
+                    >
+                      <div style={{ fontWeight: 'bold', marginBottom: 2 }}>{msg.sender.name}</div>
+                      <div>{msg.message}</div>
+                      {msg.attachment && (
+                        <div style={{ marginTop: 8 }}>
+                          <a href={msg.attachment} target="_blank" rel="noopener noreferrer">
+                            <img
+                              src={msg.attachment}
+                              alt="attachment"
+                              style={{ maxWidth: '180px', maxHeight: '180px', borderRadius: '8px', marginTop: '4px' }}
+                            />
+                          </a>
+                        </div>
+                      )}
+                      <div style={{
+                        fontSize: 12,
+                        opacity: 0.7,
+                        marginTop: 6,
+                        textAlign: 'right'
+                      }}>
+                        {new Date(msg.createdAt).toLocaleString()}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div>No messages found.</div>
+              )
+            )}
+            {showNewMsgTooltip && (
+              <div
                 style={{
-                  backgroundColor: msg.sender === 'Support' ? 'var(--secondary)' : 'white',
-                  color: msg.sender === 'Support' ? 'white' : 'var(--text-primary)'
+                  position: 'fixed',
+                  right: 32,
+                  bottom: 32,
+                  background: 'linear-gradient(90deg, #ff6a88 0%, #ffb86c 100%)',
+                  color: '#fff',
+                  padding: '8px 22px',
+                  borderRadius: '20px',
+                  fontWeight: 600,
+                  fontSize: '1em',
+                  boxShadow: '0 2px 8px rgba(255,106,136,0.10)',
+                  zIndex: 9999,
+                  cursor: 'pointer',
+                  userSelect: 'none'
                 }}
+                onClick={handleNewMsgClick}
               >
-                <strong>{msg.sender}</strong>
-                <small className="ms-2" style={{ opacity: 0.7 }}>
-                  {new Date(msg.time).toLocaleString()}
-                </small>
-                <div>{msg.text}</div>
+                New Message
               </div>
-            ))}
+            )}
           </div>
-          
-          <Form.Group className="mt-3">
-            <Form.Control
-              as="textarea"
-              rows={3}
-              value={replyText}
-              onChange={(e) => setReplyText(e.target.value)}
-              placeholder="Type your reply here..."
-              style={{ borderColor: 'var(--primary)' }}
-            />
-            <Button 
-              variant="primary" 
-              className="mt-2"
-              onClick={() => handleReply(activeTicket?.id)}
-              style={{ backgroundColor: 'var(--primary)', borderColor: 'var(--primary)' }}
-            >
-              Send Reply
-            </Button>
-          </Form.Group>
+          <div style={{
+            padding: '16px',
+            background: 'rgba(255,255,255,0.95)',
+            borderTop: '1px solid #ddd'
+          }}>
+            <Form.Group className="mb-0">
+              <Form.Control
+                as="textarea"
+                rows={2}
+                value={replyText}
+                onChange={(e) => setReplyText(e.target.value)}
+                placeholder="Type your reply here..."
+                style={{ borderColor: 'var(--primary)', resize: 'none' }}
+              />
+              {activeTicket?.status === 'Open' && (
+              <Button
+                variant="danger"
+                className="mt-2"
+                onClick={() => closeTicket(activeTicket.id)}
+                style={{ backgroundColor: 'black', borderColor: 'var(--dark)', float: 'left' }}
+                onMouseDown={e => e.currentTarget.style.transform = 'scale(0.97)'}
+                onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
+              >
+                <XCircleFill style={{ marginRight: 2, fontSize: '1em', color: '#fff' }} />
+                <span style={{ color: '#fff' }}>Close Ticket</span>
+              </Button>
+            )}
+              <Button 
+                variant="primary" 
+                className="mt-2"
+                onClick={() => handleReply(activeTicket?.id)}
+                style={{ backgroundColor: 'var(--primary)', borderColor: 'var(--primary)', float: 'right' }}
+              >
+                Send Reply
+              </Button>
+            </Form.Group>
+          </div>
         </Modal.Body>
       </Modal>
     </div>
