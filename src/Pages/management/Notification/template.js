@@ -978,7 +978,7 @@ export const reminderTemplate1 = ({ title, message }) => `
       </style>
     </head>
     <body>
-    <div style="background-color: #eee; height: 100vh; width: 100%;">
+    <div style="background-color: #eee; height: 70vh; width: 100%;">
   <div style="max-width: 1200px; margin: 0 auto; padding: 20px 0; height: 100%;">
     <div style="display: flex; justify-content: center; align-items: center; height: 100%;">
       <div style="width: 100%; max-width: 800px;margin:30px">
@@ -1060,7 +1060,7 @@ export const reminderTemplate3 = ({ title, message }) => `
       </style>
     </head>
     <body>
-    <div style="background-color: #f5f5f5; font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;flex-direction: column;gap;30px">
+    <div style="background-color: #f5f5f5; font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 70vh; margin: 0;flex-direction: column;gap;30px">
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-quote" viewBox="0 0 16 16">
   <path d="M12 12a1 1 0 0 0 1-1V8.558a1 1 0 0 0-1-1h-1.388q0-.527.062-1.054.093-.558.31-.992t.559-.683q.34-.279.868-.279V3q-.868 0-1.52.372a3.3 3.3 0 0 0-1.085.992 4.9 4.9 0 0 0-.62 1.458A7.7 7.7 0 0 0 9 7.558V11a1 1 0 0 0 1 1zm-6 0a1 1 0 0 0 1-1V8.558a1 1 0 0 0-1-1H4.612q0-.527.062-1.054.094-.558.31-.992.217-.434.559-.683.34-.279.868-.279V3q-.868 0-1.52.372a3.3 3.3 0 0 0-1.085.992 4.9 4.9 0 0 0-.62 1.458A7.7 7.7 0 0 0 3 7.558V11a1 1 0 0 0 1 1z"/>
 </svg>
@@ -1089,7 +1089,7 @@ export const reminderTemplate4 = ({ title, message }) => `
       </style>
     </head>
     <body>
-    <div style="background-image: url('${motivationalImage3}');background-size:contain;background-repeat:no-repeat;height:600px">
+    <div style="background-image: url('${motivationalImage3}');background-size:contain;background-repeat:no-repeat;height:500px">
     <div style="padding-left:120px;padding-top:160px;max-width:400px">
         <h3>${title || "Default Title"}</h3>
         <p>${message || "Thank you for your interest in our service."}</p>

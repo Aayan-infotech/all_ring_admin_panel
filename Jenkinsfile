@@ -4,8 +4,8 @@ pipeline {
     environment {
         IMAGE_NAME = "docker.io/kartikeytiwari/all-ring-admin-panel"
         IMAGE_TAG = "${BUILD_NUMBER}"
-        CONTAINER_PORT = "2005"
-        HOST_PORT = "2005"
+        CONTAINER_PORT = "5010"
+        HOST_PORT = "5010"
         CONTAINER_NAME = "${JOB_BASE_NAME}-container"
     }
 

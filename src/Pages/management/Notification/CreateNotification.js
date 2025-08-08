@@ -1,6 +1,3 @@
-
-
-
 import React, { useState, useEffect } from "react";
 import {
   ChatQuote as QuoteIcon,
@@ -10,7 +7,7 @@ import {
   XCircleFill as BlockedIcon,
   QuestionCircleFill as UnverifiedIcon,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
 } from "react-bootstrap-icons";
 import axios from "axios";
 import motivationalImage4 from "./images/motivational-reminder4.jpg";
@@ -36,14 +33,14 @@ import {
 const NotificationCreator = () => {
   // Color variables
   const colors = {
-    primary: '#e83561',
-    secondary: '#003865',
-    accent: '#ffedf0',
-    textPrimary: '#000000',
-    success: '#28a745',
-    danger: '#dc3545',
-    warning: '#ffc107',
-    info: '#17a2b8'
+    primary: "#e83561",
+    secondary: "#003865",
+    accent: "#ffedf0",
+    textPrimary: "#000000",
+    success: "#28a745",
+    danger: "#dc3545",
+    warning: "#ffc107",
+    info: "#17a2b8",
   };
 
   const [notificationType, setNotificationType] = useState("quote");
@@ -81,9 +78,11 @@ const NotificationCreator = () => {
       try {
         setLoading(true);
         const response = await axios.get(
-          "http://localhost:5010/api/location/getAllLocations"
+          "http://3.228.185.94:5010/api/location/getAllLocations"
         );
-        setLocations(Array.isArray(response.data.data) ? response.data.data : []);
+        setLocations(
+          Array.isArray(response.data.data) ? response.data.data : []
+        );
       } catch (error) {
         console.error("Error fetching locations:", error);
         setLocations([]);
@@ -101,9 +100,9 @@ const NotificationCreator = () => {
       try {
         setLoading(true);
         const token = localStorage.getItem("adminToken");
-        
-        let url = `http://localhost:5010/api/admin/getRegister/${recipientType}`;
-        
+
+        let url = `http://3.228.185.94:5010/api/admin/getRegister/${recipientType}`;
+
         // Add location filter if an event is selected and has a location
         const eventLocation = selectedEvent?.location?.location;
         if (notificationType === "event" && eventLocation) {
@@ -113,15 +112,19 @@ const NotificationCreator = () => {
         }
 
         const response = await axios.get(url, {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
         });
 
-        const users = Array.isArray(response.data.users) ? response.data.users : [];
-        setRecipients(users.map(user => ({
-          ...user,
-          selected: false,
-          status: user.accountStatus || "active"
-        })));
+        const users = Array.isArray(response.data.users)
+          ? response.data.users
+          : [];
+        setRecipients(
+          users.map((user) => ({
+            ...user,
+            selected: false,
+            status: user.accountStatus || "active",
+          }))
+        );
       } catch (error) {
         console.error(`Error fetching ${recipientType}s:`, error);
         setRecipients([]);
@@ -132,22 +135,26 @@ const NotificationCreator = () => {
     fetchRecipients();
   }, [recipientType, location, notificationType, selectedEvent]);
 
-  const filteredRecipients = recipients.filter(recipient => {
+  const filteredRecipients = recipients.filter((recipient) => {
     // Location filter
-    const locationMatch = !location || 
-      (recipient?.location?.location === location) || 
-      (recipient.location === location);
-    
+    const locationMatch =
+      !location ||
+      recipient?.location?.location === location ||
+      recipient.location === location;
+
     // Status filter
-    const statusMatch = statusFilter === "all" || 
-      (recipient.status || "active") === statusFilter;
-    
+    const statusMatch =
+      statusFilter === "all" || (recipient.status || "active") === statusFilter;
+
     return locationMatch && statusMatch;
   });
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredRecipients.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredRecipients.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
   const totalPages = Math.ceil(filteredRecipients.length / itemsPerPage);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
@@ -156,7 +163,7 @@ const NotificationCreator = () => {
     try {
       setLoadingEvents(true);
       const response = await axios.get(
-        "http://localhost:5010/api/AdminClasses/getAllUpcomingClasses",
+        "http://3.228.185.94:5010/api/AdminClasses/getAllUpcomingClasses",
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -195,6 +202,9 @@ const NotificationCreator = () => {
     const templateFunction = templateMap[templateId] || reminderTemplate1;
     return (
       <div
+        style={{
+          height: "70vh", 
+        }}
         dangerouslySetInnerHTML={{
           __html: templateFunction({
             title,
@@ -266,7 +276,7 @@ const NotificationCreator = () => {
   };
 
   const getLocationName = (loc) => {
-    if (!loc || typeof loc !== 'object') return loc || "N/A";
+    if (!loc || typeof loc !== "object") return loc || "N/A";
     return loc.location || "N/A";
   };
 
@@ -364,9 +374,11 @@ const NotificationCreator = () => {
   const toggleSelectAll = (e) => {
     const isChecked = e.target.checked;
     setRecipients(
-      recipients.map(recipient => ({
+      recipients.map((recipient) => ({
         ...recipient,
-        selected: filteredRecipients.some(fr => fr._id === recipient._id) ? isChecked : recipient.selected
+        selected: filteredRecipients.some((fr) => fr._id === recipient._id)
+          ? isChecked
+          : recipient.selected,
       }))
     );
   };
@@ -386,17 +398,21 @@ const NotificationCreator = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "active": return colors.success;
-      case "blocked": return colors.danger;
-      case "unverified": return colors.warning;
-      default: return colors.info;
+      case "active":
+        return colors.success;
+      case "blocked":
+        return colors.danger;
+      case "unverified":
+        return colors.warning;
+      default:
+        return colors.info;
     }
   };
 
   const handleSubmit = async (e) => {
     try {
       setSending(true);
-      
+
       if (notificationType === "event" && recipientType === "mentor") {
         alert("Class invitations cannot be sent to mentors");
         return;
@@ -427,7 +443,7 @@ const NotificationCreator = () => {
       }
 
       const res = await axios.post(
-        "http://localhost:5010/api/notification/send",
+        "http://3.228.185.94:5010/api/notification/send",
         notificationData,
         {
           headers: {
@@ -435,7 +451,7 @@ const NotificationCreator = () => {
           },
         }
       );
-      
+
       if (res.status === 201) {
         alert("Notification created successfully!");
         // Reset all form states
@@ -450,12 +466,15 @@ const NotificationCreator = () => {
         });
         setSelectedEvent(null);
         setSelectedTemplate(null);
-        setRecipients(recipients.map(r => ({ ...r, selected: false })));
+        setRecipients(recipients.map((r) => ({ ...r, selected: false })));
         setCurrentPage(1);
       }
     } catch (error) {
       console.log(error);
-      alert("Error creating notification: " + (error.response?.data?.message || error.message));
+      alert(
+        "Error creating notification: " +
+          (error.response?.data?.message || error.message)
+      );
     } finally {
       setSending(false);
     }
@@ -469,7 +488,10 @@ const NotificationCreator = () => {
 
       {/* Notification Type Selector */}
       <div className="mb-4">
-        <label className="form-label fw-bold mb-2" style={{ color: colors.secondary }}>
+        <label
+          className="form-label fw-bold mb-2"
+          style={{ color: colors.secondary }}
+        >
           SELECT NOTIFICATION TYPE
         </label>
         <select
@@ -490,10 +512,10 @@ const NotificationCreator = () => {
               location: "",
             });
           }}
-          style={{ 
+          style={{
             borderColor: colors.primary,
             maxWidth: "300px",
-            color: colors.textPrimary
+            color: colors.textPrimary,
           }}
         >
           <option value="" disabled selected hidden>
@@ -507,7 +529,10 @@ const NotificationCreator = () => {
       {/* Template Selection */}
       {notificationType && (
         <div className="mb-4">
-          <label className="form-label fw-bold mb-3" style={{ color: colors.secondary }}>
+          <label
+            className="form-label fw-bold mb-3"
+            style={{ color: colors.secondary }}
+          >
             CHOOSE A TEMPLATE
           </label>
           <div className="d-flex flex-wrap gap-3">
@@ -515,13 +540,20 @@ const NotificationCreator = () => {
               <div
                 key={template.id}
                 onClick={() => setSelectedTemplate(template)}
-                className={`card border-2 ${selectedTemplate?.id === template.id ? "border-primary" : "border-light"} shadow-sm`}
+                className={`card border-2 ${
+                  selectedTemplate?.id === template.id
+                    ? "border-primary"
+                    : "border-light"
+                } shadow-sm`}
                 style={{
                   width: "180px",
                   cursor: "pointer",
                   transition: "all 0.3s",
-                  transform: selectedTemplate?.id === template.id ? "scale(1.02)" : "none",
-                  backgroundColor: colors.accent
+                  transform:
+                    selectedTemplate?.id === template.id
+                      ? "scale(1.02)"
+                      : "none",
+                  backgroundColor: colors.accent,
                 }}
               >
                 <img
@@ -531,10 +563,16 @@ const NotificationCreator = () => {
                   style={{ height: "120px", objectFit: "cover" }}
                 />
                 <div className="card-body p-2">
-                  <h6 className="card-title mb-1" style={{ color: colors.textPrimary }}>
+                  <h6
+                    className="card-title mb-1"
+                    style={{ color: colors.textPrimary }}
+                  >
                     {template.name}
                   </h6>
-                  <p className="card-text small" style={{ color: colors.secondary }}>
+                  <p
+                    className="card-text small"
+                    style={{ color: colors.secondary }}
+                  >
                     {template.description}
                   </p>
                 </div>
@@ -550,35 +588,49 @@ const NotificationCreator = () => {
           <div className="row g-4">
             {/* Event Selection Column */}
             <div className="col-lg-6">
-              <div className="card border-0 shadow-sm" style={{ backgroundColor: colors.accent }}>
+              <div
+                className="card border-0 shadow-sm"
+                style={{ backgroundColor: colors.accent }}
+              >
                 <div className="card-body p-4">
-                  <h5 className="mb-4 fw-bold" style={{ color: colors.secondary }}>
+                  <h5
+                    className="mb-4 fw-bold"
+                    style={{ color: colors.secondary }}
+                  >
                     Select Event
                   </h5>
                   {loadingEvents ? (
                     <div className="text-center">
-                      <div className="spinner-border" style={{ color: colors.primary }} role="status">
+                      <div
+                        className="spinner-border"
+                        style={{ color: colors.primary }}
+                        role="status"
+                      >
                         <span className="visually-hidden">Loading...</span>
                       </div>
                     </div>
                   ) : (
                     <div className="mb-3">
-                      <label className="form-label fw-bold" style={{ color: colors.secondary }}>
+                      <label
+                        className="form-label fw-bold"
+                        style={{ color: colors.secondary }}
+                      >
                         Upcoming Events
                       </label>
                       <select
                         className="form-select"
                         value={selectedEvent?._id || ""}
                         onChange={handleEventChange}
-                        style={{ 
+                        style={{
                           borderColor: colors.secondary,
-                          color: colors.textPrimary
+                          color: colors.textPrimary,
                         }}
                       >
                         <option value="">Select an event...</option>
                         {upcomingEvents.map((event) => (
                           <option key={event._id} value={event._id}>
-                            {event.eventName || event.title} - {event.date} at {event.time}
+                            {event.eventName || event.title} - {event.date} at{" "}
+                            {event.time}
                           </option>
                         ))}
                       </select>
@@ -611,14 +663,23 @@ const NotificationCreator = () => {
           <div className="row g-4">
             {/* Form Column */}
             <div className="col-lg-6">
-              <div className="card border-0 shadow-sm" style={{ backgroundColor: colors.accent }}>
+              <div
+                className="card border-0 shadow-sm"
+                style={{ backgroundColor: colors.accent }}
+              >
                 <div className="card-body p-4">
-                  <h5 className="mb-4 fw-bold" style={{ color: colors.secondary }}>
+                  <h5
+                    className="mb-4 fw-bold"
+                    style={{ color: colors.secondary }}
+                  >
                     Notification Details
                   </h5>
                   <form>
                     <div className="mb-3">
-                      <label className="form-label fw-bold" style={{ color: colors.secondary }}>
+                      <label
+                        className="form-label fw-bold"
+                        style={{ color: colors.secondary }}
+                      >
                         Title
                       </label>
                       <input
@@ -628,15 +689,18 @@ const NotificationCreator = () => {
                         value={formData.title}
                         onChange={handleInputChange}
                         required
-                        style={{ 
+                        style={{
                           borderColor: colors.secondary,
-                          color: colors.textPrimary
+                          color: colors.textPrimary,
                         }}
                       />
                     </div>
 
                     <div className="mb-3">
-                      <label className="form-label fw-bold" style={{ color: colors.secondary }}>
+                      <label
+                        className="form-label fw-bold"
+                        style={{ color: colors.secondary }}
+                      >
                         Message
                       </label>
                       <textarea
@@ -646,9 +710,9 @@ const NotificationCreator = () => {
                         value={formData.message}
                         onChange={handleInputChange}
                         required
-                        style={{ 
+                        style={{
                           borderColor: colors.secondary,
-                          color: colors.textPrimary
+                          color: colors.textPrimary,
                         }}
                       ></textarea>
                     </div>
@@ -672,31 +736,39 @@ const NotificationCreator = () => {
       )}
 
       {/* Recipient Selection */}
-      <div className="card border-0 shadow-sm mt-4" style={{ backgroundColor: colors.accent }}>
+      <div
+        className="card border-0 shadow-sm mt-4"
+        style={{ backgroundColor: colors.accent }}
+      >
         <div className="card-body p-4">
           <h5 className="mb-4 fw-bold" style={{ color: colors.secondary }}>
             Recipient Selection
           </h5>
-          
+
           <div className="row mb-4">
             <div className="col-md-6">
-              <label className="form-label fw-bold" style={{ color: colors.secondary }}>
+              <label
+                className="form-label fw-bold"
+                style={{ color: colors.secondary }}
+              >
                 Recipient Type
               </label>
               <div className="d-flex gap-2">
                 {/* {['user', 'mentor', 'instructor'].map((type) => ( */}
-                     {['user', 'instructor'].map((type) => (
+                {["user", "instructor"].map((type) => (
                   <button
                     key={type}
                     type="button"
-                    className={`btn ${recipientType === type ? 'active' : ''}`}
+                    className={`btn ${recipientType === type ? "active" : ""}`}
                     onClick={() => setRecipientType(type)}
                     style={{
-                      textTransform: 'capitalize',
+                      textTransform: "capitalize",
                       flex: 1,
-                      backgroundColor: recipientType === type ? colors.primary : 'transparent',
-                      color: recipientType === type ? 'white' : colors.textPrimary,
-                      border: `1px solid ${colors.primary}`
+                      backgroundColor:
+                        recipientType === type ? colors.primary : "transparent",
+                      color:
+                        recipientType === type ? "white" : colors.textPrimary,
+                      border: `1px solid ${colors.primary}`,
                     }}
                   >
                     {type}
@@ -704,18 +776,21 @@ const NotificationCreator = () => {
                 ))}
               </div>
             </div>
-            
+
             <div className="col-md-3">
-              <label className="form-label fw-bold" style={{ color: colors.secondary }}>
+              <label
+                className="form-label fw-bold"
+                style={{ color: colors.secondary }}
+              >
                 Location
               </label>
               <select
                 className="form-select"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                style={{ 
+                style={{
                   borderColor: colors.secondary,
-                  color: colors.textPrimary
+                  color: colors.textPrimary,
                 }}
                 disabled={loading}
               >
@@ -729,16 +804,19 @@ const NotificationCreator = () => {
             </div>
 
             <div className="col-md-3">
-              <label className="form-label fw-bold" style={{ color: colors.secondary }}>
+              <label
+                className="form-label fw-bold"
+                style={{ color: colors.secondary }}
+              >
                 Status
               </label>
               <select
                 className="form-select"
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                style={{ 
+                style={{
                   borderColor: colors.secondary,
-                  color: colors.textPrimary
+                  color: colors.textPrimary,
                 }}
               >
                 <option value="all">All Statuses</option>
@@ -752,27 +830,37 @@ const NotificationCreator = () => {
           {/* Recipients Table */}
           {loading ? (
             <div className="text-center py-4">
-              <div className="spinner-border" style={{ color: colors.primary }} role="status">
+              <div
+                className="spinner-border"
+                style={{ color: colors.primary }}
+                role="status"
+              >
                 <span className="visually-hidden">Loading...</span>
               </div>
             </div>
           ) : (
             <div className="mt-4">
               <h6 className="mb-3 fw-bold" style={{ color: colors.secondary }}>
-                {recipientType.charAt(0).toUpperCase() + recipientType.slice(1)} List
+                {recipientType.charAt(0).toUpperCase() + recipientType.slice(1)}{" "}
+                List
                 {location && ` (Filtered by location: ${location})`}
               </h6>
               <div className="table-responsive">
                 <table className="table table-striped table-hover">
                   <thead>
-                    <tr style={{ backgroundColor: colors.primary, color: 'white' }}>
+                    <tr
+                      style={{
+                        backgroundColor: colors.primary,
+                        color: "white",
+                      }}
+                    >
                       <th>
                         <input
                           type="checkbox"
                           onChange={toggleSelectAll}
                           checked={
                             filteredRecipients.length > 0 &&
-                            filteredRecipients.every(r => r.selected)
+                            filteredRecipients.every((r) => r.selected)
                           }
                         />
                       </th>
@@ -792,20 +880,37 @@ const NotificationCreator = () => {
                             <input
                               type="checkbox"
                               checked={recipient.selected || false}
-                              onChange={() => toggleUserSelection(recipient._id)}
+                              onChange={() =>
+                                toggleUserSelection(recipient._id)
+                              }
                             />
                           </td>
-                          <td style={{ color: colors.textPrimary }}>{recipient.name || "N/A"}</td>
-                          <td style={{ color: colors.textPrimary }}>{recipient.email || "N/A"}</td>
+                          <td style={{ color: colors.textPrimary }}>
+                            {recipient.name || "N/A"}
+                          </td>
+                          <td style={{ color: colors.textPrimary }}>
+                            {recipient.email || "N/A"}
+                          </td>
                           {recipientType !== "user" && (
-                            <td style={{ color: colors.textPrimary }}>{recipient.specialization || recipient.expertise || "N/A"}</td>
+                            <td style={{ color: colors.textPrimary }}>
+                              {recipient.specialization ||
+                                recipient.expertise ||
+                                "N/A"}
+                            </td>
                           )}
-                          <td style={{ color: colors.textPrimary }}>{getLocationName(recipient.location)}</td>
+                          <td style={{ color: colors.textPrimary }}>
+                            {getLocationName(recipient.location)}
+                          </td>
                           <td>
-                            <span className="badge" style={{ 
-                              backgroundColor: getStatusColor(recipient.status || "active"),
-                              color: 'white'
-                            }}>
+                            <span
+                              className="badge"
+                              style={{
+                                backgroundColor: getStatusColor(
+                                  recipient.status || "active"
+                                ),
+                                color: "white",
+                              }}
+                            >
                               {getStatusIcon(recipient.status || "active")}
                               <span className="ms-2 text-capitalize">
                                 {recipient.status || "active"}
@@ -816,57 +921,81 @@ const NotificationCreator = () => {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={recipientType !== "user" ? 6 : 5} className="text-center" style={{ color: colors.textPrimary }}>
-                          No {recipientType}s found{location ? ` in ${location}` : ''}
+                        <td
+                          colSpan={recipientType !== "user" ? 6 : 5}
+                          className="text-center"
+                          style={{ color: colors.textPrimary }}
+                        >
+                          No {recipientType}s found
+                          {location ? ` in ${location}` : ""}
                         </td>
                       </tr>
                     )}
                   </tbody>
                 </table>
               </div>
-              
+
               {filteredRecipients.length > itemsPerPage && (
                 <div className="d-flex justify-content-center mt-3">
                   <nav aria-label="Page navigation">
                     <ul className="pagination">
-                      <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                      <li
+                        className={`page-item ${
+                          currentPage === 1 ? "disabled" : ""
+                        }`}
+                      >
                         <button
                           className="page-link"
                           onClick={() => paginate(currentPage - 1)}
                           disabled={currentPage === 1}
                           style={{
                             color: colors.secondary,
-                            borderColor: colors.secondary
+                            borderColor: colors.secondary,
                           }}
                         >
                           <ChevronLeft />
                         </button>
                       </li>
-                      
+
                       {Array.from({ length: totalPages }, (_, i) => (
-                        <li key={i + 1} className={`page-item ${currentPage === i + 1 ? 'active' : ''}`}>
+                        <li
+                          key={i + 1}
+                          className={`page-item ${
+                            currentPage === i + 1 ? "active" : ""
+                          }`}
+                        >
                           <button
                             className="page-link"
                             onClick={() => paginate(i + 1)}
                             style={{
-                              backgroundColor: currentPage === i + 1 ? colors.primary : 'transparent',
-                              color: currentPage === i + 1 ? 'white' : colors.secondary,
-                              borderColor: colors.secondary
+                              backgroundColor:
+                                currentPage === i + 1
+                                  ? colors.primary
+                                  : "transparent",
+                              color:
+                                currentPage === i + 1
+                                  ? "white"
+                                  : colors.secondary,
+                              borderColor: colors.secondary,
                             }}
                           >
                             {i + 1}
                           </button>
                         </li>
                       ))}
-                      
-                      <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+
+                      <li
+                        className={`page-item ${
+                          currentPage === totalPages ? "disabled" : ""
+                        }`}
+                      >
                         <button
                           className="page-link"
                           onClick={() => paginate(currentPage + 1)}
                           disabled={currentPage === totalPages}
                           style={{
                             color: colors.secondary,
-                            borderColor: colors.secondary
+                            borderColor: colors.secondary,
                           }}
                         >
                           <ChevronRight />
@@ -893,7 +1022,11 @@ const NotificationCreator = () => {
         disabled={(notificationType === "event" && !selectedEvent) || sending}
       >
         {sending ? (
-          <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+          <span
+            className="spinner-border spinner-border-sm me-2"
+            role="status"
+            aria-hidden="true"
+          ></span>
         ) : (
           <SendIcon className="me-2" />
         )}

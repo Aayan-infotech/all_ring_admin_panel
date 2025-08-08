@@ -36,3 +36,34 @@
     transform: rotate(360deg);
   }
 }
+.flyout-submenu {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  background: #2d2d2d;
+  padding: 8px 0;
+  border-radius: 4px;
+  min-width: 180px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  z-index: 999;
+}
+
+.flyout-submenu .submenu-item {
+  display: flex;
+  align-items: center;
+  padding: 6px 12px;
+  color: #fff;
+  text-decoration: none;
+}
+
+.flyout-submenu .submenu-item:hover {
+  background: #3e3e3e;
+}
+.admin-sidebar {
+  overflow-y: auto; /* still scrollable with mouse wheel */
+  scrollbar-width: none; /* Firefox */
+}
+
+.admin-sidebar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}

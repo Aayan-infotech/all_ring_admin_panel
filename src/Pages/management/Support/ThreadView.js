@@ -7,7 +7,7 @@ const ThreadView = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`http://localhost:5010/api/support/thread/${ticketId}`)
+    fetch(`http://3.228.185.94:5010/api/support/thread/${ticketId}`)
       .then(res => res.json())
       .then(data => {
         if (data.success && Array.isArray(data.thread)) {

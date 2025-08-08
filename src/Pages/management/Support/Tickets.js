@@ -16,7 +16,7 @@ const Tickets = () => {
   const [lastThreadLength, setLastThreadLength] = useState(0);
 
   useEffect(() => {
-    fetch('http://localhost:5010/api/support/tickets')
+    fetch('http://3.228.185.94:5010/api/support/tickets')
       .then(res => res.json())
       .then(data => {
         if (data.success && Array.isArray(data.data)) {
@@ -59,7 +59,7 @@ const Tickets = () => {
     let interval;
     if (activeTicket) {
       interval = setInterval(() => {
-        fetch(`http://localhost:5010/api/support/thread/${activeTicket.ticketId}`)
+        fetch(`http://3.228.185.94:5010/api/support/thread/${activeTicket.ticketId}`)
           .then(res => res.json())
           .then(data => {
             if (data.success && Array.isArray(data.thread)) {
@@ -129,7 +129,7 @@ const Tickets = () => {
     formData.append('message', replyText);
     formData.append('isAdmin', true);
 
-    await fetch(`http://localhost:5010/api/support/message/${activeTicket.name?._id || activeTicket.ticketId}`, {
+    await fetch(`http://3.228.185.94:5010/api/support/message/${activeTicket.name?._id || activeTicket.ticketId}`, {
       method: 'POST',
       body: formData,
     });
@@ -152,7 +152,7 @@ const Tickets = () => {
 
   const openTicketThread = (ticket) => {
     setLoadingThread(true);
-    fetch(`http://localhost:5010/api/support/thread/${ticket.ticketId}`)
+    fetch(`http://3.228.185.94:5010/api/support/thread/${ticket.ticketId}`)
       .then(res => res.json())
       .then(data => {
         if (data.success && Array.isArray(data.thread)) {
