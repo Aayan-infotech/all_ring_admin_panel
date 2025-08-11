@@ -26,6 +26,26 @@ const Dashboard = () => {
   const [dashboardCounts, setDashboardCounts] = useState(null);
   const [trendingInstructors, setTrendingInstructors] = useState([]);
   const [instructorsLoading, setInstructorsLoading] = useState(true);
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Clock updater
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Format date & time
+  const formattedDateTime = currentTime.toLocaleString("en-US", {
+    weekday: "short",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
 
   useEffect(() => {
     const token = localStorage.getItem("adminToken");
@@ -164,7 +184,7 @@ const Dashboard = () => {
         </h2>
         <div className="text-muted d-flex align-items-center gap-2">
           <CalendarCheck size={20} />
-          <span>{new Date().toLocaleDateString()}</span>
+          <span style={{ fontWeight: "bold" }}>{formattedDateTime}</span>
         </div>
       </div>
 
