@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Table, Button, Form, Modal, Badge } from 'react-bootstrap';
+import { Table, Button, Form, Modal, Badge, Breadcrumb } from 'react-bootstrap';
 import { ReplyFill, XCircleFill } from 'react-bootstrap-icons';
 import API_BASE_URL from '../../../config/api';
 
@@ -182,7 +182,41 @@ const Tickets = () => {
 
   return (
     <div className="support-tickets">
-      <h2 style={{ color: 'var(--secondary)' }}>Support Tickets</h2>
+      <div className="mb-4">
+              <Breadcrumb style={{ backgroundColor: 'var(--light)', padding: '10px', borderRadius: '5px' }}>
+                <Breadcrumb.Item 
+                  href="/dashboard" 
+                  style={{ 
+                    color: 'var(--secondary)', 
+                    textDecoration: 'none',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}
+                >
+                  <i className="fas fa-home me-2"></i> Dashboard
+                </Breadcrumb.Item>
+                <Breadcrumb.Item 
+                  style={{ 
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}
+                >
+                  <i className="fas fa-chalkboard-teacher me-2"></i> Help and Support
+                </Breadcrumb.Item>
+                <Breadcrumb.Item 
+                  active 
+                  style={{ 
+                    color: 'var(--primary)', 
+                    fontWeight: 'bold',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}
+                >
+                  <i className="fas fa-chalkboard-teacher me-2"></i> Support Tickets
+                </Breadcrumb.Item>
+              </Breadcrumb>
+            </div>
+      <h4 style={{ color: 'var(--secondary)' }}>All Support Tickets</h4>
       
       <Table striped bordered hover responsive>
         <thead style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
