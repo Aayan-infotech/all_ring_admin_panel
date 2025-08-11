@@ -188,9 +188,8 @@ const Tickets = () => {
         <thead style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
           <tr>
             <th>Sr.no</th>
-            <th>Profile Picture</th>
+            <th>From</th>
             <th>Subject</th>
-            <th>Name</th>
             <th>User Role</th>
             <th>Location</th>
             <th>Status</th>
@@ -201,45 +200,54 @@ const Tickets = () => {
           {tickets.map((ticket, index) => (
             <tr key={ticket.id}>
               <td>{index + 1}</td>
-              <td style={{ width: '60px', textAlign: 'center' }}>
-                <img
-                  src={ticket.profilePicture}
-                  onError={(e) => { e.target.onerror = null; e.target.src = 'https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg'; }}
-                  alt="Profile"
-                  width={40}
-                  height={40}
-                  className="rounded-circle"
-                  style={{ objectFit: 'cover' }}
-                />
-              </td>
-              
-              <td>
-                <div style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  gap: '2px'
-                }}>
-                  <span style={{
-                    fontWeight: 600,
-                    fontSize: '1.08em',
-                    color: 'var(--secondary)'
-                  }}>
-                    {ticket.name}
-                  </span>
-                  <span style={{
-                    fontSize: '0.95em',
-                    color: '#555',
-                    background: 'rgba(220,220,220,0.5)',
-                    padding: '2px 8px',
-                    borderRadius: '6px',
-                    marginTop: '2px',
-                    fontFamily: 'monospace'
-                  }}>
-                    {ticket.email}
-                  </span>
-                </div>
-              </td>
+              <td style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+  <img
+    src={ticket.profilePicture}
+    onError={(e) => {
+      e.target.onerror = null;
+      e.target.src =
+        'https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg';
+    }}
+    alt="Profile"
+    width={40}
+    height={40}
+    className="rounded-circle"
+    style={{ objectFit: 'cover' }}
+  />
+
+  <div
+    style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'flex-start',
+      gap: '2px',
+    }}
+  >
+    <span
+      style={{
+        fontWeight: 600,
+        fontSize: '1.08em',
+        color: 'var(--secondary)',
+      }}
+    >
+      {ticket.name}
+    </span>
+    <span
+      style={{
+        fontSize: '0.65em',
+        color: '#555',
+        background: 'rgba(220,220,220,0.5)',
+        padding: '2px 8px',
+        borderRadius: '6px',
+        marginTop: '2px',
+        fontFamily: 'monospace',
+      }}
+    >
+      {ticket.email}
+    </span>
+  </div>
+</td>
+
               <td>{ticket.subject}</td>
               <td>{ticket.userType}</td>
               <td>{ticket.location}</td>
