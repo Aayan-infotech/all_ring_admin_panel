@@ -29,6 +29,10 @@
   border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
+.css-rizt0-MuiTypography-root {
+  font-size: 14px !important;
+}
+
 .message {
   margin-bottom: 15px;
   padding: 10px;
