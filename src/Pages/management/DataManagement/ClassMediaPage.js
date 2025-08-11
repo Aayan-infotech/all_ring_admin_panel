@@ -36,7 +36,7 @@
 //     setLoading(true);
 //     try {
 //       const token = localStorage.getItem('adminToken');
-//       const res = await axios.get('http://localhost:5010/api/AdminClasses/getAllClasses', {
+//       const res = await axios.get('http://3.228.185.94:5010/api/AdminClasses/getAllClasses', {
 //         headers: {
 //           Authorization: `Bearer ${token}`,
 //         },
@@ -53,7 +53,7 @@
 //     setMediaLoading(true);
 //     try {
 //       const token = localStorage.getItem('adminToken');
-//       const res = await axios.get(`http://localhost:5010/api/mediaAdmin/getAllMedia/${classId}`, {
+//       const res = await axios.get(`http://3.228.185.94:5010/api/mediaAdmin/getAllMedia/${classId}`, {
 //         headers: {
 //           Authorization: `Bearer ${token}`,
 //         },
@@ -81,7 +81,7 @@
 
 //   try {
 //     const token = localStorage.getItem("adminToken");
-//     await axios.delete(`http://localhost:5010/api/mediaAdmin/deleteMedia/${classId}/${mediaId}`, {
+//     await axios.delete(`http://3.228.185.94:5010/api/mediaAdmin/deleteMedia/${classId}/${mediaId}`, {
 //       headers: {
 //         Authorization: `Bearer ${token}`,
 //       },
@@ -491,7 +491,7 @@ const ClassMediaPage = () => {
         status: filters.status
       };
 
-      const res = await axios.get('http://localhost:5010/api/AdminClasses/getAllClasses', {
+      const res = await axios.get('http://3.228.185.94:5010/api/AdminClasses/getAllClasses', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -516,7 +516,7 @@ const ClassMediaPage = () => {
     setMediaLoading(true);
     try {
       const token = localStorage.getItem('adminToken');
-      const res = await axios.get(`http://localhost:5010/api/mediaAdmin/getAllMedia/${classId}`, {
+      const res = await axios.get(`http://3.228.185.94:5010/api/mediaAdmin/getAllMedia/${classId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -545,7 +545,7 @@ const ClassMediaPage = () => {
 
     try {
       const token = localStorage.getItem("adminToken");
-      await axios.delete(`http://localhost:5010/api/mediaAdmin/deleteMedia/${classId}/${mediaId}`, {
+      await axios.delete(`http://3.228.185.94:5010/api/mediaAdmin/deleteMedia/${classId}/${mediaId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
