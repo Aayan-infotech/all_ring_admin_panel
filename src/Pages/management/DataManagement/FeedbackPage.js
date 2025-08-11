@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Table, Spinner, Alert } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import API_BASE_URL from '../../../config/api';
 
 const FeedbackPage = () => {
   const { classId } = useParams();
@@ -12,7 +13,7 @@ const FeedbackPage = () => {
 
   const fetchFeedbacks = async () => {
     try {
-const res = await axios.get(`http://3.228.185.94:5010/api/feedback/getAllFeedbacks/${classId}`);
+const res = await axios.get(`${API_BASE_URL}/api/feedback/getAllFeedbacks/${classId}`);
       setFeedbacks(res.data.data || []);
     } catch (err) {
       setError('Failed to load feedbacks');

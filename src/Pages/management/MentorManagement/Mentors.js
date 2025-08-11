@@ -32,6 +32,7 @@ import axios from 'axios';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import AddMentorOffcanvas from './AddMentorOffcanvas';
+import API_BASE_URL from '../../../config/api';
 
 const Mentors = () => {
   const { register, handleSubmit, reset, watch,formState: { errors } } = useForm();
@@ -90,7 +91,7 @@ const Mentors = () => {
         status: statusFilter
       };
 
-      const res = await axios.get('http://3.228.185.94:5010/api/admin/getRegister/mentor', {
+      const res = await axios.get(`${API_BASE_URL}/api/admin/getRegister/mentor`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -110,7 +111,7 @@ const Mentors = () => {
   const fetchLocations = async () => {
     try {
       const token = localStorage.getItem('adminToken');
-      const res = await axios.get('http://3.228.185.94:5010/api/location/getAllLocations', {
+      const res = await axios.get(`${API_BASE_URL}/api/location/getAllLocations`, {
         headers: {
           Authorization: `Bearer ${token}`,
         }
@@ -161,7 +162,7 @@ const Mentors = () => {
       const newStatus = mentor.user_status === 1 ? 2 : 1;
 
       await axios.patch(
-        `http://3.228.185.94:5010/api/admin/editUserStatus/${mentor._id}`,
+        `${API_BASE_URL}/api/admin/editUserStatus/${mentor._id}`,
         { user_status: newStatus },
         {
           headers: {
@@ -195,7 +196,7 @@ const Mentors = () => {
       const token = localStorage.getItem('adminToken');
 
       await axios.put(
-        `http://3.228.185.94:5010/api/admin/changeUserPassword/${selectedUser._id}`,
+        `${API_BASE_URL}/api/admin/changeUserPassword/${selectedUser._id}`,
         { newPassword, confirmPassword },
         {
           headers: {
@@ -228,7 +229,7 @@ const Mentors = () => {
       formDataToSend.append('location', formData.locationId);
 
       const response = await axios.put(
-        `http://3.228.185.94:5010/api/auth/update-user/${selectedUser._id}`,
+        `${API_BASE_URL}/api/auth/update-user/${selectedUser._id}`,
         formDataToSend,
         {
           headers: {

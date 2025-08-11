@@ -29,6 +29,7 @@ import {
   reminderTemplate3,
   reminderTemplate4,
 } from "./template";
+import API_BASE_URL from "../../../config/api";
 
 const NotificationCreator = () => {
   // Color variables
@@ -78,7 +79,7 @@ const NotificationCreator = () => {
       try {
         setLoading(true);
         const response = await axios.get(
-          "http://3.228.185.94:5010/api/location/getAllLocations"
+          `${API_BASE_URL}/api/location/getAllLocations`
         );
         setLocations(
           Array.isArray(response.data.data) ? response.data.data : []
@@ -101,7 +102,7 @@ const NotificationCreator = () => {
         setLoading(true);
         const token = localStorage.getItem("adminToken");
 
-        let url = `http://3.228.185.94:5010/api/admin/getRegister/${recipientType}`;
+        let url = `${API_BASE_URL}/api/admin/getRegister/${recipientType}`;
 
         // Add location filter if an event is selected and has a location
         const eventLocation = selectedEvent?.location?.location;
@@ -163,7 +164,7 @@ const NotificationCreator = () => {
     try {
       setLoadingEvents(true);
       const response = await axios.get(
-        "http://3.228.185.94:5010/api/AdminClasses/getAllUpcomingClasses",
+        `${API_BASE_URL}/api/AdminClasses/getAllUpcomingClasses`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -443,7 +444,7 @@ const NotificationCreator = () => {
       }
 
       const res = await axios.post(
-        "http://3.228.185.94:5010/api/notification/send",
+        `${API_BASE_URL}/api/notification/send`,
         notificationData,
         {
           headers: {

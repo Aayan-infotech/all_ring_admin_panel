@@ -6,6 +6,7 @@ import { Offcanvas, Form, Button, Spinner } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import API_BASE_URL from '../../../config/api';
 
 const AddMediaOffcanvas = ({ show,onSuccess, handleClose, classId }) => {
   const { 
@@ -31,7 +32,7 @@ const AddMediaOffcanvas = ({ show,onSuccess, handleClose, classId }) => {
       }
 
       const response = await axios.post(
-        `http://3.228.185.94:5010/api/mediaAdmin/addMedia/${classId}`,
+        `${API_BASE_URL}/api/mediaAdmin/addMedia/${classId}`,
         formData,
         {
           headers: {

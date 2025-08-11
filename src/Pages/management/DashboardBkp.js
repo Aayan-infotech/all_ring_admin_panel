@@ -15,6 +15,7 @@ import {
   CalendarCheck,
   JournalBookmarkFill,
 } from 'react-bootstrap-icons';
+import API_BASE_URL from '../../config/api';
 
 const Dashboard = () => {
   const [statsData, setStatsData] = useState(null);
@@ -29,7 +30,7 @@ const Dashboard = () => {
     const fetchStats = async () => {
       try {
         const token = localStorage.getItem('adminToken');
-        const res = await axios.get('http://3.228.185.94:5010/api/admin/stats/overview', {
+        const res = await axios.get(`${API_BASE_URL}/api/admin/stats/overview`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.data.success) {
@@ -44,7 +45,7 @@ const Dashboard = () => {
 
     const fetchParticipationData = async () => {
       try {
-        const res = await axios.get('http://3.228.185.94:5010/api/register/getParticipationOverview');
+        const res = await axios.get(`${API_BASE_URL}/api/register/getParticipationOverview`);
         if (res.data.success) {
           const data = res.data.data;
           
@@ -78,7 +79,7 @@ const Dashboard = () => {
 
     const fetchDashboardCounts = async () => {
       try {
-        const res = await axios.get('http://3.228.185.94:5010/api/register/dashboardCounts');
+        const res = await axios.get(`${API_BASE_URL}/api/register/dashboardCounts`);
         if (res.data.success) {
           setDashboardCounts(res.data.data);
         }
@@ -90,7 +91,7 @@ const Dashboard = () => {
     const fetchTrendingInstructors = async () => {
       try {
         const token = localStorage.getItem('adminToken');
-        const res = await axios.get('http://3.228.185.94:5010/api/instructor/getTrendingInstructors', {
+        const res = await axios.get(`${API_BASE_URL}/api/instructor/getTrendingInstructors`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.data.success) {

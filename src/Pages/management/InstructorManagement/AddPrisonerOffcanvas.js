@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Offcanvas, Form, Button, Spinner, Table, Badge } from 'react-bootstrap';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import API_BASE_URL from '../../../config/api';
 
 const AddPrisonerOffcanvas = ({ show, handleClose, instructorId, locations, preSelectedLocation }) => {
   const [prisonerName, setPrisonerName] = useState('');
@@ -22,7 +23,7 @@ const AddPrisonerOffcanvas = ({ show, handleClose, instructorId, locations, preS
         location,
       };
 
-      await axios.post('http://3.228.185.94:5010/api/prisoner/addPrisoner', payload);
+      await axios.post(`${API_BASE_URL}/api/prisoner/addPrisoner`, payload);
       toast.success('Prisoner added successfully');
 
       // Reset the form fields
@@ -38,7 +39,7 @@ const AddPrisonerOffcanvas = ({ show, handleClose, instructorId, locations, preS
 
   const fetchLocations = async () => {
     try {
-      const res = await axios.get('http://3.228.185.94:5010/api/location/getAllLocations');
+      const res = await axios.get(`${API_BASE_URL}/api/location/getAllLocations`);
       const locations = res.data?.data || [];
       const activeLocations = locations.filter(loc => loc.status === 'Active');
       setLocationList(activeLocations);
@@ -60,7 +61,7 @@ const AddPrisonerOffcanvas = ({ show, handleClose, instructorId, locations, preS
     if (!instructorId) return;
     setLoading(true);
     try {
-      const res = await axios.get(`http://3.228.185.94:5010/api/prisoner/prisonersByInstructor/${instructorId}`);
+      const res = await axios.get(`${API_BASE_URL}/api/prisoner/prisonersByInstructor/${instructorId}`);
       setPrisoners(res.data.data || []);
     } catch (err) {
       console.error("Failed to fetch prisoners:", err);

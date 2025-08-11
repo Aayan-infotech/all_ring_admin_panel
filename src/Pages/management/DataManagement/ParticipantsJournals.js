@@ -9,6 +9,7 @@ import {
 } from 'react-bootstrap';
 import { Eye, Search, ChevronDown, X } from 'react-bootstrap-icons';
 import axios from 'axios';
+import API_BASE_URL from '../../../config/api';
 
 const ParticipantsJournals = () => {
   // Fallback static data matching API structure
@@ -60,7 +61,7 @@ const ParticipantsJournals = () => {
   useEffect(() => {
     const fetchJournals = async () => {
       try {
-        const response = await axios.get('http://3.228.185.94:5010/api/journel/getJournalForAdmin');
+        const response = await axios.get(`${API_BASE_URL}/api/journel/getJournalForAdmin`);
         setApiResponse(response.data);
         setFilteredJournals(response.data.data);
         setLoading(false);

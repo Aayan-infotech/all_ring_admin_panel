@@ -3,6 +3,7 @@ import { Offcanvas, Form, Button, Spinner, Row, Col,Alert  } from 'react-bootstr
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import API_BASE_URL from '../../../config/api';
 
 const AddClassOffcanvas = ({ show, handleClose, onSaved }) => {
   const {
@@ -32,7 +33,7 @@ const AddClassOffcanvas = ({ show, handleClose, onSaved }) => {
 
       setIsLoading(true);
       try {
-        const locationsRes = await axios.get('http://3.228.185.94:5010/api/location/getAllLocations');
+        const locationsRes = await axios.get(`${API_BASE_URL}/api/location/getAllLocations`);
         
         const activeLocations = (locationsRes.data?.data || [])
           .filter(location => location.status === 'Active');
@@ -66,7 +67,7 @@ const AddClassOffcanvas = ({ show, handleClose, onSaved }) => {
         // Try the location-specific endpoint first
         try {
           const response = await axios.get(
-            `http://3.228.185.94:5010/api/instructor/getByLocation/${selectedLocation}`,
+            `${API_BASE_URL}/api/instructor/getByLocation/${selectedLocation}`,
             { headers: { Authorization: `Bearer ${token}` } }
           );
           
@@ -84,7 +85,7 @@ const AddClassOffcanvas = ({ show, handleClose, onSaved }) => {
         
         // Fallback: get all instructors and filter
         const allInstructorsRes = await axios.get(
-          'http://3.228.185.94:5010/api/admin/getRegister/instructor',
+          `${API_BASE_URL}/api/admin/getRegister/instructor`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         
@@ -169,7 +170,7 @@ const AddClassOffcanvas = ({ show, handleClose, onSaved }) => {
 
     try {
       const token = localStorage.getItem('adminToken');
-      await axios.post('http://3.228.185.94:5010/api/AdminClasses/addClass', formData, {
+      await axios.post(`${API_BASE_URL}/api/AdminClasses/addClass`, formData, {
         headers: { 
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`
@@ -222,7 +223,8 @@ const AddClassOffcanvas = ({ show, handleClose, onSaved }) => {
           <Form onSubmit={handleSubmit(onSubmit)}>
             <Row className="mb-3">
               <Form.Group as={Col} md={12} controlId="title">
-n                 <Form.Control
+                  <Form.Label>Title <span className="text-danger">*</span></Form.Label>
+         <Form.Control
                   type="text"
                   {...register('title', { required: 'Title is required' })}
                   isInvalid={!!errors.title}

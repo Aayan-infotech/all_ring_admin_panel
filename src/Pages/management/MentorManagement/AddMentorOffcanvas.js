@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import React, { useEffect, useState } from 'react';
 import PhoneInput from 'react-phone-input-2';
+import API_BASE_URL from '../../../config/api';
 
 
 const AddMentorOffcanvas = ({ show, handleClose, onMentorAdded }) => {
@@ -25,7 +26,7 @@ const AddMentorOffcanvas = ({ show, handleClose, onMentorAdded }) => {
 useEffect(() => {
   const fetchLocations = async () => {
     try {
-      const response = await axios.get('http://3.228.185.94:5010/api/location/getAllLocations');
+      const response = await axios.get(`${API_BASE_URL}/api/location/getAllLocations`);
       
       // Filter only active locations
       const activeLocations = (response.data?.data || [])
@@ -45,19 +46,7 @@ useEffect(() => {
 
   fetchLocations();
 }, []);
-//   useEffect(() => {
-//   const fetchLocations = async () => {
-//     try {
-//       const response = await axios.get('http://3.228.185.94:5010/api/location/getAllLocations');
-//       setLocations(response.data?.data || []); // ✅ fix: use response.data.data instead of response.data.locations
-//     } catch (error) {
-//       console.error('Error fetching locations:', error);
-//       toast.error('Failed to load locations');
-//     }
-//   };
 
-//   fetchLocations();
-// }, []);
 
   const onSubmit = async (data) => {
     const formData = new FormData();
@@ -73,7 +62,7 @@ useEffect(() => {
 
     try {
       await axios.post(
-        'http://3.228.185.94:5010/api/auth/adminRegister/mentor',
+        `${API_BASE_URL}/api/auth/adminRegister/mentor`,
         formData,
         { headers: { 'Content-Type': 'multipart/form-data' } }
       );

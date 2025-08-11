@@ -9,8 +9,9 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { XCircleFill, CheckCircleFill } from 'react-bootstrap-icons';
 import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api';
+import API_BASE_URL from '../../../config/api';
 
-const API_BASE = 'http://3.228.185.94:5010/api/location';
+const API_BASE = `${API_BASE_URL}/api/location`;
 
 // Map settings
 const mapContainerStyle = {

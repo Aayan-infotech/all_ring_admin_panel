@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import API_BASE_URL from '../../../config/api';
 
 const ThreadView = () => {
   const { ticketId } = useParams();
@@ -7,7 +8,7 @@ const ThreadView = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`http://3.228.185.94:5010/api/support/thread/${ticketId}`)
+    fetch(`${API_BASE_URL}/api/support/thread/${ticketId}`)
       .then(res => res.json())
       .then(data => {
         if (data.success && Array.isArray(data.thread)) {

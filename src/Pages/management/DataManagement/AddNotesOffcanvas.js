@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { Offcanvas, Form, Button, Spinner, Table } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
+import API_BASE_URL from '../../../config/api';
 
 const AddNotesOffcanvas = ({ show, handleClose, classId }) => {
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm();
@@ -14,7 +15,7 @@ const AddNotesOffcanvas = ({ show, handleClose, classId }) => {
   const fetchNotes = async () => {
     try {
       setLoadingNotes(true);
-      const response = await axios.get(`http://3.228.185.94:5010/api/notes/getNoteById/${classId}`);
+      const response = await axios.get(`${API_BASE_URL}/api/notes/getNoteById/${classId}`);
       setNotes(response.data.data ? [response.data.data] : []);
 
     } catch (error) {
@@ -40,7 +41,7 @@ const AddNotesOffcanvas = ({ show, handleClose, classId }) => {
       }
 
       const response = await axios.post(
-        `http://3.228.185.94:5010/api/notes/addNotes/${classId}`,
+        `${API_BASE_URL}/api/notes/addNotes/${classId}`,
         formData,
         {
           headers: {

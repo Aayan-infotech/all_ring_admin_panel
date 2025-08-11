@@ -32,6 +32,7 @@ import AddMediaOffcanvas from './AddMediaOffcanvas';
 import AddNotesOffcanvas from './AddNotesOffcanvas';
 import { toast } from 'react-toastify';
 import { useForm } from 'react-hook-form';
+import API_BASE_URL from '../../../config/api';
 const ClassesWorkshops = () => {
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -77,7 +78,7 @@ const [sessionsPerPage] = useState(5); // You can adjust this number
   const fetchInstructors = async () => {
     try {
       const token = localStorage.getItem('adminToken');
-      const res = await axios.get('http://3.228.185.94:5010/api/admin/getRegister/instructor', {
+      const res = await axios.get(`${API_BASE_URL}/api/admin/getRegister/instructor`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setInstructors(res.data?.users || []);
@@ -106,7 +107,7 @@ const [sessionsPerPage] = useState(5); // You can adjust this number
         // Try the location-specific endpoint first
         try {
           const response = await axios.get(
-            `http://3.228.185.94:5010/api/instructor/getByLocation/${selectedClass.location._id}`,
+            `${API_BASE_URL}/api/instructor/getByLocation/${selectedClass.location._id}`,
             { headers: { Authorization: `Bearer ${token}` } }
           );
 
@@ -120,7 +121,7 @@ const [sessionsPerPage] = useState(5); // You can adjust this number
 
         // Fallback: get all instructors and filter
         const allInstructorsRes = await axios.get(
-          'http://3.228.185.94:5010/api/admin/getRegister/instructor',
+          `${API_BASE_URL}/api/admin/getRegister/instructor`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
@@ -160,7 +161,7 @@ const [sessionsPerPage] = useState(5); // You can adjust this number
         ...(search && { search })
       };
 
-      const res = await axios.get('http://3.228.185.94:5010/api/AdminClasses/getAllClasses', {
+      const res = await axios.get(`${API_BASE_URL}/api/AdminClasses/getAllClasses`, {
         headers: { Authorization: `Bearer ${token}` },
         params
       });
@@ -237,7 +238,7 @@ const [sessionsPerPage] = useState(5); // You can adjust this number
     try {
       const token = localStorage.getItem('adminToken');
       const response = await axios.put(
-        `http://3.228.185.94:5010/api/AdminClasses/updateClass/${selectedClass._id}`,
+        `${API_BASE_URL}/api/AdminClasses/updateClass/${selectedClass._id}`,
         formData,
         {
           headers: {
@@ -257,7 +258,7 @@ const [sessionsPerPage] = useState(5); // You can adjust this number
   };
   const fetchLocations = async () => {
     try {
-      const response = await axios.get('http://3.228.185.94:5010/api/location/getAllLocations');
+      const response = await axios.get(`${API_BASE_URL}/api/location/getAllLocations`);
 
       // Filter to only include active locations
       const activeLocations = (response.data?.data || [])
@@ -270,20 +271,13 @@ const [sessionsPerPage] = useState(5); // You can adjust this number
     }
   };
 
-  // const fetchLocations = async () => {
-  //   try {
-  //     const res = await axios.get('http://3.228.185.94:5010/api/location/getAllLocations');
-  //     setAllLocations(res.data?.data || []);
-  //   } catch (err) {
-  //     console.error('Error fetching locations:', err);
-  //   }
-  // };
+ 
 
   const fetchQuestions = async (classId) => {
     try {
       const token = localStorage.getItem('adminToken');
       const res = await axios.get(
-        `http://3.228.185.94:5010/api/questionaire/getQuestions/${classId}`,
+        `${API_BASE_URL}/api/questionaire/getQuestions/${classId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -308,7 +302,7 @@ const [sessionsPerPage] = useState(5); // You can adjust this number
     try {
       const token = localStorage.getItem('adminToken');
       const response = await axios.patch(
-        `http://3.228.185.94:5010/api/AdminClasses/blockClass/${id}`,
+        `${API_BASE_URL}/api/AdminClasses/blockClass/${id}`,
         {},
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -340,7 +334,7 @@ const [sessionsPerPage] = useState(5); // You can adjust this number
   const handleDelete = async () => {
     try {
       const token = localStorage.getItem('adminToken');
-      await axios.delete(`http://3.228.185.94:5010/api/AdminClasses/deleteClass/${itemToDelete}`, {
+      await axios.delete(`${API_BASE_URL}/api/AdminClasses/deleteClass/${itemToDelete}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -359,7 +353,7 @@ const [sessionsPerPage] = useState(5); // You can adjust this number
     try {
       const token = localStorage.getItem('adminToken');
       await axios.post(
-        `http://3.228.185.94:5010/api/questionaire/addQuestions/${classId}`,
+        `${API_BASE_URL}/api/questionaire/addQuestions/${classId}`,
         { questionText },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -377,7 +371,7 @@ const [sessionsPerPage] = useState(5); // You can adjust this number
     try {
       const token = localStorage.getItem('adminToken');
       await axios.put(
-        `http://3.228.185.94:5010/api/questionaire/editQuestion/${classId}/${questionId}`,
+        `${API_BASE_URL}/api/questionaire/editQuestion/${classId}/${questionId}`,
         { questionText },
         { headers: { Authorization: `Bearer ${token}` } }
       );

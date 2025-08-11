@@ -19,6 +19,7 @@ import {
 } from 'react-bootstrap-icons';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import API_BASE_URL from '../../../config/api';
 
 // Helper: Find and return array of items with assigned status
 const getPreselected = (items) =>
@@ -73,7 +74,7 @@ const AssignMentorTeam = () => {
         filterLocation: filters.location,
         status: statusFilter
       };
-      const res = await axios.get('http://3.228.185.94:5010/api/admin/getRegister/mentor', {
+      const res = await axios.get(`${API_BASE_URL}/api/admin/getRegister/mentor`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -92,7 +93,7 @@ const AssignMentorTeam = () => {
   const fetchLocations = async () => {
     try {
       const token = localStorage.getItem('adminToken');
-      const res = await axios.get('http://3.228.185.94:5010/api/location/getAllLocations', {
+      const res = await axios.get(`${API_BASE_URL}/api/location/getAllLocations`, {
         headers: {
           Authorization: `Bearer ${token}`,
         }
@@ -140,7 +141,7 @@ const AssignMentorTeam = () => {
       setLoadingInstructors(true);
       const token = localStorage.getItem('adminToken');
       const res = await axios.get(
-        `http://3.228.185.94:5010/api/assignInstructor/getInstructorByLocation/${mentorId}`,
+        `${API_BASE_URL}/api/assignInstructor/getInstructorByLocation/${mentorId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -167,7 +168,7 @@ const AssignMentorTeam = () => {
       const token = localStorage.getItem('adminToken');
       const usersPromises = instructorIds.map(async (instructorId) => {
         const res = await axios.get(
-          `http://3.228.185.94:5010/api/assignInstructor/getUsersByInstructor/${instructorId}`,
+          `${API_BASE_URL}/api/assignInstructor/getUsersByInstructor/${instructorId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -248,7 +249,7 @@ const AssignMentorTeam = () => {
         }))
       };
       await axios.post(
-        `http://3.228.185.94:5010/api/assignInstructor/assignInstructorAndUsers/${selectedUser._id}`,
+        `${API_BASE_URL}/api/assignInstructor/assignInstructorAndUsers/${selectedUser._id}`,
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
