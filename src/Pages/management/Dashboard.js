@@ -15,7 +15,7 @@ import {
   DatabaseFill,
   CalendarCheck,
   JournalBookmarkFill,
-  GeoAltFill 
+  GeoAltFill
 } from "react-bootstrap-icons";
 
 const Dashboard = () => {
@@ -133,40 +133,40 @@ const Dashboard = () => {
 
   const stats = statsData
     ? [
-        {
-          title: "Total Users",
-          value: statsData.activeUsers,
-          color: "linear-gradient(135deg, #42a5f5, #478ed1)",
-          icon: <PeopleFill size={28} />,
-        },
-        {
-          title: "Active Mentors",
-          value: statsData.activeMentors,
-          color: "linear-gradient(135deg, #66bb6a, #388e3c)",
-          icon: <PersonCheckFill size={28} />,
-        },
-        {
-          title: "Instructors",
-          value: statsData.activeInstructors,
-          color: "linear-gradient(135deg, #ffb74d, #f57c00)",
-          icon: <PersonLinesFill size={28} />,
-        },
-        {
-          title: "Total Classes",
-          value: statsData.activeClasses,
-          color: "linear-gradient(135deg, #ab47bc, #8e24aa)",
-          icon: <DatabaseFill size={28} />,
-        },
-      ]
+      {
+        title: "Total Users",
+        value: statsData.activeUsers,
+        color: "linear-gradient(135deg, #42a5f5, #478ed1)",
+        icon: <PeopleFill size={28} />,
+      },
+      {
+        title: "Active Mentors",
+        value: statsData.activeMentors,
+        color: "linear-gradient(135deg, #66bb6a, #388e3c)",
+        icon: <PersonCheckFill size={28} />,
+      },
+      {
+        title: "Instructors",
+        value: statsData.activeInstructors,
+        color: "linear-gradient(135deg, #ffb74d, #f57c00)",
+        icon: <PersonLinesFill size={28} />,
+      },
+      {
+        title: "Total Classes",
+        value: statsData.activeClasses,
+        color: "linear-gradient(135deg, #ab47bc, #8e24aa)",
+        icon: <DatabaseFill size={28} />,
+      },
+    ]
     : [];
 
   const dashboardStats = dashboardCounts
     ? [
-        { title: "Upcoming Sessions", icon: <JournalBookmarkFill size={24} />, value: dashboardCounts.upcomingCount },
-        { title: "Live Sessions", icon: <FileEarmarkPlayFill size={24} />, value: dashboardCounts.liveCount },
-        { title: "Total Prisoners", icon: <PeopleFill size={24} />, value: dashboardCounts.totalPrisoners },
-        { title: "Total Locations", icon: <GeoAltFill  size={24} />, value: dashboardCounts.totalLocations }
-      ]
+      { title: "Upcoming Sessions", icon: <JournalBookmarkFill size={24} />, value: dashboardCounts.upcomingCount },
+      { title: "Live Sessions", icon: <FileEarmarkPlayFill size={24} />, value: dashboardCounts.liveCount },
+      { title: "Total Prisoners", icon: <PeopleFill size={24} />, value: dashboardCounts.totalPrisoners },
+      { title: "Total Locations", icon: <GeoAltFill size={24} />, value: dashboardCounts.totalLocations }
+    ]
     : [];
 
   return (
