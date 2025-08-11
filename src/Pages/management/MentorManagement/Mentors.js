@@ -90,7 +90,7 @@ const Mentors = () => {
         status: statusFilter
       };
 
-      const res = await axios.get('http://3.228.185.94:5010/api/admin/getRegister/mentor', {
+      const res = await axios.get('http://localhost:5010/api/admin/getRegister/mentor', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -110,7 +110,7 @@ const Mentors = () => {
   const fetchLocations = async () => {
     try {
       const token = localStorage.getItem('adminToken');
-      const res = await axios.get('http://3.228.185.94:5010/api/location/getAllLocations', {
+      const res = await axios.get('http://localhost:5010/api/location/getAllLocations', {
         headers: {
           Authorization: `Bearer ${token}`,
         }
@@ -161,7 +161,7 @@ const Mentors = () => {
       const newStatus = mentor.user_status === 1 ? 2 : 1;
 
       await axios.patch(
-        `http://3.228.185.94:5010/api/admin/editUserStatus/${mentor._id}`,
+        `http://localhost:5010/api/admin/editUserStatus/${mentor._id}`,
         { user_status: newStatus },
         {
           headers: {
@@ -195,7 +195,7 @@ const Mentors = () => {
       const token = localStorage.getItem('adminToken');
 
       await axios.put(
-        `http://3.228.185.94:5010/api/admin/changeUserPassword/${selectedUser._id}`,
+        `http://localhost:5010/api/admin/changeUserPassword/${selectedUser._id}`,
         { newPassword, confirmPassword },
         {
           headers: {
@@ -228,7 +228,7 @@ const Mentors = () => {
       formDataToSend.append('location', formData.locationId);
 
       const response = await axios.put(
-        `http://3.228.185.94:5010/api/auth/update-user/${selectedUser._id}`,
+        `http://localhost:5010/api/auth/update-user/${selectedUser._id}`,
         formDataToSend,
         {
           headers: {

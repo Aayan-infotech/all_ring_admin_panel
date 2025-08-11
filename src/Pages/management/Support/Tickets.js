@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Table, Button, Form, Modal, Badge } from 'react-bootstrap';
 import { ReplyFill, XCircleFill } from 'react-bootstrap-icons';
+import API_BASE_URL from '../../../config/api';
 
 const Tickets = () => {
   const [activeTicket, setActiveTicket] = useState(null);
@@ -16,7 +17,7 @@ const Tickets = () => {
   const [lastThreadLength, setLastThreadLength] = useState(0);
 
   useEffect(() => {
-    fetch('http://3.228.185.94:5010/api/support/tickets')
+    fetch(`${API_BASE_URL}/api/support/tickets`)
       .then(res => res.json())
       .then(data => {
         if (data.success && Array.isArray(data.data)) {
@@ -27,6 +28,7 @@ const Tickets = () => {
               ticketId: ticket.ticketId, // <-- add ticketId from API
               subject: ticket.subject,
               name: ticket.user?.name || '',
+              email: ticket.user?.email || '',
               userType: ticket.user?.role || '',
               location: ticket.user?.location || '',
               status: ticket.status,
@@ -59,7 +61,7 @@ const Tickets = () => {
     let interval;
     if (activeTicket) {
       interval = setInterval(() => {
-        fetch(`http://3.228.185.94:5010/api/support/thread/${activeTicket.ticketId}`)
+        fetch(`${API_BASE_URL}/api/support/thread/${activeTicket.ticketId}`)
           .then(res => res.json())
           .then(data => {
             if (data.success && Array.isArray(data.thread)) {
@@ -129,7 +131,7 @@ const Tickets = () => {
     formData.append('message', replyText);
     formData.append('isAdmin', true);
 
-    await fetch(`http://3.228.185.94:5010/api/support/message/${activeTicket.name?._id || activeTicket.ticketId}`, {
+    await fetch(`${API_BASE_URL}/api/support/message/${activeTicket.name?._id || activeTicket.ticketId}`, {
       method: 'POST',
       body: formData,
     });
@@ -152,7 +154,7 @@ const Tickets = () => {
 
   const openTicketThread = (ticket) => {
     setLoadingThread(true);
-    fetch(`http://3.228.185.94:5010/api/support/thread/${ticket.ticketId}`)
+    fetch(`${API_BASE_URL}/api/support/thread/${ticket.ticketId}`)
       .then(res => res.json())
       .then(data => {
         if (data.success && Array.isArray(data.thread)) {
@@ -210,8 +212,35 @@ const Tickets = () => {
                   style={{ objectFit: 'cover' }}
                 />
               </td>
+              
+              <td>
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  gap: '2px'
+                }}>
+                  <span style={{
+                    fontWeight: 600,
+                    fontSize: '1.08em',
+                    color: 'var(--secondary)'
+                  }}>
+                    {ticket.name}
+                  </span>
+                  <span style={{
+                    fontSize: '0.95em',
+                    color: '#555',
+                    background: 'rgba(220,220,220,0.5)',
+                    padding: '2px 8px',
+                    borderRadius: '6px',
+                    marginTop: '2px',
+                    fontFamily: 'monospace'
+                  }}>
+                    {ticket.email}
+                  </span>
+                </div>
+              </td>
               <td>{ticket.subject}</td>
-              <td>{ticket.name}</td>
               <td>{ticket.userType}</td>
               <td>{ticket.location}</td>
               <td>

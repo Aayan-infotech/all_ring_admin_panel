@@ -47,7 +47,7 @@ const ClassAttendance = () => {
   const fetchClasses = async (page = 1, limit = 10) => {
     try {
       setLoading(true);
-      let url = `http://3.228.185.94:5010/api/AdminClasses/getAllClasses?page=${page}&limit=${limit}`;
+      let url = `http://localhost:5010/api/AdminClasses/getAllClasses?page=${page}&limit=${limit}`;
 
       if (search) url += `&search=${search}`;
       if (filterLocation) url += `&filterLocation=${filterLocation}`;
@@ -70,7 +70,7 @@ const ClassAttendance = () => {
   // Fetch all locations for dropdown
   const fetchAllLocations = async () => {
     try {
-      const res = await axios.get('http://3.228.185.94:5010/api/location/getAllLocations');
+      const res = await axios.get('http://localhost:5010/api/location/getAllLocations');
       setAllLocations(res.data?.data || []);
     } catch (err) {
       console.error('Error fetching locations:', err);
@@ -98,7 +98,7 @@ const ClassAttendance = () => {
       setShowSessionsModal(true);
       setSessionsLoading(true);
       const res = await axios.get(
-        `http://3.228.185.94:5010/api/AdminClasses/getClassByIdAdmin/${cls._id}`
+        `http://localhost:5010/api/AdminClasses/getClassByIdAdmin/${cls._id}`
       );
       setSessionsData(res.data?.data?.sessions || []);
     } catch (err) {
@@ -116,7 +116,7 @@ const ClassAttendance = () => {
       setShowAttendanceModal(true);
       setAttLoading(true);
       const res = await axios.get(
-        `http://3.228.185.94:5010/api/AdminClasses/getSessionAttendence/${selectedClass._id}/${session._id}`
+        `http://localhost:5010/api/AdminClasses/getSessionAttendence/${selectedClass._id}/${session._id}`
       );
       const registeredUsers = res.data?.data?.registeredUsers || [];
       const transformed = registeredUsers.map(user => ({

@@ -36,7 +36,7 @@ const AssignTeam = () => {
   const fetchAllLocations = async () => {
     try {
       const token = localStorage.getItem('adminToken');
-      const res = await axios.get('http://3.228.185.94:5010/api/location/getAllLocations', {
+      const res = await axios.get('http://localhost:5010/api/location/getAllLocations', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setAllLocations(res.data.data || []);
@@ -50,7 +50,7 @@ const AssignTeam = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('adminToken');
-      let url = `http://3.228.185.94:5010/api/admin/getRegister/instructor?page=${currentPage}&limit=${limit}`;
+      let url = `http://localhost:5010/api/admin/getRegister/instructor?page=${currentPage}&limit=${limit}`;
       
       // Add filters to URL if they exist
       if (filters.search) url += `&search=${filters.search}`;
@@ -106,7 +106,7 @@ const AssignTeam = () => {
       setAssignLoading(true);
       const token = localStorage.getItem('adminToken');
       const response = await axios.get(
-        `http://3.228.185.94:5010/api/assignUsers/getUsersByLocation/${instructorId}`,
+        `http://localhost:5010/api/assignUsers/getUsersByLocation/${instructorId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -148,7 +148,7 @@ const AssignTeam = () => {
       setAssignLoading(true);
       const token = localStorage.getItem('adminToken');
       await axios.post(
-        `http://3.228.185.94:5010/api/assignUsers/assignToInstructor/${selectedInstructorId}`,
+        `http://localhost:5010/api/assignUsers/assignToInstructor/${selectedInstructorId}`,
         { userIds: selectedUsers },
         { headers: { Authorization: `Bearer ${token}` } }
       );

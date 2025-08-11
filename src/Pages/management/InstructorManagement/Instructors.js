@@ -77,7 +77,7 @@ const [showAddPrisonerOffcanvas, setShowAddPrisonerOffcanvas] = useState(false);
         status: statusFilter
       };
 
-      const res = await axios.get('http://3.228.185.94:5010/api/admin/getRegister/instructor', {
+      const res = await axios.get('http://localhost:5010/api/admin/getRegister/instructor', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -97,7 +97,7 @@ const [showAddPrisonerOffcanvas, setShowAddPrisonerOffcanvas] = useState(false);
   const fetchLocations = async () => {
     try {
       const token = localStorage.getItem('adminToken');
-      const res = await axios.get('http://3.228.185.94:5010/api/location/getAllLocations', {
+      const res = await axios.get('http://localhost:5010/api/location/getAllLocations', {
         headers: {
           Authorization: `Bearer ${token}`,
         }
@@ -148,7 +148,7 @@ const [showAddPrisonerOffcanvas, setShowAddPrisonerOffcanvas] = useState(false);
       const newStatus = instructor.user_status === 1 ? 2 : 1;
 
       await axios.patch(
-        `http://3.228.185.94:5010/api/admin/editUserStatus/${instructor._id}`,
+        `http://localhost:5010/api/admin/editUserStatus/${instructor._id}`,
         { user_status: newStatus },
         {
           headers: {
@@ -180,7 +180,7 @@ const [showAddPrisonerOffcanvas, setShowAddPrisonerOffcanvas] = useState(false);
       const token = localStorage.getItem('adminToken');
 
       await axios.put(
-        `http://3.228.185.94:5010/api/admin/changeUserPassword/${selectedInstructor._id}`,
+        `http://localhost:5010/api/admin/changeUserPassword/${selectedInstructor._id}`,
         passwords,
         {
           headers: {
@@ -212,7 +212,7 @@ const [showAddPrisonerOffcanvas, setShowAddPrisonerOffcanvas] = useState(false);
       formDataToSend.append('location', formData.locationId);
 
       await axios.put(
-        `http://3.228.185.94:5010/api/auth/update-user/${selectedInstructor._id}`,
+        `http://localhost:5010/api/auth/update-user/${selectedInstructor._id}`,
         formDataToSend,
         {
           headers: {
