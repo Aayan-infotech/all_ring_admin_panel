@@ -147,9 +147,38 @@ const Tickets = () => {
       }
       return ticket;
     });
-    
+
     setTickets(updatedTickets);
     setActiveTicket(null);
+  };
+  const handleCloseTicket = async (ticketId) => {
+    if (!ticketId) return alert("Invalid ticket ID");
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/support/close/${activeTicket.name?._id || activeTicket.ticketId}/Closed`, {
+        method: "PUT", // change to "POST" if your backend uses POST
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        // Update local state so UI reflects change
+        setActiveTicket((prev) => ({
+          ...prev,
+          status: "Closed",
+        }));
+
+        alert("Ticket closed successfully");
+      } else {
+        alert(data.message || "Failed to close ticket");
+      }
+    } catch (error) {
+      console.error("Error closing ticket:", error);
+      alert("Something went wrong while closing the ticket");
+    }
   };
 
   const openTicketThread = (ticket) => {
@@ -183,41 +212,41 @@ const Tickets = () => {
   return (
     <div className="support-tickets">
       <div className="mb-4">
-              <Breadcrumb style={{ backgroundColor: 'var(--light)', padding: '10px', borderRadius: '5px' }}>
-                <Breadcrumb.Item 
-                  href="/dashboard" 
-                  style={{ 
-                    color: 'var(--secondary)', 
-                    textDecoration: 'none',
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}
-                >
-                  <i className="fas fa-home me-2"></i> Dashboard
-                </Breadcrumb.Item>
-                <Breadcrumb.Item 
-                  style={{ 
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}
-                >
-                  <i className="fas fa-chalkboard-teacher me-2"></i> Help and Support
-                </Breadcrumb.Item>
-                <Breadcrumb.Item 
-                  active 
-                  style={{ 
-                    color: 'var(--primary)', 
-                    fontWeight: 'bold',
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}
-                >
-                  <i className="fas fa-chalkboard-teacher me-2"></i> Support Tickets
-                </Breadcrumb.Item>
-              </Breadcrumb>
-            </div>
+        <Breadcrumb style={{ backgroundColor: 'var(--light)', padding: '10px', borderRadius: '5px' }}>
+          <Breadcrumb.Item
+            href="/dashboard"
+            style={{
+              color: 'var(--secondary)',
+              textDecoration: 'none',
+              display: 'flex',
+              alignItems: 'center'
+            }}
+          >
+            <i className="fas fa-home me-2"></i> Dashboard
+          </Breadcrumb.Item>
+          <Breadcrumb.Item
+            style={{
+              display: 'flex',
+              alignItems: 'center'
+            }}
+          >
+            <i className="fas fa-chalkboard-teacher me-2"></i> Help and Support
+          </Breadcrumb.Item>
+          <Breadcrumb.Item
+            active
+            style={{
+              color: 'var(--primary)',
+              fontWeight: 'bold',
+              display: 'flex',
+              alignItems: 'center'
+            }}
+          >
+            <i className="fas fa-chalkboard-teacher me-2"></i> Support Tickets
+          </Breadcrumb.Item>
+        </Breadcrumb>
+      </div>
       <h4 style={{ color: 'var(--secondary)' }}>All Support Tickets</h4>
-      
+
       <Table striped bordered hover responsive>
         <thead style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
           <tr>
@@ -235,58 +264,58 @@ const Tickets = () => {
             <tr key={ticket.id}>
               <td>{index + 1}</td>
               <td style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-  <img
-    src={ticket.profilePicture}
-    onError={(e) => {
-      e.target.onerror = null;
-      e.target.src =
-        'https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg';
-    }}
-    alt="Profile"
-    width={40}
-    height={40}
-    className="rounded-circle"
-    style={{ objectFit: 'cover' }}
-  />
+                <img
+                  src={ticket.profilePicture}
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src =
+                      'https://img.freepik.com/free-vector/businessman-character-avatar-isolated_24877-60111.jpg';
+                  }}
+                  alt="Profile"
+                  width={40}
+                  height={40}
+                  className="rounded-circle"
+                  style={{ objectFit: 'cover' }}
+                />
 
-  <div
-    style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'flex-start',
-      gap: '2px',
-    }}
-  >
-    <span
-      style={{
-        fontWeight: 600,
-        fontSize: '1.08em',
-        color: 'var(--secondary)',
-      }}
-    >
-      {ticket.name}
-    </span>
-    <span
-      style={{
-        fontSize: '0.65em',
-        color: '#555',
-        background: 'rgba(220,220,220,0.5)',
-        padding: '2px 8px',
-        borderRadius: '6px',
-        marginTop: '2px',
-        fontFamily: 'monospace',
-      }}
-    >
-      {ticket.email}
-    </span>
-  </div>
-</td>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'flex-start',
+                    gap: '2px',
+                  }}
+                >
+                  <span
+                    style={{
+                      fontWeight: 600,
+                      fontSize: '1.08em',
+                      color: 'var(--secondary)',
+                    }}
+                  >
+                    {ticket.name}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: '0.65em',
+                      color: '#555',
+                      background: 'rgba(220,220,220,0.5)',
+                      padding: '2px 8px',
+                      borderRadius: '6px',
+                      marginTop: '2px',
+                      fontFamily: 'monospace',
+                    }}
+                  >
+                    {ticket.email}
+                  </span>
+                </div>
+              </td>
 
               <td>{ticket.subject}</td>
               <td>{ticket.userType}</td>
               <td>{ticket.location}</td>
               <td>
-                <Badge 
+                <Badge
                   bg={ticket.status === 'Open' ? 'warning' : 'success'}
                   text={ticket.status === 'Open' ? 'dark' : 'white'}
                 >
@@ -294,9 +323,9 @@ const Tickets = () => {
                 </Badge>
               </td>
               <td>
-                <Button 
-                  variant="primary" 
-                  size="sm" 
+                <Button
+                  variant="primary"
+                  size="sm"
                   onClick={() => openTicketThread(ticket)}
                   style={{ backgroundColor: 'var(--primary)', borderColor: 'var(--primary)' }}
                 >
@@ -309,14 +338,14 @@ const Tickets = () => {
       </Table>
 
       {/* Ticket Conversation Modal */}
-      <Modal 
-        show={!!activeTicket} 
+      <Modal
+        show={!!activeTicket}
         onHide={() => { setActiveTicket(null); setThread([]); }}
         size="lg"
         style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
       >
-        <Modal.Header 
-          closeButton 
+        <Modal.Header
+          closeButton
           style={{ backgroundColor: 'var(--secondary)', color: 'white', borderRadius: '12px 12px 0 0' }}
         >
           <Modal.Title style={{
@@ -353,7 +382,7 @@ const Tickets = () => {
                 {activeTicket?.status}
               </span>
             </span>
-            
+
           </Modal.Title>
         </Modal.Header>
         <Modal.Body style={{
@@ -483,8 +512,19 @@ const Tickets = () => {
                   placeholder="Type your reply here..."
                   style={{ borderColor: 'var(--primary)', resize: 'none' }}
                 />
-                <Button 
-                  variant="primary" 
+                <Button
+                  variant="secondary"
+                  className="mt-2"
+                  onClick={() => handleCloseTicket(activeTicket?.id)}
+                  style={{
+                    backgroundColor: '#1b9ebeff',
+                    borderColor: '#dc3545'
+                  }}
+                >
+                  Close Ticket
+                </Button>
+                <Button
+                  variant="primary"
                   className="mt-2"
                   onClick={() => handleReply(activeTicket?.id)}
                   style={{ backgroundColor: 'var(--primary)', borderColor: 'var(--primary)', float: 'right' }}
