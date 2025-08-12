@@ -326,7 +326,9 @@ const Dashboard = () => {
                     <th>#</th>
                     <th>Instructor</th>
                     <th>Location</th>
+                    <th>Classes</th>
                     <th>Sessions</th>
+                    <th>Registrations</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -346,7 +348,9 @@ const Dashboard = () => {
                         </div>
                       </td>
                       <td>{item.location || "N/A"}</td>
+                      <td>{item.numClasses || "N/A"}</td>
                       <td className="fw-semibold">{item.totalSessions || 0}</td>
+                      <td className="fw-semibold">{item.registrations || 0}</td>
                     </tr>
                   ))}
                 </tbody>
