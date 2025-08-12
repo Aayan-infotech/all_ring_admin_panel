@@ -390,7 +390,7 @@ const Dashboard = () => {
         </Card.Body>
       
         <Card.Body>
-          <h5 className="fw-bold mb-3">🔥 Trending Instructors & Classes</h5>
+          <h5 className="fw-bold mb-3">🔥 Trending Instructors & Classes-Sessions</h5>
           {instructorsLoading ? (
             <div className="text-center py-3">
               <Spinner animation="border" variant="primary" />
