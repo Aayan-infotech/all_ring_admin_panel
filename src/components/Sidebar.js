@@ -49,21 +49,21 @@ const Sidebar = ({ collapsed, mobileVisible, onMobileClose, setSidebarCollapsed 
       children: [{ label: "All Users", path: "/users", icon: <PeopleFill /> }],
     },
     {
-      label: "Mentor Management",
-      icon: <PersonCheckFill />,
-      module: "mentors",
-      children: [
-        { label: "All Mentors", path: "/mentors", icon: <PersonCheckFill /> },
-        { label: "Assign Team", path: "/assignmentorteam", icon: <PersonCheckFill /> },
-      ],
-    },
-    {
       label: "Instructor Management",
       icon: <PersonLinesFill />,
       module: "instructors",
       children: [
         { label: "All Instructors", path: "/instructors", icon: <PersonLinesFill /> },
         { label: "Assign Team", path: "/assignteam", icon: <PersonLinesFill /> },
+      ],
+    },
+    {
+      label: "Mentor Management",
+      icon: <PersonCheckFill />,
+      module: "mentors",
+      children: [
+        { label: "All Mentors", path: "/mentors", icon: <PersonCheckFill /> },
+        { label: "Assign Team", path: "/assignmentorteam", icon: <PersonCheckFill /> },
       ],
     },
     {

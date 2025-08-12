@@ -1,5 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { Card, Row, Col, Spinner } from "react-bootstrap";
+import { Line } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+} from "chart.js";
+
+
+
+
 import {
   LinearProgress,
   Box,
@@ -17,6 +32,8 @@ import {
   JournalBookmarkFill,
   GeoAltFill
 } from "react-bootstrap-icons";
+
+
 import API_BASE_URL from "../../config/api";
 
 const Dashboard = () => {
@@ -29,6 +46,15 @@ const Dashboard = () => {
   const [instructorsLoading, setInstructorsLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState(new Date());
 
+  ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend
+  );
   // Clock updater
   useEffect(() => {
     const timer = setInterval(() => {
@@ -326,7 +352,6 @@ const Dashboard = () => {
                     <th>#</th>
                     <th>Instructor</th>
                     <th>Location</th>
-                    <th>Num Classes</th>
                     <th>Sessions</th>
                     <th>Registrations</th>
                   </tr>
@@ -348,7 +373,6 @@ const Dashboard = () => {
                         </div>
                       </td>
                       <td>{item.location || "N/A"}</td>
-                      <td>{item.numClasses || "N/A"}</td>
                       <td className="fw-semibold">{item.totalSessions || 0}</td>
                       <td className="fw-semibold">{item.registrations || 0}</td>
                     </tr>
@@ -363,6 +387,91 @@ const Dashboard = () => {
               </div>
             )}
           </div>
+        </Card.Body>
+      
+        <Card.Body>
+          <h5 className="fw-bold mb-3">🔥 Trending Instructors & Locations</h5>
+          {instructorsLoading ? (
+            <div className="text-center py-3">
+              <Spinner animation="border" variant="primary" />
+            </div>
+          ) : trendingInstructors.length > 0 ? (
+            <Line
+              data={{
+                labels: ["Classes", "Sessions", "Registrations"], // X-axis categories
+                datasets: trendingInstructors.map((instr, idx) => ({
+                  label: instr.name || "N/A",
+                  data: [
+                    instr.numClasses || 0,
+                    instr.totalSessions || 0,
+                    instr.registrations || 0
+                  ],
+                  borderColor: `hsl(${idx * 50}, 70%, 50%)`,
+                  backgroundColor: `hsla(${idx * 50}, 70%, 50%, 0.2)`,
+                  tension: 0.4,
+                  fill: true,
+                  pointRadius: 6,
+                  pointHoverRadius: 10,
+                  pointBorderColor: "#fff",
+                  pointBorderWidth: 2,
+                }))
+              }}
+              options={{
+                responsive: true,
+                plugins: {
+                  legend: {
+                    position: "top",
+                    labels: {
+                      font: { size: 14, weight: "bold" },
+                      usePointStyle: true,
+                    },
+                  },
+                  tooltip: {
+                    usePointStyle: true,
+                    callbacks: {
+                      label: (context) => {
+                        const instr = trendingInstructors[context.datasetIndex];
+                        const metric = context.label;
+                        return `${metric}: ${context.formattedValue} (${instr.location || "N/A"})`;
+                      },
+                      afterLabel: (context) => {
+                        const instr = trendingInstructors[context.datasetIndex];
+                        return `Instructor: ${instr.name}`;
+                      }
+                    }
+                  }
+                },
+                scales: {
+                  x: {
+                    title: {
+                      display: true,
+                      text: "Metrics",
+                      font: { weight: "bold", size: 14 },
+                    },
+                    grid: {
+                      drawOnChartArea: false,
+                    }
+                  },
+                  y: {
+                    beginAtZero: true,
+                    title: {
+                      display: true,
+                      text: "Count",
+                      font: { weight: "bold", size: 14 },
+                    },
+                    ticks: {
+                      precision: 0,
+                    }
+                  }
+                }
+              }}
+            />
+
+          ) : (
+            <div className="text-center py-3">
+              <p className="text-muted">No data available</p>
+            </div>
+          )}
         </Card.Body>
       </Card>
     </div>
