@@ -198,13 +198,32 @@ const Dashboard = () => {
 
   const dashboardStats = dashboardCounts
     ? [
-      { title: "Upcoming Sessions", icon: <JournalBookmarkFill size={24} />, value: dashboardCounts.upcomingCount },
-      { title: "Live Sessions", icon: <FileEarmarkPlayFill size={24} />, value: dashboardCounts.liveCount },
-      { title: "Total Prisoners", icon: <PeopleFill size={24} />, value: dashboardCounts.totalPrisoners },
-      { title: "Total Locations", icon: <GeoAltFill size={24} />, value: dashboardCounts.totalLocations }
+      { 
+        title: "Upcoming Sessions", 
+        icon: <JournalBookmarkFill size={24} />, 
+        value: dashboardCounts.upcomingCount,
+        path: "/data/classses"
+      },
+      { 
+        title: "Live Sessions", 
+        icon: <FileEarmarkPlayFill size={24} />, 
+        value: dashboardCounts.liveCount,
+        path: "/data/classses"
+      },
+      { 
+        title: "Total Prisoners", 
+        icon: <PeopleFill size={24} />, 
+        value: dashboardCounts.totalPrisoners,
+        path: "/prisoners"
+      },
+      { 
+        title: "Total Locations", 
+        icon: <GeoAltFill size={24} />, 
+        value: dashboardCounts.totalLocations,
+        path: "/data"
+      }
     ]
     : [];
-
   return (
     <div
       className="dashboard-container p-4"
@@ -310,7 +329,7 @@ const Dashboard = () => {
       </Row>
 
       {/* Middle Stats */}
-      <Row className="g-3 mb-4">
+        <Row className="g-3 mb-4">
         {dashboardStats.map((item, idx) => (
           <Col key={idx} xs={12} sm={6} lg={3}>
             <Card
@@ -319,6 +338,17 @@ const Dashboard = () => {
                 background: "rgba(255,255,255,0.7)",
                 backdropFilter: "blur(6px)",
                 borderRadius: "14px",
+                cursor: "pointer",
+                transition: "transform 0.2s ease"
+              }}
+              onClick={() => navigate(item.path)}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-5px)";
+                e.currentTarget.style.boxShadow = "0 6px 15px rgba(0,0,0,0.1)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "none";
               }}
             >
               <Card.Body className="text-center">
