@@ -13,6 +13,8 @@ import {
 } from "chart.js";
 
 
+import { useNavigate } from 'react-router-dom';
+
 
 
 import {
@@ -40,6 +42,8 @@ const Dashboard = () => {
   const [statsData, setStatsData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [participationData, setParticipationData] = useState([]);
+    const navigate = useNavigate();
+
   const [participationLoading, setParticipationLoading] = useState(true);
   const [dashboardCounts, setDashboardCounts] = useState(null);
   const [trendingInstructors, setTrendingInstructors] = useState([]);
@@ -158,31 +162,36 @@ const Dashboard = () => {
     fetchTrendingInstructors();
   }, []);
 
-  const stats = statsData
+   const stats = statsData
     ? [
       {
         title: "Total Users",
         value: statsData.activeUsers,
         color: "linear-gradient(135deg, #42a5f5, #478ed1)",
         icon: <PeopleFill size={28} />,
+        path: "/users" // Add path for navigation
       },
       {
         title: "Active Mentors",
         value: statsData.activeMentors,
         color: "linear-gradient(135deg, #66bb6a, #388e3c)",
         icon: <PersonCheckFill size={28} />,
+        path: "/mentors"
       },
       {
         title: "Instructors",
         value: statsData.activeInstructors,
         color: "linear-gradient(135deg, #ffb74d, #f57c00)",
         icon: <PersonLinesFill size={28} />,
+        path: "/instructors"
       },
       {
         title: "Total Classes",
         value: statsData.activeClasses,
         color: "linear-gradient(135deg, #ab47bc, #8e24aa)",
         icon: <DatabaseFill size={28} />,
+        path: "/data/classses"
+    
       },
     ]
     : [];
@@ -216,7 +225,7 @@ const Dashboard = () => {
       </div>
 
       {/* Top Stats */}
-      <Row className="g-3 mb-4">
+      {/* <Row className="g-3 mb-4">
         {loading ? (
           <Col className="text-center py-5">
             <Spinner animation="border" variant="primary" />
@@ -233,6 +242,49 @@ const Dashboard = () => {
                   boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
                   transition: "transform 0.25s ease, box-shadow 0.25s ease",
                 }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "translateY(-6px)";
+                  e.currentTarget.style.boxShadow =
+                    "0 6px 25px rgba(0,0,0,0.25)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow =
+                    "0 4px 20px rgba(0,0,0,0.15)";
+                }}
+              >
+                <Card.Body className="d-flex justify-content-between align-items-center">
+                  <div>
+                    <h6 className="mb-1">{item.title}</h6>
+                    <h3 className="fw-bold">{item.value}</h3>
+                  </div>
+                  {item.icon}
+                </Card.Body>
+              </Card>
+            </Col>
+          ))
+        )}
+      </Row> */}
+          {/* Modified Top Stats with navigation */}
+      <Row className="g-3 mb-4">
+        {loading ? (
+          <Col className="text-center py-5">
+            <Spinner animation="border" variant="primary" />
+          </Col>
+        ) : (
+          stats.map((item, idx) => (
+            <Col key={idx} xs={12} sm={6} lg={3}>
+              <Card
+                className="h-100 shadow-sm border-0"
+                style={{
+                  background: item.color,
+                  color: "#fff",
+                  borderRadius: "16px",
+                  boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
+                  transition: "transform 0.25s ease, box-shadow 0.25s ease",
+                  cursor: "pointer" // Add cursor pointer to indicate clickable
+                }}
+                onClick={() => navigate(item.path)} // Add click handler
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = "translateY(-6px)";
                   e.currentTarget.style.boxShadow =
