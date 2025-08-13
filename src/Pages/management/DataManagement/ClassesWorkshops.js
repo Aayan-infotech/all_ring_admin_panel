@@ -345,7 +345,59 @@ const convert24To12 = (time24) => {
     setItemToDelete(id);
     setShowDeleteModal(true);
   };
+const fetchInstructorsByLocation = async (locationId) => {
+  if (!locationId) {
+    setEditModalInstructors([]);
+    setNoInstructorsAvailable(false);
+    return;
+  }
 
+  setLoadingInstructors(true);
+  setNoInstructorsAvailable(false);
+
+  try {
+    const token = localStorage.getItem('adminToken');
+
+    // Try the location-specific endpoint first
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/api/instructor/getByLocation/${locationId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.data?.data?.length > 0) {
+        setEditModalInstructors(response.data.data);
+        return;
+      }
+    } catch (apiError) {
+      console.log('Location-specific API failed, trying fallback');
+    }
+
+    // Fallback: get all instructors and filter
+    const allInstructorsRes = await axios.get(
+      `${API_BASE_URL}/api/admin/getRegister/instructor`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    const filtered = allInstructorsRes.data?.users?.filter(inst =>
+      inst.location && inst.location._id === locationId
+    ) || [];
+
+    if (filtered.length > 0) {
+      setEditModalInstructors(filtered);
+    } else {
+      setNoInstructorsAvailable(true);
+      setEditModalInstructors([]);
+    }
+
+  } catch (error) {
+    console.error('Error fetching instructors:', error);
+    toast.error('Failed to load instructors');
+    setEditModalInstructors([]);
+  } finally {
+    setLoadingInstructors(false);
+  }
+};
   const handleDelete = async () => {
     try {
       const token = localStorage.getItem('adminToken');
@@ -537,6 +589,11 @@ const convert24To12 = (time24) => {
     startTimeParts,
     endTimeParts
   });
+
+    // Fetch instructors for the initial location
+  if (item.location?._id) {
+    fetchInstructorsByLocation(item.location._id);
+  }
   setShowEditModal(true);
 }}
                       >
@@ -1076,24 +1133,33 @@ const convert24To12 = (time24) => {
 
 
               {/* Location Field */}
-              <Form.Group className="mb-3">
-                <Form.Label>Location</Form.Label>
-                <Form.Select
-                  name="location"
-                  defaultValue={selectedClass.location?._id}
-                  required
-                >
-                  <option value="">Select a location</option>
-                  {allLocations.map((location) => (
-                    <option key={location._id} value={location._id}>
-                      {location.location}
-                    </option>
-                  ))}
-                </Form.Select>
-              </Form.Group>
+              {/* Location Field */}
+<Form.Group className="mb-3">
+  <Form.Label>Location</Form.Label>
+  <Form.Select
+    name="location"
+    defaultValue={selectedClass.location?._id}
+    required
+    onChange={async (e) => {
+      const locationId = e.target.value;
+      // Update the form value
+      setValue('location', locationId);
+      // Fetch instructors for this location
+      await fetchInstructorsByLocation(locationId);
+    }}
+  >
+    <option value="">Select a location</option>
+    {allLocations.map((location) => (
+      <option key={location._id} value={location._id}>
+        {location.location}
+      </option>
+    ))}
+  </Form.Select>
+</Form.Group>
 
               {/* Instructor Field */}
-          <Form.Group className="mb-3">
+   {/* Instructor Field */}
+<Form.Group className="mb-3">
   <Form.Label>Instructor</Form.Label>
   {loadingInstructors ? (
     <div className="d-flex align-items-center">
