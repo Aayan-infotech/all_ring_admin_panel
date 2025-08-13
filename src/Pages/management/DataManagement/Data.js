@@ -329,11 +329,11 @@ const Data = () => {
       </Button>
     </OverlayTrigger>
 
-    <OverlayTrigger placement="top" overlay={<Tooltip>Delete Location</Tooltip>}>
+    {/* <OverlayTrigger placement="top" overlay={<Tooltip>Delete Location</Tooltip>}>
       <Button size="sm" variant="danger" onClick={() => confirmDelete(item)}>
         Delete
       </Button>
-    </OverlayTrigger>
+    </OverlayTrigger> */}
 
     {item.status === 'Active' ? (
       <OverlayTrigger placement="top" overlay={<Tooltip>Block this location</Tooltip>}>
