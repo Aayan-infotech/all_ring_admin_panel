@@ -48,32 +48,39 @@ useEffect(() => {
 }, []);
 
 
-  const onSubmit = async (data) => {
-    const formData = new FormData();
-    formData.append('name', data.name);
-    formData.append('number', data.number);
-    formData.append('email', data.email);
-    formData.append('password', data.password);
-    formData.append('confirmPassword', data.confirmPassword);
-    formData.append('dateofbirth', data.dateofbirth);
-    formData.append('location', data.location);
-    formData.append('expertise', data.expertise);
-    formData.append('files', data.files[0]);
-
-    try {
-      await axios.post(
-        `${API_BASE_URL}/api/auth/adminRegister/mentor`,
-        formData,
-        { headers: { 'Content-Type': 'multipart/form-data' } }
-      );
-      toast.success('Mentor registered successfully!');
-      onMentorAdded();
-      reset();
-      handleClose();
-    } catch (err) {
-      toast.error(`Failed: ${err.response?.data?.message || err.message}`);
-    }
+ const onSubmit = async (data) => {
+  // Convert YYYY-MM-DD to DD-MM-YYYY
+  const convertDate = (dateString) => {
+    if (!dateString) return '';
+    const [year, month, day] = dateString.split('-');
+    return `${day}-${month}-${year}`;
   };
+
+  const formData = new FormData();
+  formData.append('name', data.name);
+  formData.append('number', data.number);
+  formData.append('email', data.email);
+  formData.append('password', data.password);
+  formData.append('confirmPassword', data.confirmPassword);
+  formData.append('dateofbirth', convertDate(data.dateofbirth)); // Convert format here
+  formData.append('location', data.location);
+  formData.append('expertise', data.expertise);
+  formData.append('files', data.files[0]);
+
+  try {
+    await axios.post(
+      `${API_BASE_URL}/api/auth/adminRegister/mentor`,
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } }
+    );
+    toast.success('Mentor registered successfully!');
+    onMentorAdded();
+    reset();
+    handleClose();
+  } catch (err) {
+    toast.error(`Failed: ${err.response?.data?.message || err.message}`);
+  }
+};
 
   return (
     <Offcanvas show={show} onHide={handleClose} placement="end">
@@ -170,7 +177,7 @@ useEffect(() => {
             {errors.confirmPassword && <span className="text-danger small">{errors.confirmPassword.message}</span>}
           </Form.Group>
 
-         <Form.Group className="mb-3" controlId="dateofbirth">
+         {/* <Form.Group className="mb-3" controlId="dateofbirth">
   <Form.Label>Date of Birth (DD-MM-YYYY or DD/MM/YYYY)</Form.Label>
   <Form.Control
     type="text"
@@ -184,8 +191,33 @@ useEffect(() => {
     })}
   />
   {errors.dateofbirth && <span className="text-danger small">{errors.dateofbirth.message}</span>}
+</Form.Group> */}
+<Form.Group className="mb-4" controlId="dateofbirth">
+  <Form.Label style={{ color: 'var(--secondary)', fontWeight: 'bold' }}>Date of Birth</Form.Label>
+  <Form.Control
+    type="date"
+    {...register('dateofbirth', { 
+      required: 'Date of birth is required',
+      validate: {
+        notFuture: value => {
+          const selectedDate = new Date(value);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0); // Remove time part
+          return selectedDate <= today || "Date cannot be in the future";
+        }
+      }
+    })}
+    isInvalid={!!errors.dateofbirth}
+    style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
+    max={new Date().toISOString().split('T')[0]} // Disable future dates
+    onKeyDown={(e) => e.preventDefault()} // Prevent manual typing
+    onPaste={(e) => e.preventDefault()} // Prevent pasting
+  />
+  <Form.Control.Feedback type="invalid">
+    {errors.dateofbirth?.message}
+  </Form.Control.Feedback>
+  <Form.Text muted>Will be converted to DD-MM-YYYY format</Form.Text>
 </Form.Group>
-
 
           {/* <Form.Group className="mb-3" controlId="location">
            
