@@ -17,7 +17,9 @@
 .css-176wsp5-MuiListItemIcon-root {
   min-width: 21px !important;
 }
-
+.modal-backdrop {
+  z-index: 1090 !important; /* Just below your modal */
+}
 .ticket-conversation {
   height: 100vh;
   max-height: 600px;
@@ -28,7 +30,19 @@
   /* margin-bottom: 15px; */
   border: 1px solid rgba(0, 0, 0, 0.1);
 }
+/* In your global CSS */
+.modal {
+  position: fixed;
+  z-index: 9999 !important;
+}
 
+.modal-backdrop {
+  z-index: 9998 !important;
+}
+
+.MuiDrawer-root {
+  z-index: 100 !important;
+}
 .css-rizt0-MuiTypography-root {
   font-size: 14px !important;
 }

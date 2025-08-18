@@ -462,15 +462,18 @@ const AssignMentorTeam = () => {
       )}
 
       {/* Assign Team Modal */}
-      <Modal 
-        show={showAssignModal} 
-        onHide={() => {
-          setShowAssignModal(false);
-          clearSelections();
-        }}
-        size="xl"
-        centered
-      >
+<Modal 
+  show={showAssignModal} 
+  onHide={() => {
+    setShowAssignModal(false);
+    clearSelections();
+  }}
+  style={{ zIndex: 9999 }}  // Increased to very high value
+  backdropStyle={{ zIndex: 9998 }} // For the backdrop
+  className="z-9999"
+  size="xl"
+  centered
+>
         <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
           <Modal.Title className="d-flex align-items-center">
             <PeopleFill className="me-2" size={24} />

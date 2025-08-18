@@ -110,20 +110,21 @@ const Sidebar = ({ collapsed, mobileVisible, onMobileClose, setSidebarCollapsed 
 
 
   return (
-    <Drawer
-      variant={mobileVisible ? "temporary" : "permanent"}
-      open={mobileVisible || !collapsed}
-      onClose={onMobileClose}
-      sx={{
-        "& .MuiDrawer-paper": {
-          width: collapsed ? 80 : drawerWidth,
-          background: "linear-gradient(180deg, #1a237e, #0d47a1)",
-          color: "white",
-          borderRight: "none",
-          transition: "width 0.3s ease",
-        },
-      }}
-    >
+ <Drawer
+  variant={mobileVisible ? "temporary" : "permanent"}
+  open={mobileVisible || !collapsed}
+  onClose={onMobileClose}
+  sx={{
+    "& .MuiDrawer-paper": {
+      width: collapsed ? 80 : drawerWidth,
+      background: "linear-gradient(180deg, #1a237e, #0d47a1)",
+      color: "white",
+      borderRight: "none",
+      transition: "width 0.3s ease",
+      zIndex: 100, // Lower than modal
+    },
+  }}
+>
       {/* Logo */}
       <Box
         display="flex"
