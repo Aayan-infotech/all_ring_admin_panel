@@ -1,6 +1,7 @@
 
+
 import React, { useEffect, useState } from 'react';
-import { Table, Spinner, Alert } from 'react-bootstrap';
+import { Table, Spinner, Alert, Card, Accordion, Badge } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import API_BASE_URL from '../../../config/api';
@@ -8,12 +9,15 @@ import API_BASE_URL from '../../../config/api';
 const FeedbackPage = () => {
   const { classId } = useParams();
   const [feedbacks, setFeedbacks] = useState([]);
+  const [questionnaires, setQuestionnaires] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [qnaLoading, setQnaLoading] = useState(true);
   const [error, setError] = useState('');
+  const [qnaError, setQnaError] = useState('');
 
   const fetchFeedbacks = async () => {
     try {
-const res = await axios.get(`${API_BASE_URL}/api/feedback/getAllFeedbacks/${classId}`);
+      const res = await axios.get(`${API_BASE_URL}/api/feedback/getAllFeedbacks/${classId}`);
       setFeedbacks(res.data.data || []);
     } catch (err) {
       setError('Failed to load feedbacks');
@@ -23,46 +27,132 @@ const res = await axios.get(`${API_BASE_URL}/api/feedback/getAllFeedbacks/${clas
     }
   };
 
+  const fetchQuestionnaires = async () => {
+    try {
+      setQnaLoading(true);
+      // First get all feedbacks to extract user IDs
+      const feedbacksRes = await axios.get(`${API_BASE_URL}/api/feedback/getAllFeedbacks/${classId}`);
+      const userIds = [...new Set(feedbacksRes.data.data.map(fb => fb.user?._id).filter(id => id))];
+      
+      // Fetch questionnaire data for each user
+      const questionnairePromises = userIds.map(userId => 
+        axios.get(`${API_BASE_URL}/api/questionaire/getUserQuestionnaireWithAnswers/${classId}/${userId}`)
+      );
+      
+      const questionnaireResults = await Promise.allSettled(questionnairePromises);
+      
+      // Process the results according to the actual API response structure
+      const validQuestionnaires = questionnaireResults
+        .filter(result => result.status === 'fulfilled' && result.value.data.success)
+        .map(result => {
+          const data = result.value.data.data;
+          return {
+            userId: data.userId,
+            classId: data.classId,
+            questions: data.questions || [],
+            userName: feedbacksRes.data.data.find(fb => fb.user?._id === data.userId)?.user?.name || 'Unknown User'
+          };
+        });
+      
+      setQuestionnaires(validQuestionnaires);
+    } catch (err) {
+      setQnaError('Failed to load questions and answers');
+      console.error(err);
+    } finally {
+      setQnaLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchFeedbacks();
+    fetchQuestionnaires();
   }, [classId]);
 
   return (
-<div className="p-4" style={{ background: '#f9f9f9' }}>
+    <div className="p-4" style={{ background: '#f9f9f9', minHeight: '100vh' }}>
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h3 style={{ fontWeight: '600', color: 'var(--secondary)' }}>Class Feedback</h3>
       </div>
+      
       {loading ? (
         <div className="text-center mt-4"><Spinner animation="border" /></div>
       ) : error ? (
         <Alert variant="danger">{error}</Alert>
       ) : (
-        <Table bordered hover className="align-middle">
-          <thead className="text-white" style={{ backgroundColor: '#003865' }}>
-            <tr>
-              <th>#</th>
-              <th>User</th>
-              <th>Comment</th>
-              <th>Rating</th>
-              <th>Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            {feedbacks.length > 0 ? feedbacks.map((fb, idx) => (
-              <tr key={fb._id || idx}>
-                <td>{idx + 1}</td>
-                <td>{fb.user?.name || 'N/A'}</td>
-                <td>{fb.feedback || 'No comment'}</td>
-                <td>{fb.rating || 'N/A'}</td>
-                <td>{new Date(fb.createdAt).toLocaleDateString()}</td>
-              </tr>
-            )) : (
+        <>
+          <Table bordered hover className="align-middle mb-4">
+            <thead className="text-white" style={{ backgroundColor: '#003865' }}>
               <tr>
-                <td colSpan="5" className="text-center">No feedbacks found.</td>
+                <th>#</th>
+                <th>User</th>
+                <th>Comment</th>
+                <th>Rating</th>
+                <th>Date</th>
               </tr>
-            )}
-          </tbody>
-        </Table>
+            </thead>
+            <tbody>
+              {feedbacks.length > 0 ? feedbacks.map((fb, idx) => (
+                <tr key={fb._id || idx}>
+                  <td>{idx + 1}</td>
+                  <td>{fb.user?.name || 'N/A'}</td>
+                  <td>{fb.feedback || 'No comment'}</td>
+                  <td>
+                    {fb.rating ? (
+                      <Badge bg="primary">{fb.rating}/5</Badge>
+                    ) : (
+                      'N/A'
+                    )}
+                  </td>
+                  <td>{new Date(fb.createdAt).toLocaleDateString()}</td>
+                </tr>
+              )) : (
+                <tr>
+                  <td colSpan="5" className="text-center">No feedbacks found.</td>
+                </tr>
+              )}
+            </tbody>
+          </Table>
+
+          {/* Questions and Answers Section */}
+          <Card className="mb-4">
+            <Card.Header style={{ backgroundColor: '#003865', color: 'white' }}>
+              <h5 className="mb-0">Questions and Answers</h5>
+            </Card.Header>
+            <Card.Body>
+              {qnaLoading ? (
+                <div className="text-center"><Spinner animation="border" /></div>
+              ) : qnaError ? (
+                <Alert variant="warning">{qnaError}</Alert>
+              ) : questionnaires.length === 0 ? (
+                <p className="text-center text-muted">No questions and answers available.</p>
+              ) : (
+                <Accordion>
+                  {questionnaires.map((qna, idx) => (
+                    <Accordion.Item key={idx} eventKey={idx.toString()}>
+                      <Accordion.Header>
+                        {qna.userName} - {qna.questions.length} Questions
+                      </Accordion.Header>
+                      <Accordion.Body>
+                        {qna.questions.length > 0 ? (
+                          qna.questions.map((question, qIdx) => (
+                            <div key={qIdx} className="mb-3">
+                              <h6 className="text-primary">Q: {question.questionText}</h6>
+                              <p className="ms-3">
+                                <strong>A:</strong> {question.answerText || 'No answer provided'}
+                              </p>
+                            </div>
+                          ))
+                        ) : (
+                          <p className="text-muted">No questions answered by this user.</p>
+                        )}
+                      </Accordion.Body>
+                    </Accordion.Item>
+                  ))}
+                </Accordion>
+              )}
+            </Card.Body>
+          </Card>
+        </>
       )}
     </div>
   );
