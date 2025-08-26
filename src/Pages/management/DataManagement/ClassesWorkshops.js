@@ -286,28 +286,45 @@ const convert24To12 = (time24) => {
     }
   };
 
- 
+ const fetchQuestions = async (classId) => {
+  try {
+    const token = localStorage.getItem('adminToken');
+    const res = await axios.get(
+      `${API_BASE_URL}/api/questionaire/getQuestions/${classId}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
 
-  const fetchQuestions = async (classId) => {
-    try {
-      const token = localStorage.getItem('adminToken');
-      const res = await axios.get(
-        `${API_BASE_URL}/api/questionaire/getQuestions/${classId}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      if (res.data.success && res.data.questions) {
-        setQuestions(res.data.questions);
-      } else {
-        setQuestions([]);
-        toast.warning('No questions found for this class');
-      }
-    } catch (err) {
-      console.error('Error fetching questions:', err);
-      toast.error('Failed to fetch questions');
+    if (res.data.success && res.data.questions) {
+      setQuestions(res.data.questions);
+    } else {
       setQuestions([]);
     }
-  };
+  } catch (err) {
+    console.error('Error fetching questions:', err);
+    setQuestions([]);
+  }
+};
+
+  // const fetchQuestions = async (classId) => {
+  //   try {
+  //     const token = localStorage.getItem('adminToken');
+  //     const res = await axios.get(
+  //       `${API_BASE_URL}/api/questionaire/getQuestions/${classId}`,
+  //       { headers: { Authorization: `Bearer ${token}` } }
+  //     );
+
+  //     if (res.data.success && res.data.questions) {
+  //       setQuestions(res.data.questions);
+  //     } else {
+  //       setQuestions([]);
+  //       toast.warning('No questions found for this class');
+  //     }
+  //   } catch (err) {
+  //     console.error('Error fetching questions:', err);
+  //     toast.error('Failed to fetch questions');
+  //     setQuestions([]);
+  //   }
+  // };
   useEffect(() => {
     fetchClasses();
     fetchLocations();
@@ -619,7 +636,7 @@ const fetchInstructorsByLocation = async (locationId) => {
                       >
                         <FileEarmarkText size={16} />
                       </Button>
-                      <Button
+                      {/* <Button
                         variant="light"
                         className="icon-btn border-primary text-primary"
                         size="sm"
@@ -630,8 +647,21 @@ const fetchInstructorsByLocation = async (locationId) => {
                         }}
                       >
                         <PlusCircle size={16} />
-                      </Button>
+                      </Button> */}
                       <Button
+  variant="light"
+  className="icon-btn border-primary text-primary"
+  size="sm"
+  onClick={() => {
+    setSelectedClass(item);
+    setShowAddQuestionModal(true);
+    setQuestionText('');
+    fetchQuestions(item._id); // Add this line to fetch questions for this specific class
+  }}
+>
+  <PlusCircle size={16} />
+</Button>
+                      {/* <Button
                         variant="light"
                         className="icon-btn border-info text-info"
                         size="sm"
@@ -641,7 +671,21 @@ const fetchInstructorsByLocation = async (locationId) => {
                         }}
                       >
                         <InfoCircle size={16} />
-                      </Button>
+                      </Button> */}
+
+
+                      <Button
+  variant="light"
+  className="icon-btn border-info text-info"
+  size="sm"
+  onClick={() => {
+    setSelectedClass(item);
+    setShowViewQuestionsModal(true);
+    fetchQuestions(item._id); // Add this line
+  }}
+>
+  <InfoCircle size={16} />
+</Button>
 
                     </div>
                   </td>
@@ -1237,8 +1281,17 @@ const fetchInstructorsByLocation = async (locationId) => {
 
 
 
-      <Modal show={showAddQuestionModal} onHide={() => { setShowAddQuestionModal(false); setQuestionText(''); setEditingQuestion(null); }} centered size="lg">
-        <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
+<Modal 
+  show={showAddQuestionModal} 
+  onHide={() => { 
+    setShowAddQuestionModal(false); 
+    setQuestionText(''); 
+    setEditingQuestion(null);
+    setQuestions([]); // Reset questions when modal closes
+  }} 
+  centered 
+  size="lg"
+>        <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
           <Modal.Title>
             {editingQuestion ? 'Edit Question' : `Add Questions for ${selectedClass?.title}`}
           </Modal.Title>
