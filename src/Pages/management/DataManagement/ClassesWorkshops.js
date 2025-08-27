@@ -661,7 +661,7 @@ const fetchInstructorsByLocation = async (locationId) => {
 >
   <PlusCircle size={16} />
 </Button>
-                      {/* <Button
+                      <Button
                         variant="light"
                         className="icon-btn border-info text-info"
                         size="sm"
@@ -671,10 +671,10 @@ const fetchInstructorsByLocation = async (locationId) => {
                         }}
                       >
                         <InfoCircle size={16} />
-                      </Button> */}
+                      </Button>
 
 
-                      <Button
+                      {/* <Button
   variant="light"
   className="icon-btn border-info text-info"
   size="sm"
@@ -685,7 +685,7 @@ const fetchInstructorsByLocation = async (locationId) => {
   }}
 >
   <InfoCircle size={16} />
-</Button>
+</Button> */}
 
                     </div>
                   </td>
