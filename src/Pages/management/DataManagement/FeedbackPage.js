@@ -516,7 +516,7 @@ const FeedbackPage = () => {
     <div className="p-4" style={{ background: '#f9f9f9', minHeight: '100vh' }}>
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h3 style={{ fontWeight: '600', color: 'var(--secondary)' }}>Class Feedback</h3>
-        {sessionId && <Badge bg="info">Session: {sessionId}</Badge>}
+        {/* {sessionId && <Badge bg="info">Session: {sessionId}</Badge>} */}
       </div>
       
       {loading ? (
