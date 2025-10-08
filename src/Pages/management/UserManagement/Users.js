@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // import React, { useEffect, useState } from 'react';
 // import {
 //   Table,
@@ -955,6 +956,8 @@
 
 
 
+=======
+>>>>>>> a8782a6a0a3b4e2e48d6adc799c4e9d7e7154656
 import React, { useEffect, useState } from 'react';
 import {
   Table,
@@ -977,7 +980,8 @@ import {
   CheckCircleFill,
   XCircleFill,
   PlusCircle,
-  EyeFill
+  EyeFill,
+  Download
 } from 'react-bootstrap-icons';
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
@@ -1005,6 +1009,11 @@ const Users = () => {
   const [showAddUser, setShowAddUser] = useState(false);
   const [showResetModal, setShowResetModal] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState('');
+  
+  // New states for PDF download
+  const [showPdfModal, setShowPdfModal] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState('');
+  const [pdfLoading, setPdfLoading] = useState(false);
   
   // Pagination and filter states
   const [currentPage, setCurrentPage] = useState(1);
@@ -1040,6 +1049,36 @@ const Users = () => {
   const handleViewProfile = (user) => {
     setViewUser(user);
     setShowViewModal(true);
+  };
+
+  // New function to handle PDF download
+  const handleDownloadPdf = async (userId) => {
+    setPdfLoading(true);
+    setSelectedUserId(userId);
+    
+    try {
+      const token = localStorage.getItem('adminToken');
+      const response = await axios.get(
+        `http://34.206.193.218:5010/api/milestones/downloadReport/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          responseType: 'blob' // Important for handling binary data
+        }
+      );
+      
+      // Create a blob from the PDF data
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      setPdfUrl(url);
+      setShowPdfModal(true);
+    } catch (error) {
+      console.error('Error downloading PDF:', error);
+      toast.error('Failed to download report');
+    } finally {
+      setPdfLoading(false);
+    }
   };
 
   const handleResetPassword = async () => {
@@ -1235,7 +1274,8 @@ const Users = () => {
     },
     resetPassword: "Reset password",
     editUser: "Edit user",
-    viewProfile: "View profile"
+    viewProfile: "View profile",
+    downloadReport: "Download milestone report" // New tooltip
   };
 
   // Calculate total pages for pagination
@@ -1313,18 +1353,6 @@ const Users = () => {
             <option value="0">Unverified</option>
           </Form.Select>
         </Col>
-        {/* <Col md={2}>
-          <Form.Select
-            value={itemsPerPage}
-            onChange={handleItemsPerPageChange}
-            style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
-          >
-            <option value="5">5 per page</option>
-            <option value="10">10 per page</option>
-            <option value="20">20 per page</option>
-            <option value="50">50 per page</option>
-          </Form.Select>
-        </Col> */}
       </Row>
 
       {loading ? (
@@ -1471,6 +1499,25 @@ const Users = () => {
                               <EyeFill size={20} />
                             </Button>
                           </OverlayTrigger>
+
+                          {/* New Download Report Button */}
+                          <OverlayTrigger
+                            placement="top"
+                            overlay={<Tooltip>{actionTooltips.downloadReport}</Tooltip>}
+                          >
+                            <Button
+                              size="sm"
+                              onClick={() => handleDownloadPdf(user._id)}
+                              style={{
+                                backgroundColor: 'transparent',
+                                border: 'none',
+                                padding: '0 5px',
+                                color: '#28a745'
+                              }}
+                            >
+                              <Download size={20} />
+                            </Button>
+                          </OverlayTrigger>
                         </ButtonGroup>
                       </td>
                     </tr>
@@ -1541,6 +1588,66 @@ const Users = () => {
           toast.success('User added successfully!');
         }}
       />
+
+      {/* PDF Modal */}
+      <Modal
+        show={showPdfModal}
+        onHide={() => {
+          setShowPdfModal(false);
+          // Clean up the URL object to prevent memory leaks
+          if (pdfUrl) {
+            URL.revokeObjectURL(pdfUrl);
+            setPdfUrl('');
+          }
+        }}
+        size="lg"
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Milestone Report</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {pdfLoading ? (
+            <div className="text-center">
+              <Spinner animation="border" variant="primary" />
+              <p>Loading report...</p>
+            </div>
+          ) : pdfUrl ? (
+            <div style={{ height: '500px' }}>
+              <iframe 
+                src={pdfUrl} 
+                width="100%" 
+                height="100%" 
+                title="Milestone Report"
+                style={{ border: 'none' }}
+              />
+            </div>
+          ) : (
+            <p>No report available</p>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button 
+            variant="secondary" 
+            onClick={() => setShowPdfModal(false)}
+          >
+            Close
+          </Button>
+          {pdfUrl && (
+            <Button 
+              variant="primary" 
+              onClick={() => {
+                const link = document.createElement('a');
+                link.href = pdfUrl;
+                link.download = `milestone-report-${selectedUserId}.pdf`;
+                link.click();
+              }}
+            >
+              Download PDF
+            </Button>
+          )}
+        </Modal.Footer>
+      </Modal>
 
       <Modal
         show={showResetModal}
