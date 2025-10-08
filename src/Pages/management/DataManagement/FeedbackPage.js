@@ -231,7 +231,7 @@
 //   const fetchIncidents = async () => {
 //     try {
 //       setIncidentLoading(true);
-//       const res = await axios.get(`http://34.206.193.218:5010/api/incident/getIncidentBySession/${sessionId}`);
+//       const res = await axios.get(`http://91.189.120.112:5010/api/incident/getIncidentBySession/${sessionId}`);
 //       setIncidents(res.data.data || []);
 //     } catch (err) {
 //       setIncidentError('Failed to load incidents');
@@ -478,7 +478,7 @@ const FeedbackPage = () => {
         return;
       }
       
-      const res = await axios.get(`http://34.206.193.218:5010/api/incident/getIncidentBySession/${sessionId}`);
+      const res = await axios.get(`http://91.189.120.112:5010/api/incident/getIncidentBySession/${sessionId}`);
       setIncidents(res.data.data || []);
     } catch (err) {
       setIncidentError('Failed to load incidents');

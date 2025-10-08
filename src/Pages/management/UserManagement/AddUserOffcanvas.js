@@ -32,7 +32,7 @@ const AddUserOffcanvas = ({ show, handleClose, onUserAdded , editingUser }) => {
 useEffect(() => {
   const fetchLocations = async () => {
     try {
-      const response = await axios.get('http://34.206.193.218:5010/api/location/getAllLocations');
+      const response = await axios.get('http://91.189.120.112:5010/api/location/getAllLocations');
       // Filter only active locations
       const activeLocations = (response.data?.data || []).filter(loc => loc.status === 'Active');
       setLocations(activeLocations); 
@@ -68,7 +68,7 @@ useEffect(() => {
 
     try {
       await axios.post(
-        `http://34.206.193.218:5010/api/auth/adminRegister/user`,
+        `http://91.189.120.112:5010/api/auth/adminRegister/user`,
         formData,
         {
           headers: {
