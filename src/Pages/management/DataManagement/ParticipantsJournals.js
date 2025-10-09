@@ -286,7 +286,7 @@ const ParticipantsJournals = () => {
       </Card>
 
       {/* Journal Details Modal */}
-      <Modal show={showModal} onHide={handleCloseModal} size="lg">
+      {/* <Modal show={showModal} onHide={handleCloseModal} size="lg">
         <Modal.Header closeButton style={{ backgroundColor: 'var(--accent)' }}>
           <Modal.Title>Journal Details</Modal.Title>
         </Modal.Header>
@@ -367,7 +367,211 @@ const ParticipantsJournals = () => {
             Close
           </Button>
         </Modal.Footer>
-      </Modal>
+      </Modal> */}
+
+
+
+      <Modal show={showModal} onHide={handleCloseModal} size="lg" className="journal-modal">
+  <Modal.Header 
+    closeButton 
+    className="border-bottom-0 pb-0"
+    style={{ backgroundColor: 'var(--accent)', borderTopLeftRadius: '0.5rem', borderTopRightRadius: '0.5rem' }}
+  >
+    <Modal.Title className="d-flex align-items-center">
+      <i className="bi bi-journal-text me-2"></i>
+      Journal Details
+    </Modal.Title>
+  </Modal.Header>
+  
+  <Modal.Body className="pt-4">
+    {selectedJournal && (
+      <div className="journal-details">
+        {/* Class Information Section */}
+        <div className="section-card mb-4">
+          <div className="section-header mb-3">
+            <h6 className="section-title d-flex align-items-center text-primary">
+              <i className="bi bi-mortarboard-fill me-2"></i>
+              Class Information
+            </h6>
+            <div className="divider"></div>
+          </div>
+          
+          <Row className="g-3">
+            <Col md={6}>
+              <div className="info-item">
+                <label className="info-label">
+                  <i className="bi bi-journal me-1"></i>
+                  Class
+                </label>
+                <p className="info-value fw-semibold">{selectedJournal.classId?.title || 'N/A'}</p>
+              </div>
+            </Col>
+            <Col md={6}>
+              <div className="info-item">
+                <label className="info-label">
+                  <i className="bi bi-person me-1"></i>
+                  Instructor
+                </label>
+                <p className="info-value">{selectedJournal.classId?.Instructor?.name || 'N/A'}</p>
+              </div>
+            </Col>
+            <Col md={6}>
+              <div className="info-item">
+                <label className="info-label">
+                  <i className="bi bi-geo-alt me-1"></i>
+                  Location
+                </label>
+                <p className="info-value">{selectedJournal.classId?.location?.location || 'N/A'}</p>
+              </div>
+            </Col>
+            <Col md={6}>
+              <div className="info-item">
+                <label className="info-label">
+                  <i className="bi bi-circle-fill me-1"></i>
+                  Status
+                </label>
+                <div className="info-value">
+                  <Badge 
+                    bg={selectedJournal.classId?.status === 'Active' ? 'success' : 'warning'} 
+                    className="status-badge"
+                  >
+                    {selectedJournal.classId?.status || 'N/A'}
+                  </Badge>
+                </div>
+              </div>
+            </Col>
+          </Row>
+        </div>
+
+        {/* Participant Information Section */}
+        <div className="section-card mb-4">
+          <div className="section-header mb-3">
+            <h6 className="section-title d-flex align-items-center text-primary">
+              <i className="bi bi-person-badge me-2"></i>
+              Participant Information
+            </h6>
+            <div className="divider"></div>
+          </div>
+          
+          <Row className="g-3">
+            <Col md={6}>
+              <div className="info-item">
+                <label className="info-label">
+                  <i className="bi bi-person-circle me-1"></i>
+                  Name
+                </label>
+                <p className="info-value fw-semibold">{selectedJournal.userId?.name || 'N/A'}</p>
+              </div>
+            </Col>
+            <Col md={6}>
+              <div className="info-item">
+                <label className="info-label">
+                  <i className="bi bi-envelope me-1"></i>
+                  Email
+                </label>
+                <p className="info-value text-truncate">{selectedJournal.userId?.email || 'N/A'}</p>
+              </div>
+            </Col>
+          </Row>
+        </div>
+
+        {/* Journal Content Section */}
+        <div className="section-card mb-4">
+          <div className="section-header mb-3">
+            <h6 className="section-title d-flex align-items-center text-primary">
+              <i className="bi bi-pencil-square me-2"></i>
+              Journal Content
+            </h6>
+            <div className="divider"></div>
+          </div>
+          
+          <div className="journal-entries">
+            <Card className="journal-card mb-3 border-0 shadow-sm">
+              <Card.Header className="bg-light border-bottom-0 py-3">
+                <h6 className="mb-0 d-flex align-items-center">
+                  <i className="bi bi-1-circle me-2 text-primary"></i>
+                  {selectedJournal.title1 || 'Journal Entry 1'}
+                </h6>
+              </Card.Header>
+              <Card.Body className="py-3">
+                <p className="mb-0 journal-content">
+                  {selectedJournal.description1 || 'No content available'}
+                </p>
+              </Card.Body>
+            </Card>
+            
+            <Card className="journal-card border-0 shadow-sm">
+              <Card.Header className="bg-light border-bottom-0 py-3">
+                <h6 className="mb-0 d-flex align-items-center">
+                  <i className="bi bi-2-circle me-2 text-primary"></i>
+                  {selectedJournal.title2 || 'Journal Entry 2'}
+                </h6>
+              </Card.Header>
+              <Card.Body className="py-3">
+                <p className="mb-0 journal-content">
+                  {selectedJournal.description2 || 'No content available'}
+                </p>
+              </Card.Body>
+            </Card>
+          </div>
+        </div>
+
+        {/* Sharing Information Section */}
+        <div className="section-card">
+          <div className="section-header mb-3">
+            <h6 className="section-title d-flex align-items-center text-primary">
+              <i className="bi bi-share me-2"></i>
+              Sharing Information
+            </h6>
+            <div className="divider"></div>
+          </div>
+          
+          <div className="info-item mb-3">
+            <label className="info-label">
+              <i className="bi bi-people me-1"></i>
+              Shared with
+            </label>
+            <div className="info-value">
+              <div className="d-flex flex-wrap gap-2">
+                {Array.isArray(selectedJournal.shareWith) && selectedJournal.shareWith.length > 0 ? (
+                  selectedJournal.shareWith.map((item, i) => (
+                    <Badge key={i} bg="primary" className="px-3 py-2 shared-badge">
+                      <i className="bi bi-person me-1"></i>
+                      {item}
+                    </Badge>
+                  ))
+                ) : (
+                  <Badge bg="secondary" className="px-3 py-2">
+                    <i className="bi bi-eye-slash me-1"></i>
+                    Not shared
+                  </Badge>
+                )}
+              </div>
+            </div>
+          </div>
+          
+          <div className="creation-info mt-4 pt-3 border-top">
+            <small className="text-muted d-flex align-items-center">
+              <i className="bi bi-clock-history me-1"></i>
+              Created on: {new Date(selectedJournal.createdAt).toLocaleString()}
+            </small>
+          </div>
+        </div>
+      </div>
+    )}
+  </Modal.Body>
+  
+  <Modal.Footer className="border-top-0 pt-0">
+    <Button 
+      variant="outline-secondary" 
+      onClick={handleCloseModal}
+      className="d-flex align-items-center"
+    >
+      <i className="bi bi-x-lg me-2"></i>
+      Close
+    </Button>
+  </Modal.Footer>
+</Modal>
     </div>
   );
 };
