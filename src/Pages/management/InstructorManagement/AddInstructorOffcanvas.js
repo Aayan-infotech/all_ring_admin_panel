@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import API_BASE_URL from '../../../config/api';
 
 const AddInstructorOffcanvas = ({ show, handleClose, onInstructorAdded }) => {
   const {
@@ -15,24 +16,11 @@ const AddInstructorOffcanvas = ({ show, handleClose, onInstructorAdded }) => {
     formState: { errors, isSubmitting }
   } = useForm();
   const [locations, setLocations] = useState([]);
- // Fetch locations from API
-// useEffect(() => {
-//   const fetchLocations = async () => {
-//     try {
-//       const response = await axios.get('http://52.20.55.193:5010/api/location/getAllLocations');
-//       setLocations(response.data?.data || []); // ✅ fix: use response.data.data instead of response.data.locations
-//     } catch (error) {
-//       console.error('Error fetching locations:', error);
-//       toast.error('Failed to load locations');
-//     }
-//   };
 
-//   fetchLocations();
-// }, []);
 useEffect(() => {
   const fetchLocations = async () => {
     try {
-      const response = await axios.get('http://52.20.55.193:5010/api/location/getAllLocations');
+      const response = await axios.get(`${API_BASE_URL}/api/location/getAllLocations`);
       
       // Filter to only include active locations
       const activeLocations = (response.data?.data || [])
@@ -61,7 +49,7 @@ useEffect(() => {
 
 
     try {
-      await axios.post('http://52.20.55.193:5010/api/auth/adminRegister/instructor', formData, {
+      await axios.post(`${API_BASE_URL}/api/auth/adminRegister/instructor`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
@@ -87,7 +75,7 @@ useEffect(() => {
         <Form onSubmit={handleSubmit(onSubmit)} className="p-3 rounded shadow-sm" style={{ backgroundColor: '#fff' }}>
           
           <Form.Group className="mb-3">
-            <Form.Label>Name</Form.Label>
+            <Form.Label>Name</Form.Label>  
             <Form.Control
               type="text"
               {...register('name', { required: 'Name is required' })}
@@ -132,22 +120,7 @@ useEffect(() => {
             {errors.confirmPassword && <span className="text-danger small">{errors.confirmPassword.message}</span>}
           </Form.Group>
 
-          {/* <Form.Group className="mb-3">
-           
-            <Form.Select
-  {...register('location', { required: 'Location is required' })}
-  isInvalid={!!errors.location}
-  style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
->
-  <option value="">Select location</option>
-  {locations.map((loc) => (
-    <option key={loc._id} value={loc.location}>
-      {loc.location}
-    </option>
-  ))}
-</Form.Select>
-
-          </Form.Group> */}
+        
 <Form.Group className="mb-3">
   <Form.Label>Location</Form.Label>
   <Form.Select

@@ -1,115 +1,122 @@
-
-
-
-
 import React, { useEffect, useState } from 'react';
-import { Offcanvas, Form, Button, Spinner, Row, Col } from 'react-bootstrap';
+import { Offcanvas, Form, Button, Spinner, Row, Col,Alert  } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { TimePicker } from '@mui/x-date-pickers/TimePicker';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import dayjs from 'dayjs';
+import API_BASE_URL from '../../../config/api';
 
 const AddClassOffcanvas = ({ show, handleClose, onSaved }) => {
-  // const { register, handleSubmit, reset, formState: { errors, isSubmitting },watch  } = useForm();
   const {
-  register,
-  handleSubmit,
-  reset,
-  formState: { errors, isSubmitting },
-  watch,
-  setValue,
-  trigger,
-  setError,
-  clearErrors
-} = useForm();
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+    watch,
+    setValue,
+  } = useForm();
 
   const [instructors, setInstructors] = useState([]);
   const [locations, setLocations] = useState([]);
   const [tags, setTags] = useState([]);
   const [newTag, setNewTag] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [noInstructorsAvailable, setNoInstructorsAvailable] = useState(false);
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const token = localStorage.getItem('adminToken');
-  //     if (!token) return;
-
-  //     setIsLoading(true);
-  //     try {
-  //       const [instructorsRes, locationsRes] = await Promise.all([
-  //         axios.get('http://52.20.55.193:5010/api/admin/getRegister/instructor', {
-  //           headers: { Authorization: `Bearer ${token}` }
-  //         }),
-  //         axios.get('http://52.20.55.193:5010/api/location/getAllLocations')
-  //       ]);
-  //       setInstructors(instructorsRes.data?.users || []);
-  //       setLocations(locationsRes.data?.data || []);
-  //     } catch (error) {
-  //       console.error('Error fetching data:', error);
-  //       toast.error('Failed to load form data');
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
-
-  //   if (show) fetchData();
-  // }, [show]);
-
-  // Get today's date in YYYY-MM-DD format (for date input min attribute)
   const today = new Date().toISOString().split('T')[0];
-  
-  // Watch startDate to set as min for endDate
   const startDate = watch('startDate');
-
-const generateTimeOptions = () => {
-  const times = [];
-  for (let hour = 1; hour <= 12; hour++) {
-    for (let min of [0, 30]) {
-      ['AM', 'PM'].forEach(ampm => {
-        const formattedHour = hour.toString().padStart(2, '0');
-        const formattedMin = min.toString().padStart(2, '0');
-        times.push(`${formattedHour}:${formattedMin} ${ampm}`);
-      });
-    }
-  }
-  return times;
-};
-
-const timeOptions = generateTimeOptions();
+  const selectedLocation = watch('location');
 
   useEffect(() => {
-  const fetchData = async () => {
-    const token = localStorage.getItem('adminToken');
-    if (!token) return;
+    const fetchData = async () => {
+      const token = localStorage.getItem('adminToken');
+      if (!token) return;
 
-    setIsLoading(true);
-    try {
-      const [instructorsRes, locationsRes] = await Promise.all([
-        axios.get('http://52.20.55.193:5010/api/admin/getRegister/instructor', {
-          headers: { Authorization: `Bearer ${token}` }
-        }),
-        axios.get('http://52.20.55.193:5010/api/location/getAllLocations')
-      ]);
+      setIsLoading(true);
+      try {
+        const locationsRes = await axios.get(`${API_BASE_URL}/api/location/getAllLocations`);
+        
+        const activeLocations = (locationsRes.data?.data || [])
+          .filter(location => location.status === 'Active');
 
-      // Filter active locations (status is 'Active')
-      const activeLocations = (locationsRes.data?.data || [])
-        .filter(location => location.status === 'Active');
+        setLocations(activeLocations);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        toast.error('Failed to load locations');
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-      setInstructors(instructorsRes.data?.users || []);
-      setLocations(activeLocations); // only active locations
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      toast.error('Failed to load form data');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    if (show) fetchData();
+  }, [show]);
 
-  if (show) fetchData();
-}, [show]);
+ useEffect(() => {
+    const fetchInstructorsByLocation = async () => {
+      if (!selectedLocation) {
+        setInstructors([]);
+        setNoInstructorsAvailable(false); // Reset this state
+        return;
+      }
+
+      setIsLoading(true);
+      setNoInstructorsAvailable(false); // Reset before new fetch
+      
+      try {
+        const token = localStorage.getItem('adminToken');
+        
+        // Try the location-specific endpoint first
+        try {
+          const response = await axios.get(
+            `${API_BASE_URL}/api/instructor/getByLocation/${selectedLocation}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          
+          if (response.data?.data?.length > 0) {
+            setInstructors(response.data.data);
+            setNoInstructorsAvailable(false);
+          } else {
+            setNoInstructorsAvailable(true);
+            setInstructors([]);
+          }
+          return;
+        } catch (apiError) {
+          console.log('Location-specific API failed, trying fallback');
+        }
+        
+        // Fallback: get all instructors and filter
+        const allInstructorsRes = await axios.get(
+          `${API_BASE_URL}/api/admin/getRegister/instructor`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        
+        const filtered = allInstructorsRes.data?.users?.filter(inst => 
+          inst.location && inst.location._id === selectedLocation
+        ) || [];
+        
+        if (filtered.length > 0) {
+          setInstructors(filtered);
+          setNoInstructorsAvailable(false);
+        } else {
+          setNoInstructorsAvailable(true);
+          setInstructors([]);
+        }
+        
+      } catch (error) {
+        console.error('Error fetching instructors:', error);
+        toast.error('Failed to load instructors');
+        setInstructors([]);
+        setNoInstructorsAvailable(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    const timer = setTimeout(() => {
+      fetchInstructorsByLocation();
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [selectedLocation]);
 
   const handleAddTag = (e) => {
     e.preventDefault();
@@ -123,56 +130,71 @@ const timeOptions = generateTimeOptions();
     setTags(tags.filter(tag => tag !== tagToRemove));
   };
 
-const onSubmit = async (data) => {
-  const formData = new FormData();
-  
-  // Append fields exactly as in the curl request
-  formData.append('title', data.title);
-  formData.append('theme', data.theme);
-  formData.append('startDate', data.startDate);
-  formData.append('endDate', data.endDate);
-  formData.append('sessionType', data.sessionType);
-  formData.append('startTime', data.startTime);
-  formData.append('endTime', data.endTime);
-  formData.append('location', data.location);
-  formData.append('Instructor', data.instructor); // Note capital 'I'
-  formData.append('Type', data.type); // Note capital 'T'
-  
-  // Append image file
-  if (data.image && data.image[0]) {
-    formData.append('Image', data.image[0]); // Note capital 'I'
-  }
-  
-  // Append tags as separate fields (tags[] format)
-  tags.forEach(tag => {
-    formData.append('tags', tag);
-  });
+  const convertTo24HourFormat = (time12h) => {
+    if (!time12h) return '';
+    const [timePart, modifier] = time12h.split(' ');
+    let [hours, minutes] = timePart.split(':').map(Number);
+    if (modifier === 'PM' && hours < 12) hours += 12;
+    if (modifier === 'AM' && hours === 12) hours = 0;
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+  };
 
-  try {
-    const token = localStorage.getItem('adminToken');
-    await axios.post('http://52.20.55.193:5010/api/AdminClasses/addClass', formData, {
-      headers: { 
-        'Content-Type': 'multipart/form-data',
-        Authorization: `Bearer ${token}`
-      }
-    });
+  const onSubmit = async (data) => {
+    const formData = new FormData();
+    const startTime = `${data.startTimeHour}:${data.startTimeMinute} ${data.startTimeAmPm}`;
+    const endTime = `${data.endTimeHour}:${data.endTimeMinute} ${data.endTimeAmPm}`;
+    
+    const start = new Date(`01/01/2000 ${startTime}`);
+    const end = new Date(`01/01/2000 ${endTime}`);
+    if (end <= start) {
+      toast.error('End time must be after start time');
+      return;
+    }
+    
+    formData.append('title', data.title);
+    formData.append('theme', data.theme);
+    formData.append('startDate', data.startDate);
+    formData.append('endDate', data.endDate);
+    formData.append('sessionType', data.sessionType);
+    formData.append('startTime', convertTo24HourFormat(startTime));
+    formData.append('endTime', convertTo24HourFormat(endTime));
+    formData.append('location', data.location);
+    formData.append('Instructor', data.instructor);
+    formData.append('Type', data.type);
+    
+    if (data.image?.[0]) {
+      formData.append('Image', data.image[0]);
+    }
+    
+    tags.forEach(tag => formData.append('tags', tag));
 
-    toast.success('Class added successfully');
-    handleClose();
-    reset();
-    setTags([]);
-    onSaved();
-  } catch (err) {
-    console.error('Error adding class:', err);
-    toast.error(err.response?.data?.message || 'Failed to add class');
-  }
-};
+    try {
+      const token = localStorage.getItem('adminToken');
+      await axios.post(`${API_BASE_URL}/api/AdminClasses/addClass`, formData, {
+        headers: { 
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      toast.success('Class added successfully');
+      handleClose();
+      reset();
+      setTags([]);
+      onSaved();
+    } catch (err) {
+      console.error('Error adding class:', err);
+      toast.error(err.response?.data?.message || 'Failed to add class');
+    }
+  };
 
   const handleCloseOffcanvas = () => {
     reset();
     setTags([]);
     handleClose();
   };
+
+  
 
   return (
     <Offcanvas 
@@ -201,13 +223,12 @@ const onSubmit = async (data) => {
           <Form onSubmit={handleSubmit(onSubmit)}>
             <Row className="mb-3">
               <Form.Group as={Col} md={12} controlId="title">
-                <Form.Label>Title <span className="text-danger">*</span></Form.Label>
-                <Form.Control
+                  <Form.Label>Title <span className="text-danger">*</span></Form.Label>
+         <Form.Control
                   type="text"
                   {...register('title', { required: 'Title is required' })}
                   isInvalid={!!errors.title}
                   placeholder="Enter class title"
-                  // style={{ borderColor: 'var(--secondary)' }}
                 />
                 <Form.Control.Feedback type="invalid">
                   {errors.title?.message}
@@ -223,7 +244,6 @@ const onSubmit = async (data) => {
                   accept="image/*"
                   {...register('image', { required: 'Image is required' })}
                   isInvalid={!!errors.image}
-                  // style={{ borderColor: 'var(--secondary)' }}
                 />
                 <Form.Control.Feedback type="invalid">
                   {errors.image?.message}
@@ -240,20 +260,20 @@ const onSubmit = async (data) => {
                   {...register('theme', { required: 'Theme is required' })}
                   isInvalid={!!errors.theme}
                   placeholder="Enter class description"
-                  // style={{ borderColor: 'var(--secondary)' }}
                 />
                 <Form.Control.Feedback type="invalid">
                   {errors.theme?.message}
                 </Form.Control.Feedback>
               </Form.Group>
             </Row>
-   <Row className="mb-3">
+
+            <Row className="mb-3">
               <Form.Group as={Col} md={6} controlId="startDate">
                 <Form.Label>Start Date <span className="text-danger">*</span></Form.Label>
                 <Form.Control
                   type="date"
                   min={today}
-                  onKeyDown={(e) => e.preventDefault()} // Prevent manual typing
+                  onKeyDown={(e) => e.preventDefault()}
                   {...register('startDate', { 
                     required: 'Start date is required',
                     validate: value => {
@@ -275,7 +295,7 @@ const onSubmit = async (data) => {
                 <Form.Control
                   type="date"
                   min={startDate || today}
-                  onKeyDown={(e) => e.preventDefault()} // Prevent manual typing
+                  onKeyDown={(e) => e.preventDefault()}
                   {...register('endDate', { 
                     required: 'End date is required',
                     validate: value => {
@@ -291,211 +311,134 @@ const onSubmit = async (data) => {
               </Form.Group>
             </Row>
 
-            {/* <Row className="mb-3">
-              <Form.Group as={Col} md={6} controlId="startDate">
-                <Form.Label>Start Date <span className="text-danger">*</span></Form.Label>
-                <Form.Control
-                  type="date"
-                  {...register('startDate', { required: 'Start date is required' })}
-                  isInvalid={!!errors.startDate}
-                  // style={{ borderColor: 'var(--secondary)' }}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {errors.startDate?.message}
-                </Form.Control.Feedback>
-              </Form.Group>
-
-              <Form.Group as={Col} md={6} controlId="endDate">
-                <Form.Label>End Date <span className="text-danger">*</span></Form.Label>
-                <Form.Control
-                  type="date"
-                  {...register('endDate', { required: 'End date is required' })}
-                  isInvalid={!!errors.endDate}
-                  // style={{ borderColor: 'var(--secondary)' }}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {errors.endDate?.message}
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Row> */}
-
             <Row className="mb-3">
               <Form.Group as={Col} md={12} controlId="sessionType">
                 <Form.Label>Session Type <span className="text-danger">*</span></Form.Label>
                 <Form.Select
                   {...register('sessionType', { required: 'Session type is required' })}
                   isInvalid={!!errors.sessionType}
-                  // style={{ borderColor: 'var(--secondary)' }}
                 >
                   <option value="">Select Session Type</option>
                   <option value="weekly">Weekly</option>
                   <option value="daily">Daily</option>
                   <option value="monthly">Monthly</option>
-                  <option value="one-time">One-time</option>
                 </Form.Select>
                 <Form.Control.Feedback type="invalid">
                   {errors.sessionType?.message}
                 </Form.Control.Feedback>
               </Form.Group>
             </Row>
-   {/* <Row className="mb-3">
-              <Form.Group as={Col} md={6} controlId="startTime">
-                <Form.Label>Start Time <span className="text-danger">*</span></Form.Label>
-                <Form.Control
-                  type="time"
-                  onKeyDown={(e) => e.preventDefault()} // Prevent manual typing
-                  {...register('startTime', { required: 'Start time is required' })}
-                  isInvalid={!!errors.startTime}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {errors.startTime?.message}
-                </Form.Control.Feedback>
-              </Form.Group>
 
-              <Form.Group as={Col} md={6} controlId="endTime">
-                <Form.Label>End Time <span className="text-danger">*</span></Form.Label>
-                <Form.Control
-                  type="time"
-                  onKeyDown={(e) => e.preventDefault()} // Prevent manual typing
-                  {...register('endTime', { 
-                    required: 'End time is required',
-                    validate: value => {
-                      const startTime = watch('startTime');
-                      if (!startTime) return true;
-                      return value > startTime || "End time must be after start time";
-                    }
-                  })}
-                  isInvalid={!!errors.endTime}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {errors.endTime?.message}
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Row> */}
-       {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
-  <Row className="mb-3">
-    <Form.Group as={Col} md={6}>
-      <Form.Label>Start Time <span className="text-danger">*</span></Form.Label>
-      <TimePicker
-        ampm
-        value={watch('startTime') ? dayjs(watch('startTime'), 'HH:mm') : null}
-        onChange={(value) => {
-          setValue('startTime', value ? value.format('HH:mm') : '');
-          trigger('endTime'); // Re-validate endTime
-        }}
-        renderInput={({ inputRef, inputProps, InputProps }) => (
-          <div className="position-relative">
-            <Form.Control
-              ref={inputRef}
-              {...inputProps}
-              isInvalid={!!errors.startTime}
-              onKeyDown={(e) => e.preventDefault()} // prevent manual typing
-            />
-            {InputProps?.endAdornment}
-            <Form.Control.Feedback type="invalid">
-              {errors.startTime?.message}
-            </Form.Control.Feedback>
-          </div>
-        )}
-      />
-    </Form.Group>
-
-    <Form.Group as={Col} md={6}>
-      <Form.Label>End Time <span className="text-danger">*</span></Form.Label>
-      <TimePicker
-        ampm
-        value={watch('endTime') ? dayjs(watch('endTime'), 'HH:mm') : null}
-        onChange={(value) => {
-          const start = watch('startTime');
-          const end = value ? value.format('HH:mm') : '';
-          setValue('endTime', end);
-          if (start && end && end <= start) {
-            setError('endTime', { type: 'manual', message: 'End time must be after start time' });
-          } else {
-            clearErrors('endTime');
-          }
-        }}
-        renderInput={({ inputRef, inputProps, InputProps }) => (
-          <div className="position-relative">
-            <Form.Control
-              ref={inputRef}
-              {...inputProps}
-              isInvalid={!!errors.endTime}
-              onKeyDown={(e) => e.preventDefault()}
-            />
-            {InputProps?.endAdornment}
-            <Form.Control.Feedback type="invalid">
-              {errors.endTime?.message}
-            </Form.Control.Feedback>
-          </div>
-        )}
-      />
-    </Form.Group>
-  </Row>
-</LocalizationProvider> */}
+       
 <Row className="mb-3">
+  {/* START TIME */}
   <Form.Group as={Col} md={6} controlId="startTime">
     <Form.Label>Start Time <span className="text-danger">*</span></Form.Label>
-    <Form.Select
-      {...register('startTime', { required: 'Start time is required' })}
-      isInvalid={!!errors.startTime}
-    >
-      <option value="">Select Start Time</option>
-      {timeOptions.map((time, idx) => (
-        <option key={idx} value={time}>{time}</option>
-      ))}
-    </Form.Select>
-    <Form.Control.Feedback type="invalid">
-      {errors.startTime?.message}
-    </Form.Control.Feedback>
+    <div className="d-flex gap-2 align-items-start">
+      <div>
+        <Form.Label className="small">Hour</Form.Label>
+        <Form.Select
+          {...register('startTimeHour', { required: 'Start hour is required' })}
+          isInvalid={!!errors.startTimeHour}
+        >
+          <option value="">Hour</option>
+          {Array.from({ length: 12 }, (_, i) => i + 1).map(hour => (
+            <option key={`start-hour-${hour}`} value={hour}>{hour}</option>
+          ))}
+        </Form.Select>
+      </div>
+
+      <div>
+        <Form.Label className="small">Minute</Form.Label>
+        <Form.Select
+          {...register('startTimeMinute', { required: 'Start minute is required' })}
+          isInvalid={!!errors.startTimeMinute}
+        >
+          <option value="">Min</option>
+          {Array.from({ length: 12 }, (_, i) => (i * 5).toString().padStart(2, '0')).map(min => (
+            <option key={`start-min-${min}`} value={min}>{min}</option>
+          ))}
+        </Form.Select>
+      </div>
+
+      <div>
+        <Form.Label className="small">AM/PM</Form.Label>
+        <Form.Select
+          {...register('startTimeAmPm', { required: 'Start AM/PM is required' })}
+          isInvalid={!!errors.startTimeAmPm}
+        >
+          <option value="">AM/PM</option>
+          <option value="AM">AM</option>
+          <option value="PM">PM</option>
+        </Form.Select>
+      </div>
+    </div>
+
+    {(errors.startTimeHour || errors.startTimeMinute || errors.startTimeAmPm) && (
+      <div className="text-danger small mt-1">Start time is required</div>
+    )}
+
+    {/* 🟢 Start Time Preview */}
+    <div className="mt-2 small text-muted">
+      Selected: {watch('startTimeHour') || '--'}:
+      {watch('startTimeMinute') || '--'} {watch('startTimeAmPm') || '--'}
+    </div>
   </Form.Group>
 
+  {/* END TIME */}
   <Form.Group as={Col} md={6} controlId="endTime">
     <Form.Label>End Time <span className="text-danger">*</span></Form.Label>
-    <Form.Select
-      {...register('endTime', {
-        required: 'End time is required',
-        validate: value => {
-          const times = timeOptions;
-          const start = watch('startTime');
-          const startIndex = times.indexOf(start);
-          const endIndex = times.indexOf(value);
-          if (!start || startIndex === -1 || endIndex === -1) return true;
-          return endIndex > startIndex || "End time must be after start time";
-        }
-      })}
-      isInvalid={!!errors.endTime}
-    >
-      <option value="">Select End Time</option>
-      {timeOptions.map((time, idx) => (
-        <option key={idx} value={time}>{time}</option>
-      ))}
-    </Form.Select>
-    <Form.Control.Feedback type="invalid">
-      {errors.endTime?.message}
-    </Form.Control.Feedback>
+    <div className="d-flex gap-2 align-items-start">
+      <div>
+        <Form.Label className="small">Hour</Form.Label>
+        <Form.Select
+          {...register('endTimeHour', { required: 'End hour is required' })}
+          isInvalid={!!errors.endTimeHour}
+        >
+          <option value="">Hour</option>
+          {Array.from({ length: 12 }, (_, i) => i + 1).map(hour => (
+            <option key={`end-hour-${hour}`} value={hour}>{hour}</option>
+          ))}
+        </Form.Select>
+      </div>
+
+      <div>
+        <Form.Label className="small">Minute</Form.Label>
+        <Form.Select
+          {...register('endTimeMinute', { required: 'End minute is required' })}
+          isInvalid={!!errors.endTimeMinute}
+        >
+          <option value="">Min</option>
+          {Array.from({ length: 12 }, (_, i) => (i * 5).toString().padStart(2, '0')).map(min => (
+            <option key={`end-min-${min}`} value={min}>{min}</option>
+          ))}
+        </Form.Select>
+      </div>
+
+      <div>
+        <Form.Label className="small">AM/PM</Form.Label>
+        <Form.Select
+          {...register('endTimeAmPm', { required: 'End AM/PM is required' })}
+          isInvalid={!!errors.endTimeAmPm}
+        >
+          <option value="">AM/PM</option>
+          <option value="AM">AM</option>
+          <option value="PM">PM</option>
+        </Form.Select>
+      </div>
+    </div>
+
+    {(errors.endTimeHour || errors.endTimeMinute || errors.endTimeAmPm) && (
+      <div className="text-danger small mt-1">End time is required</div>
+    )}
+
+    {/* 🟢 End Time Preview */}
+    <div className="mt-2 small text-muted">
+      Selected: {watch('endTimeHour') || '--'}:
+      {watch('endTimeMinute') || '--'} {watch('endTimeAmPm') || '--'}
+    </div>
   </Form.Group>
 </Row>
-
-
-            <Row className="mb-3">
-              <Form.Group as={Col} md={12} controlId="instructor">
-                <Form.Label>Instructor <span className="text-danger">*</span></Form.Label>
-                <Form.Select
-                  {...register('instructor', { required: 'Instructor is required' })}
-                  isInvalid={!!errors.instructor}
-                  // style={{ borderColor: 'var(--secondary)' }}
-                >
-                  <option value="">Select Instructor</option>
-                  {instructors.map(inst => (
-                    <option key={inst._id} value={inst._id}>{inst.name}</option>
-                  ))}
-                </Form.Select>
-                <Form.Control.Feedback type="invalid">
-                  {errors.instructor?.message}
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Row>
 
             <Row className="mb-3">
               <Form.Group as={Col} md={12} controlId="type">
@@ -503,7 +446,6 @@ const onSubmit = async (data) => {
                 <Form.Select
                   {...register('type', { required: 'Type is required' })}
                   isInvalid={!!errors.type}
-                  // style={{ borderColor: 'var(--secondary)' }}
                 >
                   <option value="">Select Type</option>
                   <option value="Regular Class">Regular Class</option>
@@ -516,13 +458,19 @@ const onSubmit = async (data) => {
               </Form.Group>
             </Row>
 
-            <Row className="mb-3">
+                   <Row className="mb-3">
               <Form.Group as={Col} md={12} controlId="location">
                 <Form.Label>Location <span className="text-danger">*</span></Form.Label>
                 <Form.Select
-                  {...register('location', { required: 'Location is required' })}
+                  {...register('location', { 
+                    required: 'Location is required',
+                    onChange: (e) => {
+                      // Reset instructor when location changes
+                      setValue('instructor', '');
+                      setNoInstructorsAvailable(false);
+                    }
+                  })}
                   isInvalid={!!errors.location}
-                  // style={{ borderColor: 'var(--secondary)' }}
                 >
                   <option value="">Select Location</option>
                   {locations.map(loc => (
@@ -535,6 +483,37 @@ const onSubmit = async (data) => {
               </Form.Group>
             </Row>
 
+            <Row className="mb-3">
+              <Form.Group as={Col} md={12} controlId="instructor">
+                <Form.Label>Instructor <span className="text-danger">*</span></Form.Label>
+                {isLoading && selectedLocation ? (
+                  <div className="d-flex align-items-center">
+                    <Spinner animation="border" size="sm" className="me-2" />
+                    <span>Loading instructors...</span>
+                  </div>
+                ) : noInstructorsAvailable ? (
+                  <Alert variant="warning" className="py-2">
+                    No instructors available for this location
+                  </Alert>
+                ) : (
+                  <Form.Select
+                    {...register('instructor', { required: 'Instructor is required' })}
+                    isInvalid={!!errors.instructor}
+                    disabled={!selectedLocation || instructors.length === 0}
+                  >
+                    <option value="">{selectedLocation ? 'Select Instructor' : 'Select a location first'}</option>
+                    {instructors.map(inst => (
+                      <option key={inst._id} value={inst._id}>{inst.name}</option>
+                    ))}
+                  </Form.Select>
+                )}
+                <Form.Control.Feedback type="invalid">
+                  {errors.instructor?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Row>
+
+
             <Row className="mb-4">
               <Form.Group as={Col} md={12} controlId="tags">
                 <Form.Label>Tags</Form.Label>
@@ -545,7 +524,6 @@ const onSubmit = async (data) => {
                     onChange={(e) => setNewTag(e.target.value)}
                     placeholder="Add tag"
                     onKeyDown={(e) => e.key === 'Enter' && handleAddTag(e)}
-                    // style={{ borderColor: 'var(--secondary)' }}
                   />
                   <Button 
                     variant="primary" 
