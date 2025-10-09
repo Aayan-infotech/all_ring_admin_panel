@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 // import React, { useEffect, useState } from 'react';
 // import {
 //   Table,
@@ -956,8 +956,8 @@
 
 
 
-=======
->>>>>>> a8782a6a0a3b4e2e48d6adc799c4e9d7e7154656
+
+
 import React, { useEffect, useState } from 'react';
 import {
   Table,
@@ -1059,7 +1059,7 @@ const Users = () => {
     try {
       const token = localStorage.getItem('adminToken');
       const response = await axios.get(
-        `http://34.206.193.218:5010/api/milestones/downloadReport/${userId}`,
+        `http://91.189.120.112:5010/api/milestones/downloadReport/${userId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
