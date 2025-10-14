@@ -123,37 +123,72 @@ const Users = () => {
       setPdfLoading(false);
     }
   };
+const handleResetPassword = async () => {
+  const newPassword = watch("newPassword");
+  const confirmPassword = watch("confirmPassword");
 
-  const handleResetPassword = async () => {
-    const newPassword = watch("newPassword");
-    const confirmPassword = watch("confirmPassword");
+  if (newPassword !== confirmPassword) {
+    toast.error("Passwords do not match");
+    return;
+  }
 
-    if (newPassword !== confirmPassword) {
-      toast.error("Passwords do not match");
-      return;
-    }
-
-    try {
-      const token = localStorage.getItem('adminToken');
-      await axios.put(
-        `http://91.189.120.112:5010/api/admin/changeUserPassword/${selectedUserId}`,
-        {
-          newPassword,
-          confirmPassword,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+  try {
+    const token = localStorage.getItem('adminToken');
+    const response = await axios.put(
+      `http://91.189.120.112:5010/api/admin/changeUserPassword/${selectedUserId}`,
+      {
+        newPassword,
+        confirmPassword,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
         }
-      );
-      toast.success('Password updated successfully!');
-      setShowResetModal(false);
-    } catch (err) {
-      console.error(err);
-      toast.error('Something went wrong while updating the password.');
-    }
-  };
+      }
+    );
+    
+    // Use the backend success message
+    toast.success(response.data.message || 'Password updated successfully!');
+    setShowResetModal(false);
+    reset(); // Reset the form fields
+  } catch (err) {
+    console.error(err);
+    
+    // Use the backend error message if available, otherwise fallback to generic message
+    const errorMessage = err.response?.data?.message || 'Something went wrong while updating the password.';
+    toast.error(errorMessage);
+  }
+};
+  // const handleResetPassword = async () => {
+  //   const newPassword = watch("newPassword");
+  //   const confirmPassword = watch("confirmPassword");
+
+  //   if (newPassword !== confirmPassword) {
+  //     toast.error("Passwords do not match");
+  //     return;
+  //   }
+
+  //   try {
+  //     const token = localStorage.getItem('adminToken');
+  //     await axios.put(
+  //       `http://91.189.120.112:5010/api/admin/changeUserPassword/${selectedUserId}`,
+  //       {
+  //         newPassword,
+  //         confirmPassword,
+  //       },
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`
+  //         }
+  //       }
+  //     );
+  //     toast.success('Password updated successfully!');
+  //     setShowResetModal(false);
+  //   } catch (err) {
+  //     console.error(err);
+  //     toast.error('Something went wrong while updating the password.');
+  //   }
+  // };
 
   const fetchUsers = async () => {
     const token = localStorage.getItem('adminToken');
