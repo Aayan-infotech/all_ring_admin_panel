@@ -136,9 +136,9 @@ const Sidebar = ({ collapsed, mobileVisible, onMobileClose, setSidebarCollapsed 
         <Typography variant="h6" sx={{ fontWeight: "bold" }}>
           {collapsed ? "AP" : "Admin Panel"}
         </Typography>
-        <IconButton onClick={() => setSidebarCollapsed(!collapsed)} sx={{ color: "white" }}>
+        {/* <IconButton onClick={() => setSidebarCollapsed(!collapsed)} sx={{ color: "white" }}>
           {collapsed ? <ChevronRight /> : <ChevronLeft />}
-        </IconButton>
+        </IconButton> */}
       </Box>
 
       {/* Menu */}
