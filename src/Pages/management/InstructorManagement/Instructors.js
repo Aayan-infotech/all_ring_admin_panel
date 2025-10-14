@@ -165,39 +165,74 @@ const [showAddPrisonerOffcanvas, setShowAddPrisonerOffcanvas] = useState(false);
     }
   };
 
-  const handleResetPassword = async () => {
-    if (!selectedInstructor || !selectedInstructor._id) {
-      console.error('No instructor selected for password reset.');
-      return;
-    }
+  // const handleResetPassword = async () => {
+  //   if (!selectedInstructor || !selectedInstructor._id) {
+  //     console.error('No instructor selected for password reset.');
+  //     return;
+  //   }
 
-    if (passwords.newPassword !== passwords.confirmPassword) {
-      toast.error('Passwords do not match');
-      return;
-    }
+  //   if (passwords.newPassword !== passwords.confirmPassword) {
+  //     toast.error('Passwords do not match');
+  //     return;
+  //   }
 
-    try {
-      const token = localStorage.getItem('adminToken');
+  //   try {
+  //     const token = localStorage.getItem('adminToken');
 
-      await axios.put(
-        `http://91.189.120.112:5010/api/admin/changeUserPassword/${selectedInstructor._id}`,
-        passwords,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+  //     await axios.put(
+  //       `http://91.189.120.112:5010/api/admin/changeUserPassword/${selectedInstructor._id}`,
+  //       passwords,
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       }
+  //     );
 
-      toast.success('Password updated successfully!');
-      setPasswords({ newPassword: '', confirmPassword: '' });
-      setShowResetModal(false);
-    } catch (err) {
-      console.error('Password reset failed:', err.response?.data || err.message);
-      toast.error('Password reset failed!');
-    }
-  };
+  //     toast.success('Password updated successfully!');
+  //     setPasswords({ newPassword: '', confirmPassword: '' });
+  //     setShowResetModal(false);
+  //   } catch (err) {
+  //     console.error('Password reset failed:', err.response?.data || err.message);
+  //     toast.error('Password reset failed!');
+  //   }
+  // };
+const handleResetPassword = async () => {
+  if (!selectedInstructor || !selectedInstructor._id) {
+    console.error('No instructor selected for password reset.');
+    return;
+  }
 
+  if (passwords.newPassword !== passwords.confirmPassword) {
+    toast.error('Passwords do not match');
+    return;
+  }
+
+  try {
+    const token = localStorage.getItem('adminToken');
+
+    const response = await axios.put(
+      `http://91.189.120.112:5010/api/admin/changeUserPassword/${selectedInstructor._id}`,
+      passwords,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    // Use backend success message
+    toast.success(response.data.message || 'Password updated successfully!');
+    setPasswords({ newPassword: '', confirmPassword: '' });
+    setShowResetModal(false);
+  } catch (err) {
+    console.error('Password reset failed:', err.response?.data || err.message);
+    
+    // Use backend error message instead of generic frontend message
+    const errorMessage = err.response?.data?.message || 'Password reset failed!';
+    toast.error(errorMessage);
+  }
+};
   const handleSaveChanges = async () => {
     if (!selectedInstructor || !selectedInstructor._id) {
       toast.error("No instructor selected");

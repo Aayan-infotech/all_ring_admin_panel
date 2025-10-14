@@ -180,39 +180,78 @@ const Mentors = () => {
   };
 
   const handleResetPassword = async (formData) => {
-    if (!selectedUser || !selectedUser._id) {
-      console.error('No user selected for password reset.');
-      return;
-    }
+  if (!selectedUser || !selectedUser._id) {
+    console.error('No user selected for password reset.');
+    return;
+  }
 
-    const { newPassword, confirmPassword } = formData;
+  const { newPassword, confirmPassword } = formData;
 
-    if (newPassword !== confirmPassword) {
-      toast.error('Passwords do not match');
-      return;
-    }
+  if (newPassword !== confirmPassword) {
+    toast.error('Passwords do not match');
+    return;
+  }
 
-    try {
-      const token = localStorage.getItem('adminToken');
+  try {
+    const token = localStorage.getItem('adminToken');
 
-      await axios.put(
-        `${API_BASE_URL}/api/admin/changeUserPassword/${selectedUser._id}`,
-        { newPassword, confirmPassword },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+    const response = await axios.put(
+      `${API_BASE_URL}/api/admin/changeUserPassword/${selectedUser._id}`,
+      { newPassword, confirmPassword },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
-      toast.success('Password updated successfully!');
-      reset();
-      setShowResetModal(false);
-    } catch (err) {
-      console.error('Password reset failed:', err.response?.data || err.message);
-      toast.error('Password reset failed!');
-    }
-  };
+    // Use backend success message
+    toast.success(response.data.message || 'Password updated successfully!');
+    reset();
+    setShowResetModal(false);
+  } catch (err) {
+    console.error('Password reset failed:', err.response?.data || err.message);
+    
+    // Use backend error message instead of generic frontend message
+    const errorMessage = err.response?.data?.message || 'Password reset failed!';
+    toast.error(errorMessage);
+  }
+};
+
+  // const handleResetPassword = async (formData) => {
+  //   if (!selectedUser || !selectedUser._id) {
+  //     console.error('No user selected for password reset.');
+  //     return;
+  //   }
+
+  //   const { newPassword, confirmPassword } = formData;
+
+  //   if (newPassword !== confirmPassword) {
+  //     toast.error('Passwords do not match');
+  //     return;
+  //   }
+
+  //   try {
+  //     const token = localStorage.getItem('adminToken');
+
+  //     await axios.put(
+  //       `${API_BASE_URL}/api/admin/changeUserPassword/${selectedUser._id}`,
+  //       { newPassword, confirmPassword },
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       }
+  //     );
+
+  //     toast.success('Password updated successfully!');
+  //     reset();
+  //     setShowResetModal(false);
+  //   } catch (err) {
+  //     console.error('Password reset failed:', err.response?.data || err.message);
+  //     toast.error('Password reset failed!');
+  //   }
+  // };
 
   const handleSaveChanges = async () => {
     if (!selectedUser || !selectedUser._id) {
