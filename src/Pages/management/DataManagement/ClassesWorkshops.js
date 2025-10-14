@@ -52,6 +52,8 @@ const ClassesWorkshops = () => {
   const [showViewQuestionsModal, setShowViewQuestionsModal] = useState(false);
   const [questionText, setQuestionText] = useState('');
   const [questions, setQuestions] = useState([]);
+  const [expandedRows, setExpandedRows] = useState([]);
+
   const [editingQuestion, setEditingQuestion] = useState(null);
   const [instructors, setInstructors] = useState([]);
   const [pagination, setPagination] = useState({
@@ -196,6 +198,15 @@ const convert24To12 = (time24) => {
       setLoading(false);
     }
   };
+
+
+  const toggleExpand = (id) => {
+  setExpandedRows((prev) =>
+    prev.includes(id)
+      ? prev.filter((rowId) => rowId !== id)
+      : [...prev, id]
+  );
+};
   const handleUpdateClass = async () => {
     const form = document.getElementById('editClassForm');
     const formData = new FormData();
@@ -567,8 +578,36 @@ const fetchInstructorsByLocation = async (locationId) => {
                 <tr key={item._id}>
                   <td>{idx + 1}</td>
                   <td><img src={item.Image || 'https://via.placeholder.com/40'} width="40" height="40" alt="img" style={{ borderRadius: '4px' }} /></td>
-                  <td>{item.title}</td>
-                  <td>{item.theme}</td>
+                  {/* <td>{item.title}</td>
+                  <td>{item.theme}</td> */}
+                  <td style={{ maxWidth: "180px", whiteSpace: "normal", wordWrap: "break-word" }}>
+  {expandedRows.includes(item._id) || item.title.length <= 40
+    ? item.title
+    : `${item.title.slice(0, 40)}...`}
+  {item.title.length > 40 && (
+    <span
+      onClick={() => toggleExpand(item._id)}
+      style={{ color: "var(--primary)", cursor: "pointer", marginLeft: 5, fontWeight: 500 }}
+    >
+      {expandedRows.includes(item._id) ? "See Less" : "See More"}
+    </span>
+  )}
+</td>
+
+<td style={{ maxWidth: "180px", whiteSpace: "normal", wordWrap: "break-word" }}>
+  {expandedRows.includes(item._id + "_theme") || item.theme.length <= 40
+    ? item.theme
+    : `${item.theme.slice(0, 40)}...`}
+  {item.theme.length > 40 && (
+    <span
+      onClick={() => toggleExpand(item._id + "_theme")}
+      style={{ color: "var(--primary)", cursor: "pointer", marginLeft: 5, fontWeight: 500 }}
+    >
+      {expandedRows.includes(item._id + "_theme") ? "See Less" : "See More"}
+    </span>
+  )}
+</td>
+
                   <td>{item.Type}</td>
                   <td>{item.location?.location || 'N/A'}</td>
 
