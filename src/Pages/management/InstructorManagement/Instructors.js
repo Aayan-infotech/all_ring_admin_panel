@@ -297,39 +297,7 @@ const handleResetPassword = async () => {
         </Breadcrumb>
       </div>
 
-      {/* <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2 style={{ color: 'var(--secondary)', fontWeight: '600' }}>Instructor Management</h2>
-
-
-            <Button
-      variant="info"
-      onClick={() => window.location.href = '/prisoners'}
-      style={{
-        backgroundColor: 'var(--info)',
-        border: 'none',
-        padding: '10px 20px',
-        borderRadius: '8px',
-        marginRight: '10px'
-      }}
-    >
-      <EyeFill className="me-2" />
-      View Prisoners
-    </Button>
-
-        <Button
-          variant="primary"
-          onClick={() => setShowAddInstructor(true)}
-          style={{
-            backgroundColor: 'var(--primary)',
-            border: 'none',
-            padding: '10px 20px',
-            borderRadius: '8px',
-          }}
-        >
-          <PlusCircle className="me-2" />
-          Add New Instructor
-        </Button>
-      </div> */}
+    
       <div className="d-flex flex-wrap justify-content-between align-items-center mb-4">
   <h2 style={{ color: 'var(--secondary)', fontWeight: '600', margin: 0 }}>
     Instructor Management

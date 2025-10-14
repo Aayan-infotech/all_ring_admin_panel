@@ -54,41 +54,113 @@ useEffect(() => {
     return `${day}-${month}-${year}`;
   };
 
+
+
   const onSubmit = async (data) => {
-    const token = localStorage.getItem('adminToken');
-    const formData = new FormData();
-    formData.append('name', data.name);
-    formData.append('location', data.location);
-    formData.append('number', data.number);
-    formData.append('email', data.email);
-    formData.append('password', data.password);
-    formData.append('confirmPassword', data.confirmPassword);
-    formData.append('dateofbirth', formatDate(data.dateofbirth));
-    if (data.files?.[0]) formData.append('files', data.files[0]);
+  const token = localStorage.getItem('adminToken');
+  const formData = new FormData();
+  formData.append('name', data.name);
+  formData.append('location', data.location);
+  formData.append('number', data.number);
+  formData.append('email', data.email);
+  formData.append('password', data.password);
+  formData.append('confirmPassword', data.confirmPassword);
+  formData.append('dateofbirth', formatDate(data.dateofbirth));
+  if (data.files?.[0]) formData.append('files', data.files[0]);
 
-    try {
-      await axios.post(
-        `http://91.189.120.112:5010/api/auth/adminRegister/user`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      );
-      toast.success('User added successfully!', { autoClose: 3000 });
-      onUserAdded();
-      handleClose();
-      reset();
-    } catch (err) {
-      toast.error('Failed to add user: ' + (err.response?.data?.message || err.message), {
-        autoClose: 4000,
-      });
-    }
-  };
+  try {
+    const response = await axios.post(
+      `http://91.189.120.112:5010/api/auth/adminRegister/user`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
+    
+    // ONLY show backend message, remove the default frontend message
+    toast.success(response.data.message, { autoClose: 2000 });
+    // onUserAdded();
+    handleClose();
+    reset();
+  } catch (err) {
+    // ONLY show backend error message, remove the frontend prefix
+    toast.error(err.response?.data?.message || err.message, {
+      autoClose: 4000,
+    });
+  }
+};
+  // const onSubmit = async (data) => {
+  //   const token = localStorage.getItem('adminToken');
+  //   const formData = new FormData();
+  //   formData.append('name', data.name);
+  //   formData.append('location', data.location);
+  //   formData.append('number', data.number);
+  //   formData.append('email', data.email);
+  //   formData.append('password', data.password);
+  //   formData.append('confirmPassword', data.confirmPassword);
+  //   formData.append('dateofbirth', formatDate(data.dateofbirth));
+  //   if (data.files?.[0]) formData.append('files', data.files[0]);
 
+  //   try {
+  //     await axios.post(
+  //       `http://91.189.120.112:5010/api/auth/adminRegister/user`,
+  //       formData,
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //           'Content-Type': 'multipart/form-data',
+  //         },
+  //       }
+  //     );
+  //     toast.success('User added successfully!', { autoClose: 3000 });
+  //     onUserAdded();
+  //     handleClose();
+  //     reset();
+  //   } catch (err) {
+  //     toast.error('Failed to add user: ' + (err.response?.data?.message || err.message), {
+  //       autoClose: 4000,
+  //     });
+  //   }
+  // };
 
+// const onSubmit = async (data) => {
+//   const token = localStorage.getItem('adminToken');
+//   const formData = new FormData();
+//   formData.append('name', data.name);
+//   formData.append('location', data.location);
+//   formData.append('number', data.number);
+//   formData.append('email', data.email);
+//   formData.append('password', data.password);
+//   formData.append('confirmPassword', data.confirmPassword);
+//   formData.append('dateofbirth', formatDate(data.dateofbirth));
+//   if (data.files?.[0]) formData.append('files', data.files[0]);
+
+//   try {
+//     const response = await axios.post(
+//       `http://91.189.120.112:5010/api/auth/adminRegister/user`,
+//       formData,
+//       {
+//         headers: {
+//           Authorization: `Bearer ${token}`,
+//           'Content-Type': 'multipart/form-data',
+//         },
+//       }
+//     );
+    
+//     // Use backend success message instead of hardcoded frontend message
+//     toast.success(response.data.message || 'User added successfully!', { autoClose: 3000 });
+//     onUserAdded();
+//     handleClose();
+//     reset();
+//   } catch (err) {
+//     toast.error('Failed to add user: ' + (err.response?.data?.message || err.message), {
+//       autoClose: 4000,
+//     });
+//   }
+// };
   return (
     <Offcanvas show={show} onHide={handleClose} placement="end">
       <Offcanvas.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>

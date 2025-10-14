@@ -14,29 +14,53 @@ const AddPrisonerOffcanvas = ({ show, handleClose, instructorId, locations, preS
   const [prisoners, setPrisoners] = useState([]);
   const [prisonerId, setPrisonerId] = useState('');
 
-  const handleSubmit = async () => {
-    try {
-      const payload = {
-        instructorId,
-        prisonerId,
-        prisonerName,
-        location,
-      };
+  // const handleSubmit = async () => {
+  //   try {
+  //     const payload = {
+  //       instructorId,
+  //       prisonerId,
+  //       prisonerName,
+  //       location,
+  //     };
 
-      await axios.post(`${API_BASE_URL}/api/prisoner/addPrisoner`, payload);
-      toast.success('Prisoner added successfully');
+  //     await axios.post(`${API_BASE_URL}/api/prisoner/addPrisoner`, payload);
+  //     toast.success('Prisoner added successfully');
 
-      // Reset the form fields
-      setPrisonerName('');
-      setPrisonerId('');
-      setLocation(preSelectedLocation || ''); // Reset to instructor's location
+  //     // Reset the form fields
+  //     setPrisonerName('');
+  //     setPrisonerId('');
+  //     setLocation(preSelectedLocation || ''); // Reset to instructor's location
 
-      handleClose(); // Close the offcanvas
-    } catch (err) {
-      toast.error('Failed to add prisoner');
-    }
-  };
+  //     handleClose(); // Close the offcanvas
+  //   } catch (err) {
+  //     toast.error('Failed to add prisoner');
+  //   }
+  // };
+const handleSubmit = async () => {
+  try {
+    const payload = {
+      instructorId,
+      prisonerId,
+      prisonerName,
+      location,
+    };
 
+    const response = await axios.post(`${API_BASE_URL}/api/prisoner/addPrisoner`, payload);
+    
+    // Use backend success message instead of frontend message
+    toast.success(response.data.message);
+
+    // Reset the form fields
+    setPrisonerName('');
+    setPrisonerId('');
+    setLocation(preSelectedLocation || ''); // Reset to instructor's location
+
+    handleClose(); // Close the offcanvas
+  } catch (err) {
+    // Use backend error message instead of frontend message
+    toast.error(err.response?.data?.message || 'Failed to add prisoner');
+  }
+};
   const fetchLocations = async () => {
     try {
       const res = await axios.get(`${API_BASE_URL}/api/location/getAllLocations`);
@@ -56,21 +80,25 @@ const AddPrisonerOffcanvas = ({ show, handleClose, instructorId, locations, preS
       toast.error("Failed to load locations");
     }
   };
+const fetchPrisoners = async () => {
+  if (!instructorId) return;
+  setLoading(true);
+  try {
+    const res = await axios.get(`${API_BASE_URL}/api/prisoner/prisonersByInstructor/${instructorId}`);
+    setPrisoners(res.data.data || []);
+  } catch (err) {
+    console.error("Failed to fetch prisoners:", err);
+    
+    // Use backend error message instead of frontend message
+    const errorMessage = err.response?.data?.message || "Failed to load prisoners";
+    toast.error(errorMessage);
+    
+    setPrisoners([]);
+  } finally {
+    setLoading(false);
+  }
+};
 
-  const fetchPrisoners = async () => {
-    if (!instructorId) return;
-    setLoading(true);
-    try {
-      const res = await axios.get(`${API_BASE_URL}/api/prisoner/prisonersByInstructor/${instructorId}`);
-      setPrisoners(res.data.data || []);
-    } catch (err) {
-      console.error("Failed to fetch prisoners:", err);
-      toast.error("No prisoners load ");
-      setPrisoners([]);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
     if (show) {
