@@ -118,12 +118,20 @@ const [showAddPrisonerOffcanvas, setShowAddPrisonerOffcanvas] = useState(false);
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
+
+      let processedValue = value;
+  
+  // Sirf search field ke liye spaces clean karo
+  if (name === 'search') {
+    // Starting aur ending ke spaces hatao, aur andar ke multiple spaces ko ek karo
+    processedValue = value.trim().replace(/\s+/g, ' ');
+  }
     setFilters(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    setCurrentPage(1); // Reset to first page when filters change
-  };
+    ...prev,
+    [name]: processedValue
+  }));
+  setCurrentPage(1); // First page par reset karo
+};
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
