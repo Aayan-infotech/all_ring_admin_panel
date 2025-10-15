@@ -16,7 +16,7 @@ const AddMentorOffcanvas = ({ show, handleClose, onMentorAdded }) => {
     handleSubmit,
     watch,
       setValue,
-
+clearErrors,
     reset,
     formState: { errors, isSubmitting }
   } = useForm();
@@ -111,7 +111,7 @@ useEffect(() => {
             />
             {errors.number && <span className="text-danger small">{errors.number.message}</span>}
           </Form.Group> */}
-<Form.Group className="mb-4" controlId="number">
+{/* <Form.Group className="mb-4" controlId="number">
   <Form.Label >
     Phone Number
   </Form.Label>
@@ -138,8 +138,33 @@ useEffect(() => {
       {errors.number.message}
     </div>
   )}
+</Form.Group> */}
+<Form.Group className="mb-4" controlId="number">
+  <Form.Label style={{ color: 'var(--secondary)', fontWeight: 'bold' }}>Phone Number</Form.Label>
+  <PhoneInput
+    country={'in'}
+    enableSearch={true}
+    inputStyle={{
+      width: '100%',
+      border: '2px solid var(--accent)',
+      borderRadius: '8px',
+    }}
+    specialLabel=""
+    value={watch('number')}
+    onChange={(phone) => {
+      setValue('number', phone);
+      // Clear error when user starts typing
+      if (errors.number) {
+        clearErrors('number');
+      }
+    }}
+  />
+  {errors.number && (
+    <div className="text-danger mt-1" style={{ fontSize: '0.875rem' }}>
+      {errors.number.message}
+    </div>
+  )}
 </Form.Group>
-
 
           {/* Email */}
           <Form.Group className="mb-3" controlId="email">
