@@ -1,5 +1,8 @@
 
 
+
+
+
 import { useForm } from 'react-hook-form';
 import { Offcanvas, Form, Button, Spinner } from 'react-bootstrap';
 import axios from 'axios';
@@ -46,10 +49,7 @@ useEffect(() => {
 
   fetchLocations();
 }, []);
-
-
- const onSubmit = async (data) => {
-  // Convert YYYY-MM-DD to DD-MM-YYYY
+const onSubmit = async (data) => {
   const convertDate = (dateString) => {
     if (!dateString) return '';
     const [year, month, day] = dateString.split('-');
@@ -62,25 +62,109 @@ useEffect(() => {
   formData.append('email', data.email);
   formData.append('password', data.password);
   formData.append('confirmPassword', data.confirmPassword);
-  formData.append('dateofbirth', convertDate(data.dateofbirth)); // Convert format here
+  formData.append('dateofbirth', convertDate(data.dateofbirth));
   formData.append('location', data.location);
   formData.append('expertise', data.expertise);
   formData.append('files', data.files[0]);
 
   try {
-    await axios.post(
+    const response = await axios.post(
       `${API_BASE_URL}/api/auth/adminRegister/mentor`,
       formData,
       { headers: { 'Content-Type': 'multipart/form-data' } }
     );
-    toast.success('Mentor registered successfully!');
+
+    // ✅ Show backend success message
+    toast.success(response.data?.message || 'Mentor registered successfully');
+
     onMentorAdded();
     reset();
     handleClose();
   } catch (err) {
-    toast.error(`Failed: ${err.response?.data?.message || err.message}`);
+    console.error('Mentor registration error:', err);
+    // ✅ Robust error handling
+    const errorMessage =
+      err.response?.data?.message ||
+      err.response?.data?.error ||
+      err.response?.data?.errors?.[0]?.msg ||
+      'Something went wrong';
+
+    toast.error(errorMessage);
   }
 };
+
+
+//  const onSubmit = async (data) => {
+//   // Convert YYYY-MM-DD to DD-MM-YYYY
+//   const convertDate = (dateString) => {
+//     if (!dateString) return '';
+//     const [year, month, day] = dateString.split('-');
+//     return `${day}-${month}-${year}`;
+//   };
+
+//   const formData = new FormData();
+//   formData.append('name', data.name);
+//   formData.append('number', data.number);
+//   formData.append('email', data.email);
+//   formData.append('password', data.password);
+//   formData.append('confirmPassword', data.confirmPassword);
+//   formData.append('dateofbirth', convertDate(data.dateofbirth)); // Convert format here
+//   formData.append('location', data.location);
+//   formData.append('expertise', data.expertise);
+//   formData.append('files', data.files[0]);
+
+//   try {
+//     await axios.post(
+//       `${API_BASE_URL}/api/auth/adminRegister/mentor`,
+//       formData,
+//       { headers: { 'Content-Type': 'multipart/form-data' } }
+//     );
+//     toast.success('Mentor registered successfully!');
+//     onMentorAdded();
+//     reset();
+//     handleClose();
+//   } catch (err) {
+//     toast.error(`Failed: ${err.response?.data?.message || err.message}`);
+//   }
+// };
+// const onSubmit = async (data) => {
+//   // Convert YYYY-MM-DD to DD-MM-YYYY
+//   const convertDate = (dateString) => {
+//     if (!dateString) return '';
+//     const [year, month, day] = dateString.split('-');
+//     return `${day}-${month}-${year}`;
+//   };
+
+//   const formData = new FormData();
+//   formData.append('name', data.name);
+//   formData.append('number', data.number);
+//   formData.append('email', data.email);
+//   formData.append('password', data.password);
+//   formData.append('confirmPassword', data.confirmPassword);
+//   formData.append('dateofbirth', convertDate(data.dateofbirth));
+//   formData.append('location', data.location);
+//   formData.append('expertise', data.expertise);
+//   formData.append('files', data.files[0]);
+
+//   try {
+//     const response = await axios.post(
+//       `${API_BASE_URL}/api/auth/adminRegister/mentor`,
+//       formData,
+//       { headers: { 'Content-Type': 'multipart/form-data' } }
+//     );
+
+//     // ✅ Show message from backend
+//     toast.success(response.data?.message || 'Mentor registered successfully');
+    
+//     onMentorAdded();
+//     reset();
+//     handleClose();
+//   } catch (err) {
+//     // ❌ Show backend error message if available
+//     const errorMessage = err.response?.data?.message || 'Something went wrong';
+//     toast.error(errorMessage);
+//   }
+// };
 
   return (
     <Offcanvas show={show} onHide={handleClose} placement="end">
