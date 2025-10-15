@@ -331,8 +331,12 @@ const handleResetPassword = async () => {
   };
 
   const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
-    setCurrentPage(1); // Reset to first page when searching
+      let value = e.target.value;
+  value = value.trim().replace(/\s+/g, ' ');
+setSearchTerm(value);
+  setCurrentPage(1);
+    // setSearchTerm(e.target.value);
+    // setCurrentPage(1); // Reset to first page when searching
   };
 
   const handleLocationFilterChange = (e) => {
