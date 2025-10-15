@@ -28,6 +28,7 @@ const ClassAttendance = () => {
   const [filterLocation, setFilterLocation] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [allLocations, setAllLocations] = useState([]);
+const [expandedRows, setExpandedRows] = useState([]);
 
   const [pagination, setPagination] = useState({
     page: 1,
@@ -67,6 +68,13 @@ const ClassAttendance = () => {
       setLoading(false);
     }
   };
+const toggleRow = (id) => {
+  if (expandedRows.includes(id)) {
+    setExpandedRows(expandedRows.filter(rowId => rowId !== id));
+  } else {
+    setExpandedRows([...expandedRows, id]);
+  }
+};
 
   // Fetch all locations for dropdown
   const fetchAllLocations = async () => {
@@ -206,7 +214,23 @@ const ClassAttendance = () => {
                   return (
                     <tr key={cls._id || idx}>
                       <td>{idx + 1 + (pagination.page - 1) * pagination.limit}</td>
-                      <td>{cls.title}</td>
+                      {/* <td>{cls.title}</td> */}
+                      <td>
+  {cls.title.length > 30 ? (
+    <>
+      {expandedRows.includes(cls._id) ? cls.title : cls.title.slice(0, 30) + '...'}
+      <span
+        style={{ color: 'var(--primary)', cursor: 'pointer', marginLeft: '5px' }}
+        onClick={() => toggleRow(cls._id)}
+      >
+        {expandedRows.includes(cls._id) ? 'See less' : 'See more'}
+      </span>
+    </>
+  ) : (
+    cls.title
+  )}
+</td>
+
                       <td>{cls.location?.location || 'N/A'}</td>
                       <td>{cls.Instructor?.name || 'N/A'}</td>
                       <td>{cls.registrationCount}</td>

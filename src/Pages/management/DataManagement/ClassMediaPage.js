@@ -28,6 +28,7 @@ const ClassMediaPage = () => {
   const [classMedia, setClassMedia] = useState([]);
   const [mediaLoading, setMediaLoading] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(false);
+const [expandedRows, setExpandedRows] = useState([]);
 
   // Pagination and filtering state
   const [pagination, setPagination] = useState({
@@ -40,6 +41,16 @@ const ClassMediaPage = () => {
     type: '',
     status: ''
   });
+
+
+
+  const toggleRow = (id) => {
+  if (expandedRows.includes(id)) {
+    setExpandedRows(expandedRows.filter(rowId => rowId !== id));
+  } else {
+    setExpandedRows([...expandedRows, id]);
+  }
+};
 
   const fetchClasses = async () => {
     setLoading(true);
@@ -223,8 +234,40 @@ const ClassMediaPage = () => {
                 classes.map((item, index) => (
                   <tr key={item._id}>
                     <td>{(pagination.page - 1) * pagination.limit + index + 1}</td>
-                    <td>{item.title}</td>
-                    <td>{item.theme || 'N/A'}</td>
+                    {/* <td>{item.title}</td>
+                    <td>{item.theme || 'N/A'}</td> */}
+                    <td>
+  {item.title.length > 30 ? (
+    <>
+      {expandedRows.includes(item._id + '_title') ? item.title : item.title.slice(0, 30) + '...'}
+      <span
+        style={{ color: 'var(--primary)', cursor: 'pointer', marginLeft: '5px' }}
+        onClick={() => toggleRow(item._id + '_title')}
+      >
+        {expandedRows.includes(item._id + '_title') ? 'See less' : 'See more'}
+      </span>
+    </>
+  ) : (
+    item.title
+  )}
+</td>
+
+<td>
+  {item.theme && item.theme.length > 30 ? (
+    <>
+      {expandedRows.includes(item._id + '_theme') ? item.theme : item.theme.slice(0, 30) + '...'}
+      <span
+        style={{ color: 'var(--primary)', cursor: 'pointer', marginLeft: '5px' }}
+        onClick={() => toggleRow(item._id + '_theme')}
+      >
+        {expandedRows.includes(item._id + '_theme') ? 'See less' : 'See more'}
+      </span>
+    </>
+  ) : (
+    item.theme || 'N/A'
+  )}
+</td>
+
                     <td>{item.Type || 'N/A'}</td>
                     <td>{item.startDate ? new Date(item.startDate).toLocaleDateString() : 'N/A'}</td>
                     <td>{item.sessions?.[0]?.startTime || 'N/A'} - {item.sessions?.[0]?.endTime || 'N/A'}</td>
