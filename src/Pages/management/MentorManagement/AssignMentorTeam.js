@@ -113,14 +113,32 @@ const AssignMentorTeam = () => {
   };
 
   // Handle filter change
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    setFilters(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    setCurrentPage(1);
-  };
+  // const handleFilterChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setFilters(prev => ({
+  //     ...prev,
+  //     [name]: value
+  //   }));
+  //   setCurrentPage(1);
+  // };
+const handleFilterChange = (e) => {
+  const { name, value } = e.target;
+
+  let processedValue = value;
+
+  // Only clean up spaces for search input
+  if (name === 'search') {
+    // Remove leading/trailing spaces and replace multiple spaces with a single space
+    processedValue = value.trim().replace(/\s+/g, ' ');
+  }
+
+  setFilters((prev) => ({
+    ...prev,
+    [name]: processedValue
+  }));
+
+  setCurrentPage(1); // Reset to first page when filters change
+};
 
   const handlePageChange = (page) => setCurrentPage(page);
 
