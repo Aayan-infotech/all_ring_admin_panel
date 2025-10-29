@@ -1,13 +1,11 @@
 FROM node:20 AS build
 
-
 WORKDIR /usr/src/app
 
 # Copy package.json and package-lock.json
 COPY package*.json ./
-
-# Install dependencies
-RUN npm install
+# Use npm ci (faster and reproducible) and allow legacy peer deps to avoid ERESOLVE
+RUN npm ci --legacy-peer-deps
 
 # Copy the rest of the project files
 COPY . .
@@ -24,7 +22,7 @@ COPY --from=build /usr/src/app/build /usr/share/nginx/html
 # Copy the custom Nginx configuration file
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Expose the port (2022 as you specified)
+# Expose the port that container serves (map to host in docker run)
 EXPOSE 2005
 
 # Start Nginx
