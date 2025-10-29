@@ -1,177 +1,17 @@
-// import React, { useEffect, useState } from 'react';
-// import { Link, useLocation, useNavigate } from 'react-router-dom';
-// import { 
-//   PeopleFill, 
-//   PersonCheckFill, 
-//   PersonLinesFill, 
-//   DatabaseFill,
-//   ClipboardCheckFill ,
-//   JournalBookmarkFill ,
-//   HouseFill,
-//   ChevronLeft,
-//   FileEarmarkPlayFill,
-//   ChevronRight
-// } from 'react-bootstrap-icons';
-
-// const Sidebar = ({ collapsed, mobileVisible, onMobileClose,setSidebarCollapsed  }) => {
-//   const location = useLocation();
-//   const navigate = useNavigate();
-//   const [activeModule, setActiveModule] = useState('');
-
-//   useEffect(() => {
-//     const path = location.pathname;
-
-//     if (path.startsWith('/users')) {
-//       setActiveModule('users');
-//     } else if (path.startsWith('/mentors')) {
-//       setActiveModule('mentors');
-//     } else if (path.startsWith('/instructors')) {
-//       setActiveModule('instructors');
-//     } else if (path.startsWith('/data')) {
-//       setActiveModule('data');
-//     } else if (path === '/dashboard') {
-//       setActiveModule('dashboard');
-//     }
-//   }, [location.pathname]);
-
-//   const baseMenu = [
-//     {
-//       path: "/dashboard",
-//       icon: <HouseFill />,
-//       label: "Dashboard"
-//     }
-//   ];
-
-//   const moduleCards = [
-//     { module: 'users', icon: <PeopleFill />, label: 'User Management' },
-//     { module: 'mentors', icon: <PersonCheckFill />, label: 'Mentor Management' },
-//     { module: 'instructors', icon: <PersonLinesFill />, label: 'Instructor Management' },
-//     { module: 'data', icon: <DatabaseFill />, label: 'Data Management' },
-//   ];
-
-//   const subMenus = {
-//     users: [
-//       { path: "/users", icon: <PeopleFill />, label: "All Users" },
-//       // { path: "/users/add", icon: <PeopleFill />, label: "Add User" },
-//     ],
-//     mentors: [
-//       { path: "/mentors", icon: <PersonCheckFill />, label: "All Mentors" },
-//       { path: "/assignmentorteam", icon: <PersonCheckFill />, label: "Assign Team" },
-//     ],
-//     instructors: [
-//       { path: "/instructors", icon: <PersonLinesFill />, label: "All Instructors" },
-//       { path: "/assignteam", icon: <PersonLinesFill />, label: "Assign Team" },
-//     ],
-//     data: [
-//       { path: "/data", icon: <DatabaseFill />, label: "Location" },
-//       { path: "/data/classses", icon: <JournalBookmarkFill  />, label: "Classes & Workshops" },
-//        { path: "/data/attendance", icon: <ClipboardCheckFill />, label: "Class Attendance" },
-//            { path: "/data/media", icon: <FileEarmarkPlayFill  />, label: "Class Media" }
-
-//     ]
-//   };
-
-//   const handleModuleClick = (module) => {
-//     setActiveModule(module);
-//     if (subMenus[module]?.length) {
-//       navigate(subMenus[module][0].path);
-//     }
-//     onMobileClose(); 
-//   };
-
-//   const menuItems = [
-//     ...baseMenu,
-//     ...(activeModule !== 'dashboard' ? subMenus[activeModule] || [] : [])
-//   ];
-
-//   return (
-//   <div 
-//       className={`admin-sidebar ${collapsed ? 'collapsed' : ''} ${mobileVisible ? 'mobile-visible' : ''}`}
-//       onClick={(e) => {
-//         if (mobileVisible && e.target.closest('.menu-item')) {
-//           onMobileClose();
-//         }
-//       }}
-//     >
-//       <div className="sidebar-logo">
-//         {collapsed ? (
-//           <span className="logo-collapsed">AP</span>
-//         ) : (
-//           <span className="logo-expanded">Admin Panel</span>
-//         )}
-//         {!collapsed && (
-//           <button 
-//             className="sidebar-collapse-btn"
-//             onClick={() => {
-//               setSidebarCollapsed(true);
-//               onMobileClose();
-//             }}
-//           >
-//             <ChevronLeft />
-//           </button>
-//         )}
-//         {collapsed && (
-//           <button 
-//             className="sidebar-expand-btn"
-//             onClick={() => {
-//               setSidebarCollapsed(false);
-//               onMobileClose();
-//             }}
-//           >
-//             <ChevronRight />
-//           </button>
-//         )}
-//       </div>
-
-//       <div className="sidebar-menu">
-//         {baseMenu.map((item) => (
-//           <Link
-//             key={item.path}
-//             to={item.path}
-//             className={`menu-item ${location.pathname === item.path ? 'active' : ''}`}
-//           >
-//             <span className="menu-icon">{item.icon}</span>
-//             <span className="menu-text">{item.label}</span>
-//           </Link>
-//         ))}
-
-//         {activeModule === 'dashboard' &&
-//           moduleCards.map((item) => (
-//             <div
-//               key={item.module}
-//               className="menu-item"
-//               onClick={() => handleModuleClick(item.module)}
-//               style={{ cursor: 'pointer' }}
-//             >
-//               <span className="menu-icon">{item.icon}</span>
-//               <span className="menu-text">{item.label}</span>
-//             </div>
-//           ))}
-
-//         {activeModule !== 'dashboard' &&
-//           subMenus[activeModule]?.map((item) => (
-//             <Link
-//               key={item.path}
-//               to={item.path}
-//               className={`menu-item ${location.pathname === item.path ? 'active' : ''}`}
-//             >
-//               <span className="menu-icon">{item.icon}</span>
-//               <span className="menu-text">{item.label}</span>
-//             </Link>
-//           ))}
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Sidebar;
-
-
-
-
-
-import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
+import {
+  Drawer,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Collapse,
+  IconButton,
+  Typography,
+  Box,
+  Tooltip,
+} from "@mui/material";
 import {
   PeopleFill,
   PersonCheckFill,
@@ -185,137 +25,213 @@ import {
   FileEarmarkPlayFill,
   ChevronDown,
   ChevronUp,
-} from 'react-bootstrap-icons';
+  QuestionCircleFill,
+  TicketFill,
+  BellFill,
+} from "react-bootstrap-icons";
+
+const drawerWidth = 260;
 
 const Sidebar = ({ collapsed, mobileVisible, onMobileClose, setSidebarCollapsed }) => {
   const location = useLocation();
-  const [openDropdown, setOpenDropdown] = useState('');
+  const [openDropdown, setOpenDropdown] = useState("");
 
   const toggleDropdown = (module) => {
-    setOpenDropdown(prev => (prev === module ? '' : module));
+    setOpenDropdown((prev) => (prev === module ? "" : module));
   };
 
   const menuStructure = [
+    { label: "Dashboard", path: "/dashboard", icon: <HouseFill /> },
     {
-      label: 'Dashboard',
-      path: '/dashboard',
-      icon: <HouseFill />,
-    },
-    {
-      label: 'User Management',
+      label: "User Management",
       icon: <PeopleFill />,
-      module: 'users',
-      children: [
-        { label: 'All Users', path: '/users', icon: <PeopleFill /> },
-        // { label: 'Add User', path: '/users/add', icon: <PeopleFill /> },
-      ],
+      module: "users",
+      children: [{ label: "All Users", path: "/users", icon: <PeopleFill /> }],
     },
     {
-      label: 'Mentor Management',
-      icon: <PersonCheckFill />,
-      module: 'mentors',
-      children: [
-        { label: 'All Mentors', path: '/mentors', icon: <PersonCheckFill /> },
-        { label: 'Assign Team', path: '/assignmentorteam', icon: <PersonCheckFill /> },
-      ],
-    },
-    {
-      label: 'Instructor Management',
+      label: "Instructor Management",
       icon: <PersonLinesFill />,
-      module: 'instructors',
+      module: "instructors",
       children: [
-        { label: 'All Instructors', path: '/instructors', icon: <PersonLinesFill /> },
-        { label: 'Assign Team', path: '/assignteam', icon: <PersonLinesFill /> },
+        { label: "All Instructors", path: "/instructors", icon: <PersonLinesFill /> },
+        { label: "Assign Team", path: "/assignteam", icon: <PersonLinesFill /> },
       ],
     },
     {
-      label: 'Data Management',
-      icon: <DatabaseFill />,
-      module: 'data',
+      label: "Mentor Management",
+      icon: <PersonCheckFill />,
+      module: "mentors",
       children: [
-        { label: 'Location', path: '/data', icon: <DatabaseFill /> },
-        { label: 'Classes & Workshops', path: '/data/classses', icon: <JournalBookmarkFill /> },
-        { label: 'Class Attendance', path: '/data/attendance', icon: <ClipboardCheckFill /> },
-        { label: 'Class Media', path: '/data/media', icon: <FileEarmarkPlayFill /> },
+        { label: "All Mentors", path: "/mentors", icon: <PersonCheckFill /> },
+        { label: "Assign Team", path: "/assignmentorteam", icon: <PersonCheckFill /> },
       ],
+    },
+    {
+      label: "Data Management",
+      icon: <DatabaseFill />,
+      module: "data",
+      children: [
+        { label: "Location", path: "/data", icon: <DatabaseFill /> },
+        { label: "Classes & Workshops", path: "/data/classses", icon: <JournalBookmarkFill /> },
+        { label: "Class Attendance", path: "/data/attendance", icon: <ClipboardCheckFill /> },
+        { label: "Class Media", path: "/data/media", icon: <FileEarmarkPlayFill /> },
+        { label: "Participants Journals", path: "/data/pariticipantsjournal", icon: <FileEarmarkPlayFill /> },
+      ],
+    },
+    {
+      label: "Reminders",
+      icon: <BellFill />,
+      module: "reminders",
+      children: [{ label: "All Reminders", path: "/reminders", icon: <BellFill /> }],
+    },
+    {
+      label: "Help and Support",
+      icon: <QuestionCircleFill />,
+      module: "support",
+      children: [{ label: "Support Tickets", path: "/support/tickets", icon: <TicketFill /> }],
+    },
+    {
+      label: "Static Content",
+      icon: <QuestionCircleFill />,
+      module: "staticContent",
+      children: [{ label: "Static Content Data", path: "/static-content/data", icon: <TicketFill /> }],
     },
   ];
 
+  // Auto-open dropdown when visiting a child route
+
+  useEffect(() => {
+    let foundMatch = false;
+    menuStructure.forEach((item) => {
+      if (item.children?.some((sub) => location.pathname.startsWith(sub.path))) {
+        setOpenDropdown(item.module);
+        foundMatch = true;
+      }
+    });
+    // If the route doesn't belong to any submenu, close all dropdowns
+    if (!foundMatch) {
+      setOpenDropdown("");
+    }
+  }, [location.pathname]);
+
+
   return (
-    <div
-      className={`admin-sidebar ${collapsed ? 'collapsed' : ''} ${mobileVisible ? 'mobile-visible' : ''}`}
-      onClick={(e) => {
-        if (mobileVisible && e.target.closest('.menu-item')) {
-          onMobileClose();
-        }
-      }}
-    >
-      {/* Logo Section */}
-      <div className="sidebar-logo">
-        {collapsed ? <span className="logo-collapsed">AP</span> : <span className="logo-expanded">Admin Panel</span>}
-        {!collapsed ? (
-          <button className="sidebar-collapse-btn" onClick={() => setSidebarCollapsed(true)}>
-            <ChevronLeft />
-          </button>
-        ) : (
-          <button className="sidebar-expand-btn" onClick={() => setSidebarCollapsed(false)}>
-            <ChevronRight />
-          </button>
-        )}
-      </div>
+ <Drawer
+  variant={mobileVisible ? "temporary" : "permanent"}
+  open={mobileVisible || !collapsed}
+  onClose={onMobileClose}
+  sx={{
+    "& .MuiDrawer-paper": {
+      width: collapsed ? 80 : drawerWidth,
+      background: "linear-gradient(180deg, #1a237e, #0d47a1)",
+      color: "white",
+      borderRight: "none",
+      transition: "width 0.3s ease",
+      zIndex: 100, // Lower than modal
+    },
+  }}
+>
+      {/* Logo */}
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent={collapsed ? "center" : "space-between"}
+        p={2}
+        sx={{ borderBottom: "1px solid rgba(255,255,255,0.2)" }}
+      >
+        <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+          {collapsed ? "AP" : "Admin Panel"}
+        </Typography>
+        <IconButton onClick={() => setSidebarCollapsed(!collapsed)} sx={{ color: "white" }}>
+          {collapsed ? <ChevronRight /> : <ChevronLeft />}
+        </IconButton>
+      </Box>
 
-      {/* Menu Items */}
-      <div className="sidebar-menu">
-        {menuStructure.map((item) => (
-          <div key={item.label} className="menu-group">
-            {/* Main Item */}
-            {!item.children ? (
-              <Link
-                to={item.path}
-                className={`menu-item ${location.pathname === item.path ? 'active' : ''}`}
-              >
-                <span className="menu-icon">{item.icon}</span>
-                <span className="menu-text">{item.label}</span>
-              </Link>
-            ) : (
-              <>
-                <div
-                  className="menu-item"
-                  onClick={() => toggleDropdown(item.module)}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <span className="menu-icon">{item.icon}</span>
-                  <span className="menu-text">{item.label}</span>
-                  <span className="dropdown-icon">
-                    {openDropdown === item.module ? <ChevronUp /> : <ChevronDown />}
-                  </span>
-                </div>
+      {/* Menu */}
+      <List sx={{ mt: 1 }}>
+        {menuStructure.map((item) => {
+          const isDirectlyActive = item.path && location.pathname === item.path;
 
-                {/* Dropdown Submenu */}
-                {openDropdown === item.module && (
-                  <div className="submenu-list">
-                    {item.children.map((sub) => (
-                      <Link
-                        key={sub.path}
-                        to={sub.path}
-                        className={`submenu-item ${location.pathname === sub.path ? 'active' : ''}`}
-                        onClick={onMobileClose}
-                      >
-                        <span className="submenu-icon">{sub.icon}</span>
-                        <span className="submenu-text">{sub.label}</span>
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
+          return (
+            <React.Fragment key={item.label}>
+              {!item.children ? (
+                <Tooltip title={collapsed ? item.label : ""} placement="right">
+                  <ListItemButton
+                    component={Link}
+                    to={item.path}
+                    sx={{
+                      borderRadius: 1,
+                      mx: 1,
+                      my: 0.5,
+                      backgroundColor: isDirectlyActive ? "rgba(255,255,255,0.15)" : "transparent",
+                      borderLeft: isDirectlyActive ? "4px solid #ffeb3b" : "4px solid transparent",
+                      "&:hover": {
+                        backgroundColor: "rgba(255,255,255,0.25)",
+                        boxShadow: "0 4px 15px rgba(0,0,0,0.3)",
+                      },
+                    }}
+                  >
+                    <ListItemIcon sx={{ color: "white" }}>{item.icon}</ListItemIcon>
+                    {!collapsed && <ListItemText primary={item.label} />}
+                  </ListItemButton>
+                </Tooltip>
+              ) : (
+                <>
+                  {/* Parent item (never highlighted, only clickable to expand) */}
+                  <ListItemButton
+                    onClick={() => toggleDropdown(item.module)}
+                    sx={{
+                      borderRadius: 1,
+                      mx: 1,
+                      my: 0.5,
+                      "&:hover": {
+                        backgroundColor: "rgba(255,255,255,0.25)",
+                        boxShadow: "0 4px 15px rgba(0,0,0,0.3)",
+                      },
+                    }}
+                  >
+                    <ListItemIcon sx={{ color: "white" }}>{item.icon}</ListItemIcon>
+                    {!collapsed && (
+                      <>
+                        <ListItemText primary={item.label} />
+                        {openDropdown === item.module ? <ChevronUp /> : <ChevronDown />}
+                      </>
+                    )}
+                  </ListItemButton>
+
+                  {/* Submenu */}
+                  <Collapse in={openDropdown === item.module && !collapsed} timeout="auto" unmountOnExit>
+                    <List component="div" disablePadding>
+                      {item.children.map((sub) => {
+                        const isSubActive = location.pathname === sub.path;
+                        return (
+                          <ListItemButton
+                            key={sub.path}
+                            component={Link}
+                            to={sub.path}
+                            sx={{
+                              pl: 6,
+                              py: 0.8,
+                              backgroundColor: isSubActive ? "rgba(255,255,255,0.2)" : "transparent",
+                              borderLeft: isSubActive ? "4px solid #ffeb3b" : "4px solid transparent",
+                              "&:hover": { backgroundColor: "rgba(255,255,255,0.3)" },
+                            }}
+                          >
+                            <ListItemIcon sx={{ color: "white", minWidth: 36 }}>{sub.icon}</ListItemIcon>
+                            <ListItemText primary={sub.label} />
+                          </ListItemButton>
+                        );
+                      })}
+                    </List>
+                  </Collapse>
+                </>
+              )}
+            </React.Fragment>
+          );
+        })}
+      </List>
+    </Drawer>
   );
 };
 
 export default Sidebar;
-
-

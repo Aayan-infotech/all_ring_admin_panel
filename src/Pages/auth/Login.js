@@ -4,6 +4,7 @@ import axios from "axios";
 import { useForm } from "react-hook-form";
 import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
 import { login } from "../../services/auth";
+import API_BASE_URL from "../../config/api";
 const Login = () => {
   const {
     register,
@@ -21,7 +22,7 @@ const Login = () => {
 
   try {
     const response = await axios.post(
-      "http://52.20.55.193:5010/api/admin/auth/login", 
+      `${API_BASE_URL}/api/admin/auth/login`, 
       data
     );
 

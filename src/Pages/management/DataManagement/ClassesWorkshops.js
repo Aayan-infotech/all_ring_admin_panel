@@ -7,10 +7,12 @@ import {
   Form,
   Spinner,
   Badge,
-  Row,       
-  Col,      
+  Row,
+  Col,
   Modal,
-  ListGroup
+  ListGroup,
+Alert,
+  Pagination
 } from 'react-bootstrap';
 import {
   PencilSquare,
@@ -29,7 +31,8 @@ import AddClassOffcanvas from './AddClassOffcanvas';
 import AddMediaOffcanvas from './AddMediaOffcanvas';
 import AddNotesOffcanvas from './AddNotesOffcanvas';
 import { toast } from 'react-toastify';
-
+import { useForm } from 'react-hook-form';
+import API_BASE_URL from '../../../config/api';
 const ClassesWorkshops = () => {
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -42,125 +45,240 @@ const ClassesWorkshops = () => {
   const [showNotesForm, setShowNotesForm] = useState(false);
   const [selectedClass, setSelectedClass] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
-    const [showDetailsModal, setShowDetailsModal] = useState(false);
-const [showDeleteModal, setShowDeleteModal] = useState(false);
-const [itemToDelete, setItemToDelete] = useState(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
   const [showAddQuestionModal, setShowAddQuestionModal] = useState(false);
   const [showViewQuestionsModal, setShowViewQuestionsModal] = useState(false);
   const [questionText, setQuestionText] = useState('');
   const [questions, setQuestions] = useState([]);
   const [editingQuestion, setEditingQuestion] = useState(null);
-const [instructors, setInstructors] = useState([]);
+  const [instructors, setInstructors] = useState([]);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0
+  });
 
-// 2. Add a function to fetch instructors
-const fetchInstructors = async () => {
-  try {
-    const token = localStorage.getItem('adminToken');
-    const res = await axios.get('http://52.20.55.193:5010/api/admin/getRegister/instructor', {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    setInstructors(res.data?.users || []);
-  } catch (error) {
-    console.error('Error fetching instructors:', error);
-    setInstructors([]);
-  }
+  const [sessionPage, setSessionPage] = useState(1);
+const [sessionsPerPage] = useState(5); // You can adjust this number
+
+  const [editModalInstructors, setEditModalInstructors] = useState([]);
+  const [loadingInstructors, setLoadingInstructors] = useState(false);
+  const [noInstructorsAvailable, setNoInstructorsAvailable] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+    watch,
+    setValue,
+  } = useForm();
+  // 2. Add a function to fetch instructors
+  const fetchInstructors = async () => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      const res = await axios.get(`${API_BASE_URL}/api/admin/getRegister/instructor`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setInstructors(res.data?.users || []);
+    } catch (error) {
+      console.error('Error fetching instructors:', error);
+      setInstructors([]);
+    }
+  };
+
+
+const convert24To12 = (time24) => {
+  if (!time24) return { hour: '', minute: '', ampm: '' };
+  
+  let [hours, minutes] = time24.split(':');
+  hours = parseInt(hours);
+  
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12;
+  hours = hours || 12; // Convert 0 to 12
+  
+  return {
+    hour: hours.toString(),
+    minute: minutes,
+    ampm
+  };
 };
+  useEffect(() => {
+    const fetchInstructorsByLocation = async () => {
+      if (!selectedClass?.location?._id) {
+        setEditModalInstructors([]);
+        setNoInstructorsAvailable(false);
+        return;
+      }
+
+      setLoadingInstructors(true);
+      setNoInstructorsAvailable(false);
+
+      try {
+        const token = localStorage.getItem('adminToken');
+
+        // Try the location-specific endpoint first
+        try {
+          const response = await axios.get(
+            `${API_BASE_URL}/api/instructor/getByLocation/${selectedClass.location._id}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+
+          if (response.data?.data?.length > 0) {
+            setEditModalInstructors(response.data.data);
+            return;
+          }
+        } catch (apiError) {
+          console.log('Location-specific API failed, trying fallback');
+        }
+
+        // Fallback: get all instructors and filter
+        const allInstructorsRes = await axios.get(
+          `${API_BASE_URL}/api/admin/getRegister/instructor`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        const filtered = allInstructorsRes.data?.users?.filter(inst =>
+          inst.location && inst.location._id === selectedClass.location._id
+        ) || [];
+
+        if (filtered.length > 0) {
+          setEditModalInstructors(filtered);
+        } else {
+          setNoInstructorsAvailable(true);
+          setEditModalInstructors([]);
+        }
+
+      } catch (error) {
+        console.error('Error fetching instructors:', error);
+        toast.error('Failed to load instructors');
+        setEditModalInstructors([]);
+      } finally {
+        setLoadingInstructors(false);
+      }
+    };
+
+    if (selectedClass?.location?._id) {
+      fetchInstructorsByLocation();
+    }
+  }, [selectedClass?.location?._id]);
   const fetchClasses = async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('adminToken');
-      const res = await axios.get('http://52.20.55.193:5010/api/AdminClasses/getAllClasses', {
+      const params = {
+        page: pagination.page,
+        limit: pagination.limit,
+        ...(filterLocation && { filterLocation: filterLocation }),
+        ...(filterStatus && { status: filterStatus }),
+        ...(search && { search })
+      };
+
+      const res = await axios.get(`${API_BASE_URL}/api/AdminClasses/getAllClasses`, {
         headers: { Authorization: `Bearer ${token}` },
+        params
       });
-      const apiData = Array.isArray(res.data?.data) ? res.data.data : res.data;
-      setClasses(apiData || []);
+
+      setClasses(res.data?.data || []);
+      setPagination(prev => ({
+        ...prev,
+        total: res.data?.total || 0,
+        page: res.data?.page || 1,
+        limit: res.data?.limit || 10
+      }));
     } catch (err) {
       console.error('Error fetching classes:', err);
       setClasses([]);
+      toast.error('Failed to fetch classes');
     } finally {
       setLoading(false);
     }
   };
-const handleUpdateClass = async () => {
-  const form = document.getElementById('editClassForm');
-  const formData = new FormData();
+  const handleUpdateClass = async () => {
+    const form = document.getElementById('editClassForm');
+    const formData = new FormData();
 
-  // Append all fields exactly as in the curl example
-  formData.append('title', form.title.value);
-  formData.append('theme', form.theme.value);
-  
-  // Handle tags - you'll need to add tags input to your form
-  // For now, I'll add empty tags array since your form doesn't have tags input
-  formData.append('tags', JSON.stringify([]));
-  
-  // Date fields - you'll need to add these to your form
-  formData.append('startDate', form.startDate.value || new Date().toISOString().split('T')[0]);
-  formData.append('endDate', form.endDate.value || new Date().toISOString().split('T')[0]);
-  
-  // Session type - you'll need to add this to your form
-  formData.append('sessionType', form.sessionType.value || 'weekly');
-  
+    // Get time values from react-hook-form
+    const startTimeHour = form.startTimeHour.value;
+    const startTimeMinute = form.startTimeMinute.value;
+    const startTimeAmPm = form.startTimeAmPm.value;
 
-const formatTime = (time) => {
-  const [hours, minutes] = time.split(':');
-  const hourInt = parseInt(hours, 10);
-  const period = hourInt >= 12 ? 'PM' : 'AM';
-  const displayHour = hourInt % 12 || 12;
-  return `${displayHour}:${minutes} ${period}`;
-};
+    const endTimeHour = form.endTimeHour.value;
+    const endTimeMinute = form.endTimeMinute.value;
+    const endTimeAmPm = form.endTimeAmPm.value;
 
-// Add startTime and endTime from sessions[0] edit fields
-formData.append('startTime', formatTime(form.startTime.value || '12:00'));
-formData.append('endTime', formatTime(form.sessionEndTime.value || '13:00'));
+    // Format times
+    const formatTime = (hour, minute, ampm) => {
+      if (!hour || !minute || !ampm) return '';
+      return `${hour}:${minute} ${ampm}`;
+    };
 
- 
-  formData.append('location', form.location.value);
-  formData.append('Instructor', form.instructor.value);
-  formData.append('Type', form.Type.value); // You'll need to add Type field
-  
-  // Handle image upload
-  if (form.image.files[0]) {
-    formData.append('Image', form.image.files[0]);
-  } else if (selectedClass.Image) {
-    // If no new image, include the existing image URL
-    formData.append('Image', selectedClass.Image);
-  }
+    const startTime = formatTime(startTimeHour, startTimeMinute, startTimeAmPm);
+    const endTime = formatTime(endTimeHour, endTimeMinute, endTimeAmPm);
 
-  // Debug: Log form data before sending
-  for (let [key, value] of formData.entries()) {
-    console.log(key, value);
-  }
+    // Convert to 24-hour format for API
+    const convertTo24HourFormat = (time12h) => {
+      if (!time12h) return '';
+      const [timePart, modifier] = time12h.split(' ');
+      let [hours, minutes] = timePart.split(':').map(Number);
+      if (modifier === 'PM' && hours < 12) hours += 12;
+      if (modifier === 'AM' && hours === 12) hours = 0;
+      const hh = String(hours).padStart(2, '0');
+      const mm = String(minutes).padStart(2, '0');
+      return `${hh}:${mm}`;
+    };
 
-  try {
-    const token = localStorage.getItem('adminToken');
-    const response = await axios.put(
-      `http://52.20.55.193:5010/api/AdminClasses/updateClass/${selectedClass._id}`,
-      formData,
-      {
-        headers: { 
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${token}`
+    // Append all fields
+    formData.append('title', form.title.value);
+    formData.append('theme', form.theme.value);
+    formData.append('tags', JSON.stringify([]));
+    formData.append('startDate', form.startDate.value || new Date().toISOString().split('T')[0]);
+    formData.append('endDate', form.endDate.value || new Date().toISOString().split('T')[0]);
+    formData.append('sessionType', form.sessionType.value || 'weekly');
+    formData.append('startTime', convertTo24HourFormat(startTime));
+    formData.append('endTime', convertTo24HourFormat(endTime));
+    formData.append('location', form.location.value);
+    formData.append('Instructor', form.instructor.value);
+    formData.append('Type', form.Type.value);
+
+    // Handle image upload
+    if (form.image.files[0]) {
+      formData.append('Image', form.image.files[0]);
+    } else if (selectedClass.Image) {
+      formData.append('Image', selectedClass.Image);
+    }
+
+    try {
+      const token = localStorage.getItem('adminToken');
+      const response = await axios.put(
+        `${API_BASE_URL}/api/AdminClasses/updateClass/${selectedClass._id}`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${token}`
+          }
         }
-      }
-    );
-    
-    toast.success('Class updated successfully!');
-    setShowEditModal(false);
-    fetchClasses();
-  } catch (err) {
-    console.error('Update error:', err);
-    toast.error(err.response?.data?.message || 'Failed to update class');
-  }
-};
+      );
 
+      toast.success('Class updated successfully!');
+      setShowEditModal(false);
+      fetchClasses();
+    } catch (err) {
+      console.error('Update error:', err);
+      toast.error(err.response?.data?.message || 'Failed to update class');
+    }
+  };
   const fetchLocations = async () => {
     try {
-      const response = await axios.get('http://52.20.55.193:5010/api/location/getAllLocations');
-      
+      const response = await axios.get(`${API_BASE_URL}/api/location/getAllLocations`);
+
       // Filter to only include active locations
       const activeLocations = (response.data?.data || [])
         .filter(location => location.status === 'Active');
-      
+
       setAllLocations(activeLocations);
     } catch (error) {
       console.error('Error fetching locations:', error);
@@ -168,89 +286,150 @@ formData.append('endTime', formatTime(form.sessionEndTime.value || '13:00'));
     }
   };
 
-  // const fetchLocations = async () => {
-  //   try {
-  //     const res = await axios.get('http://52.20.55.193:5010/api/location/getAllLocations');
-  //     setAllLocations(res.data?.data || []);
-  //   } catch (err) {
-  //     console.error('Error fetching locations:', err);
-  //   }
-  // };
-
-const fetchQuestions = async (classId) => {
+ const fetchQuestions = async (classId) => {
   try {
     const token = localStorage.getItem('adminToken');
     const res = await axios.get(
-      `http://52.20.55.193:5010/api/questionaire/getQuestions/${classId}`,
+      `${API_BASE_URL}/api/questionaire/getQuestions/${classId}`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
-    
+
     if (res.data.success && res.data.questions) {
       setQuestions(res.data.questions);
     } else {
       setQuestions([]);
-      toast.warning('No questions found for this class');
     }
   } catch (err) {
     console.error('Error fetching questions:', err);
-    toast.error('Failed to fetch questions');
     setQuestions([]);
   }
 };
+
+  // const fetchQuestions = async (classId) => {
+  //   try {
+  //     const token = localStorage.getItem('adminToken');
+  //     const res = await axios.get(
+  //       `${API_BASE_URL}/api/questionaire/getQuestions/${classId}`,
+  //       { headers: { Authorization: `Bearer ${token}` } }
+  //     );
+
+  //     if (res.data.success && res.data.questions) {
+  //       setQuestions(res.data.questions);
+  //     } else {
+  //       setQuestions([]);
+  //       toast.warning('No questions found for this class');
+  //     }
+  //   } catch (err) {
+  //     console.error('Error fetching questions:', err);
+  //     toast.error('Failed to fetch questions');
+  //     setQuestions([]);
+  //   }
+  // };
   useEffect(() => {
     fetchClasses();
     fetchLocations();
-      fetchInstructors(); 
+    fetchInstructors();
+  }, [pagination.page, pagination.limit, filterLocation, filterStatus, search]);
+  const toggleStatus = async (id) => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      const response = await axios.patch(
+        `${API_BASE_URL}/api/AdminClasses/blockClass/${id}`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-  }, []);
-const toggleStatus = async (id) => {
+      console.log('Status toggle response:', response.data);
+
+      setClasses(prev =>
+        prev.map(cls =>
+          cls._id === id ? {
+            ...cls,
+            status: response.data.data.status // Use the status from response
+          } : cls
+        )
+      );
+
+      toast.success(`Status changed to ${response.data.data.status}`);
+    } catch (err) {
+      console.error('Status toggle failed:', err);
+      toast.error('Failed to update status');
+    }
+  };
+  const handleDeleteClick = (id) => {
+    setItemToDelete(id);
+    setShowDeleteModal(true);
+  };
+const fetchInstructorsByLocation = async (locationId) => {
+  if (!locationId) {
+    setEditModalInstructors([]);
+    setNoInstructorsAvailable(false);
+    return;
+  }
+
+  setLoadingInstructors(true);
+  setNoInstructorsAvailable(false);
+
   try {
     const token = localStorage.getItem('adminToken');
-    const response = await axios.patch(
-      `http://52.20.55.193:5010/api/AdminClasses/blockClass/${id}`, 
-      {}, 
-      {
-        headers: { Authorization: `Bearer ${token}` },
+
+    // Try the location-specific endpoint first
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/api/instructor/getByLocation/${locationId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.data?.data?.length > 0) {
+        setEditModalInstructors(response.data.data);
+        return;
       }
+    } catch (apiError) {
+      console.log('Location-specific API failed, trying fallback');
+    }
+
+    // Fallback: get all instructors and filter
+    const allInstructorsRes = await axios.get(
+      `${API_BASE_URL}/api/admin/getRegister/instructor`,
+      { headers: { Authorization: `Bearer ${token}` } }
     );
-    
-    console.log('Status toggle response:', response.data);
-    
-    setClasses(prev =>
-      prev.map(cls =>
-        cls._id === id ? { 
-          ...cls, 
-          status: response.data.data.status // Use the status from response
-        } : cls
-      )
-    );
-    
-    toast.success(`Status changed to ${response.data.data.status}`);
-  } catch (err) {
-    console.error('Status toggle failed:', err);
-    toast.error('Failed to update status');
+
+    const filtered = allInstructorsRes.data?.users?.filter(inst =>
+      inst.location && inst.location._id === locationId
+    ) || [];
+
+    if (filtered.length > 0) {
+      setEditModalInstructors(filtered);
+    } else {
+      setNoInstructorsAvailable(true);
+      setEditModalInstructors([]);
+    }
+
+  } catch (error) {
+    console.error('Error fetching instructors:', error);
+    toast.error('Failed to load instructors');
+    setEditModalInstructors([]);
+  } finally {
+    setLoadingInstructors(false);
   }
 };
-const handleDeleteClick = (id) => {
-  setItemToDelete(id);
-  setShowDeleteModal(true);
-};
+  const handleDelete = async () => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      await axios.delete(`${API_BASE_URL}/api/AdminClasses/deleteClass/${itemToDelete}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-const handleDelete = async () => {
-  try {
-    const token = localStorage.getItem('adminToken');
-    await axios.delete(`http://52.20.55.193:5010/api/AdminClasses/deleteClass/${itemToDelete}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    setClasses(prev => prev.filter(cls => cls._id !== itemToDelete));
-    setShowDeleteModal(false);
-    toast.success('Class deleted successfully!');
-  } catch (err) {
-    console.error('Delete failed:', err);
-    toast.error('Failed to delete class');
-  }
-};
+      setClasses(prev => prev.filter(cls => cls._id !== itemToDelete));
+      setShowDeleteModal(false);
+      toast.success('Class deleted successfully!');
+    } catch (err) {
+      console.error('Delete failed:', err);
+      toast.error('Failed to delete class');
+    }
+  };
 
 
 
@@ -258,13 +437,13 @@ const handleDelete = async () => {
     try {
       const token = localStorage.getItem('adminToken');
       await axios.post(
-        `http://52.20.55.193:5010/api/questionaire/addQuestions/${classId}`,
+        `${API_BASE_URL}/api/questionaire/addQuestions/${classId}`,
         { questionText },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       toast.success('Question added successfully!');
       setQuestionText('');
-      setShowAddQuestionModal(false);
+      // setShowAddQuestionModal(false);
       fetchQuestions(classId);
     } catch (err) {
       console.error('Error adding question:', err);
@@ -276,7 +455,7 @@ const handleDelete = async () => {
     try {
       const token = localStorage.getItem('adminToken');
       await axios.put(
-        `http://52.20.55.193:5010/api/questionaire/editQuestion/${classId}/${questionId}`,
+        `${API_BASE_URL}/api/questionaire/editQuestion/${classId}/${questionId}`,
         { questionText },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -289,27 +468,28 @@ const handleDelete = async () => {
       toast.error('Failed to update question');
     }
   };
-const filtered = classes.filter(cls => {
-  const matchesTitle = cls.title?.toLowerCase().includes(search.toLowerCase());
-  const matchesLocation = filterLocation ? cls.location?.location === filterLocation : true;
-  const matchesStatus = filterStatus ? cls.status?.toLowerCase() === filterStatus.toLowerCase() : true;
-  return matchesTitle && matchesLocation && matchesStatus;
-});
-const convertTo24Hour = (timeStr) => {
-  if (!timeStr) return '';
-  const [time, modifier] = timeStr.split(' ');
-  let [hours, minutes] = time.split(':');
-  hours = parseInt(hours);
+  const filtered = classes.filter(cls => {
+    const matchesTitle = cls.title?.toLowerCase().includes(search.toLowerCase());
+    // Compare location _id instead of location name
+    const matchesLocation = filterLocation ? cls.location?._id === filterLocation : true;
+    const matchesStatus = filterStatus ? cls.status?.toLowerCase() === filterStatus.toLowerCase() : true;
+    return matchesTitle && matchesLocation && matchesStatus;
+  });
+  const convertTo24Hour = (timeStr) => {
+    if (!timeStr) return '';
+    const [time, modifier] = timeStr.split(' ');
+    let [hours, minutes] = time.split(':');
+    hours = parseInt(hours);
 
-  if (modifier === 'PM' && hours !== 12) {
-    hours += 12;
-  }
-  if (modifier === 'AM' && hours === 12) {
-    hours = 0;
-  }
+    if (modifier === 'PM' && hours !== 12) {
+      hours += 12;
+    }
+    if (modifier === 'AM' && hours === 12) {
+      hours = 0;
+    }
 
-  return `${String(hours).padStart(2, '0')}:${minutes}`;
-};
+    return `${String(hours).padStart(2, '0')}:${minutes}`;
+  };
 
 
   return (
@@ -317,8 +497,8 @@ const convertTo24Hour = (timeStr) => {
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 style={{ color: 'var(--secondary)', fontWeight: 600 }}>Classes and Workshop</h2>
         <div>
-          <Button 
-            onClick={() => setShowAddForm(true)} 
+          <Button
+            onClick={() => setShowAddForm(true)}
             style={{ backgroundColor: 'var(--primary)', border: 'none', marginRight: '10px' }}
           >
             <PlusCircle className="me-2" /> Add New
@@ -327,42 +507,41 @@ const convertTo24Hour = (timeStr) => {
       </div>
 
       <Row className="mb-4 g-3">
-  <Col md={4}>
-    <Form.Control
-      placeholder="Search by title"
-      value={search}
-      onChange={(e) => setSearch(e.target.value)}
-      style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
-    />
-  </Col>
+        <Col md={4}>
+          <Form.Control
+            placeholder="Search by title"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
+          />
+        </Col>
 
-  <Col md={4}>
-    <Form.Select
-      value={filterLocation}
-      onChange={(e) => setFilterLocation(e.target.value)}
-      style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
-    >
-      <option value="">All Locations</option>
-      {allLocations.map(loc => (
-        <option key={loc._id} value={loc.location}>
-          {loc.location}
-        </option>
-      ))}
-    </Form.Select>
-  </Col>
+        <Col md={4}>
+          <Form.Select
+            value={filterLocation}
+            onChange={(e) => setFilterLocation(e.target.value)}
+          >
+            <option value="">All Locations</option>
+            {allLocations.map(loc => (
+              <option key={loc._id} value={loc._id}>  {/* This is correct */}
+                {loc.location}
+              </option>
+            ))}
+          </Form.Select>
+        </Col>
 
-  <Col md={4}>
-    <Form.Select
-      value={filterStatus}
-      onChange={(e) => setFilterStatus(e.target.value)}
-      style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
-    >
-      <option value="">All Status</option>
-      <option value="active">Active</option>
-      <option value="inactive">Inactive</option>
-    </Form.Select>
-  </Col>
-</Row>
+        <Col md={4}>
+          <Form.Select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
+          >
+            <option value="">All Status</option>
+            <option value="Active">Active</option>
+            <option value="Blocked">Blocked</option>
+          </Form.Select>
+        </Col>
+      </Row>
 
       {loading ? (
         <div className="text-center"><Spinner animation="border" /></div>
@@ -392,47 +571,60 @@ const convertTo24Hour = (timeStr) => {
                   <td>{item.theme}</td>
                   <td>{item.Type}</td>
                   <td>{item.location?.location || 'N/A'}</td>
-               
+
                   <td>
-  <Badge 
-    bg={item.status === 'Active' ? 'success' : 'danger'} 
-    style={{ textTransform: 'capitalize' }}
-  >
-    {item.status}
-  </Badge>
-</td>
+                    <Badge
+                      bg={item.status === 'Active' ? 'success' : 'danger'}
+                      style={{ textTransform: 'capitalize' }}
+                    >
+                      {item.status}
+                    </Badge>
+                  </td>
                   <td>
                     <div className="d-flex flex-wrap gap-2 justify-content-center">
-                     
+
                       <Button
-  variant="light"
-  className={`icon-btn border-0 ${item.status === 'Active' ? 'bg-light border-danger text-danger' : 'bg-light border-success text-success'}`}
-  size="sm"
-  onClick={() => toggleStatus(item._id)}
-  title={item.status === 'Active' ? 'Deactivate' : 'Activate'}
->
-  {item.status === 'Active' ? <XCircleFill size={16} /> : <CheckCircleFill size={16} />}
-</Button>
+                        variant="light"
+                        className={`icon-btn border-0 ${item.status === 'Active' ? 'bg-light border-danger text-danger' : 'bg-light border-success text-success'}`}
+                        size="sm"
+                        onClick={() => toggleStatus(item._id)}
+                        title={item.status === 'Active' ? 'Deactivate' : 'Activate'}
+                      >
+                        {item.status === 'Active' ? <XCircleFill size={16} /> : <CheckCircleFill size={16} />}
+                      </Button>
                       <Button
                         variant="light"
                         className="icon-btn border-warning text-warning"
                         size="sm"
-                        onClick={() => {
-                          setSelectedClass(item);
-                          setShowEditModal(true);
-                        }}
+                       onClick={() => {
+  const firstSession = item.sessions?.[0];
+  const startTimeParts = firstSession ? convert24To12(firstSession.startTime) : { hour: '', minute: '', ampm: '' };
+  const endTimeParts = firstSession ? convert24To12(firstSession.endTime) : { hour: '', minute: '', ampm: '' };
+  
+  setSelectedClass({
+    ...item,
+    startTimeParts,
+    endTimeParts
+  });
+
+    // Fetch instructors for the initial location
+  if (item.location?._id) {
+    fetchInstructorsByLocation(item.location._id);
+  }
+  setShowEditModal(true);
+}}
                       >
                         <PencilSquare size={16} />
                       </Button>
-                     
+
                       <Button
-  variant="light"
-  className="icon-btn border-danger text-danger"
-  size="sm"
-  onClick={() => handleDeleteClick(item._id)}
->
-  <Trash size={16} />
-</Button>
+                        variant="light"
+                        className="icon-btn border-danger text-danger"
+                        size="sm"
+                        onClick={() => handleDeleteClick(item._id)}
+                      >
+                        <Trash size={16} />
+                      </Button>
                       <Button
                         variant="light"
                         className="icon-btn border-dark text-dark"
@@ -444,7 +636,7 @@ const convertTo24Hour = (timeStr) => {
                       >
                         <FileEarmarkText size={16} />
                       </Button>
-                      <Button
+                      {/* <Button
                         variant="light"
                         className="icon-btn border-primary text-primary"
                         size="sm"
@@ -455,18 +647,45 @@ const convertTo24Hour = (timeStr) => {
                         }}
                       >
                         <PlusCircle size={16} />
+                      </Button> */}
+                      <Button
+  variant="light"
+  className="icon-btn border-primary text-primary"
+  size="sm"
+  onClick={() => {
+    setSelectedClass(item);
+    setShowAddQuestionModal(true);
+    setQuestionText('');
+    fetchQuestions(item._id); // Add this line to fetch questions for this specific class
+  }}
+>
+  <PlusCircle size={16} />
+</Button>
+                      <Button
+                        variant="light"
+                        className="icon-btn border-info text-info"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedClass(item);
+                          setShowDetailsModal(true);
+                        }}
+                      >
+                        <InfoCircle size={16} />
                       </Button>
-                          <Button
-        variant="light"
-        className="icon-btn border-info text-info"
-        size="sm"
-        onClick={() => {
-          setSelectedClass(item);
-          setShowDetailsModal(true);
-        }}
-      >
-        <InfoCircle size={16} />
-      </Button>
+
+
+                      {/* <Button
+  variant="light"
+  className="icon-btn border-info text-info"
+  size="sm"
+  onClick={() => {
+    setSelectedClass(item);
+    setShowViewQuestionsModal(true);
+    fetchQuestions(item._id); // Add this line
+  }}
+>
+  <InfoCircle size={16} />
+</Button> */}
 
                     </div>
                   </td>
@@ -475,12 +694,42 @@ const convertTo24Hour = (timeStr) => {
             </tbody>
           </Table>
         </div>
+
       )}
 
-  
+      <div className="d-flex justify-content-between align-items-center mt-3">
+        <div className="text-muted">
+          Showing {(pagination.page - 1) * pagination.limit + 1} to{' '}
+          {Math.min(pagination.page * pagination.limit, pagination.total)} of{' '}
+          {pagination.total} entries
+        </div>
+
+        <Pagination>
+          <Pagination.Prev
+            onClick={() => setPagination(prev => ({ ...prev, page: Math.max(prev.page - 1, 1) }))}
+            disabled={pagination.page === 1}
+          />
+
+          {Array.from({ length: Math.ceil(pagination.total / pagination.limit) }, (_, i) => (
+            <Pagination.Item
+              key={i + 1}
+              active={i + 1 === pagination.page}
+              onClick={() => setPagination(prev => ({ ...prev, page: i + 1 }))}
+            >
+              {i + 1}
+            </Pagination.Item>
+          ))}
+
+          <Pagination.Next
+            onClick={() => setPagination(prev => ({ ...prev, page: Math.min(prev.page + 1, Math.ceil(pagination.total / pagination.limit)) }))}
+            disabled={pagination.page === Math.ceil(pagination.total / pagination.limit)}
+          />
+        </Pagination>
+      </div>
 
 
-     {/* Delete Confirmation Modal */}
+
+      {/* Delete Confirmation Modal */}
 
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
 
@@ -516,6 +765,7 @@ const convertTo24Hour = (timeStr) => {
       <AddClassOffcanvas show={showAddForm} handleClose={() => { setShowAddForm(false); setSelectedClass(null); }} onSaved={fetchClasses} selected={selectedClass} />
       <AddMediaOffcanvas show={showMediaForm} handleClose={() => setShowMediaForm(false)} classId={selectedClass?._id} />
       <AddNotesOffcanvas show={showNotesForm} handleClose={() => setShowNotesForm(false)} classId={selectedClass?._id} />
+
 <Modal show={showDetailsModal} onHide={() => setShowDetailsModal(false)} size="lg" centered>
   <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white', padding: '1rem' }}>
     <Modal.Title style={{ fontSize: '1.25rem' }}>Class Details</Modal.Title>
@@ -527,52 +777,51 @@ const convertTo24Hour = (timeStr) => {
         <div className="col-md-4">
           {selectedClass.Image && (
             <div className="text-center mb-3">
-              <img 
-                src={selectedClass.Image} 
-                alt="Class" 
-                style={{ 
+              <img
+                src={selectedClass.Image}
+                alt="Class"
+                style={{
                   width: '100%',
                   maxHeight: '200px',
                   borderRadius: '8px',
                   objectFit: 'cover',
                   border: '1px solid #eee'
-                }} 
+                }}
               />
             </div>
           )}
-          
+
           <div className="card p-3" style={{ backgroundColor: 'var(--accent)' }}>
             <div className="d-flex justify-content-between align-items-center mb-2">
               <h5 style={{ fontSize: '1.1rem', margin: 0, fontWeight: '600' }}>{selectedClass.title}</h5>
-              <Badge 
-                bg={selectedClass.status === 'active' ? 'success' : 'danger'} 
-                pill
-                style={{ fontSize: '0.75rem' }}
-              >
-                {selectedClass.status}
-              </Badge>
             </div>
-            
-            <div className="mb-2">
-              <span className="badge bg-primary me-2" style={{ fontSize: '0.75rem' }}>
+
+            <div className="mb-2 d-flex flex-wrap gap-2">
+              <span className="badge bg-primary" style={{ fontSize: '0.75rem' }}>
                 {selectedClass.Type}
               </span>
               <span className="badge bg-info text-dark" style={{ fontSize: '0.75rem' }}>
                 {selectedClass.sessionType}
               </span>
+              <span className="badge bg-danger text-white" style={{ fontSize: '0.75rem' }}>
+                {selectedClass.status}
+              </span>
             </div>
-            
+
             <div className="small mb-2">
-              <div className="d-flex align-items-center mb-1">
-                <i className="bi bi-geo-alt me-2"></i>
-                <span>{selectedClass.location?.location || 'N/A'}</span>
+              {/* Location */}
+              <div className="d-flex align-items-center mb-2">
+                <i className="bi bi-geo-alt-fill text-danger me-2 fs-5"></i>
+                <span className="text-muted">{selectedClass.location?.location || 'N/A'}</span>
               </div>
+
+              {/* Instructor */}
               <div className="d-flex align-items-center">
-                <i className="bi bi-person me-2"></i>
-                <span>{selectedClass.Instructor?.name || 'N/A'}</span>
+                <i className="bi bi-person-fill text-primary me-2 fs-5"></i>
+                <span className="text-muted">{selectedClass.Instructor?.name || 'N/A'}</span>
               </div>
             </div>
-            
+
             {selectedClass.tags?.length > 0 && (
               <div className="mt-2">
                 <div className="text-muted small mb-1">Tags:</div>
@@ -587,7 +836,7 @@ const convertTo24Hour = (timeStr) => {
             )}
           </div>
         </div>
-        
+
         {/* Main Details Section */}
         <div className="col-md-8">
           <div className="card p-3 h-100">
@@ -596,7 +845,7 @@ const convertTo24Hour = (timeStr) => {
               <h6 className="text-muted mb-2">Theme</h6>
               <p style={{ fontSize: '0.95rem' }}>{selectedClass.theme || '-'}</p>
             </div>
-            
+
             {/* Date and Time Information */}
             <div className="row mb-3">
               <div className="col-md-6">
@@ -608,48 +857,127 @@ const convertTo24Hour = (timeStr) => {
                 <p>{new Date(selectedClass.endDate || selectedClass.Date).toLocaleDateString()}</p>
               </div>
             </div>
-            
-            {/* Class Status */}
-            <div className="mb-3">
-              <h6 className="text-muted mb-2">Class Status</h6>
-              <Badge bg={selectedClass.classStatus === 'Live' ? 'success' : 'warning'} className="text-capitalize">
-                {selectedClass.classStatus || 'N/A'}
-              </Badge>
-            </div>
-            
+
             {/* Sessions Section */}
-            {selectedClass.sessions?.length > 0 && (
-              <div className="mb-3">
-                <h6 className="text-muted mb-2">Sessions</h6>
-                <div className="table-responsive">
-                  <table className="table table-sm table-hover">
-                    <thead>
-                      <tr>
-                        <th>Date</th>
-                        <th>Start Time</th>
-                        <th>End Time</th>
-                        <th>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {selectedClass.sessions.map((session, index) => (
-                        <tr key={index}>
-                          <td>{new Date(session.date).toLocaleDateString()}</td>
-                          <td>{session.startTime}</td>
-                          <td>{session.endTime}</td>
-                          <td>
-                            <Badge bg={session.status === 'Active' ? 'success' : 'secondary'} pill>
-                              {session.status}
-                            </Badge>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+        {selectedClass.sessions?.length > 0 && (
+  <div className="mb-3">
+    <h6 className="text-muted mb-2">Sessions</h6>
+    <div className="table-responsive">
+      <table className="table table-sm table-hover align-middle">
+        <thead className="table-light">
+          <tr>
+            <th>Date</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th className="text-center">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {selectedClass.sessions
+            .slice(
+              (sessionPage - 1) * sessionsPerPage,
+              sessionPage * sessionsPerPage
+            )
+            .map((session, index) => (
+              <tr key={index}>
+                <td>{new Date(session.date).toLocaleDateString('en-US', { 
+                  year: 'numeric', 
+                  month: 'short', 
+                  day: 'numeric' 
+                })}</td>
+                <td>{session.startTime}</td>
+                <td>{session.endTime}</td>
+                <td className="text-center">
+                  <Badge 
+                    bg={
+                      session.sessionStatus === 'live' ? 'success' : 
+                      session.sessionStatus === 'completed' ? 'secondary' : 'warning'
+                    } 
+                    className="text-capitalize px-2 py-1"
+                    style={{ 
+                      fontSize: '0.75rem',
+                      minWidth: '70px'
+                    }}
+                  >
+                    {session.sessionStatus || 'N/A'}
+                  </Badge>
+                </td>
+              </tr>
+            ))}
+        </tbody>
+      </table>
+      
+      {/* Corrected Pagination */}
+      <div className="d-flex flex-column flex-md-row justify-content-between align-items-center mt-3 gap-2">
+        <div className="text-muted small">
+          Showing <span className="fw-semibold">{(sessionPage - 1) * sessionsPerPage + 1}</span> to{' '}
+          <span className="fw-semibold">
+            {Math.min(sessionPage * sessionsPerPage, selectedClass.sessions.length)}
+          </span> of{' '}
+          <span className="fw-semibold">{selectedClass.sessions.length}</span> sessions
+        </div>
+        
+        <div className="d-flex align-items-center gap-1">
+          <Button
+            variant="light"
+            size="sm"
+            onClick={() => setSessionPage(prev => Math.max(prev - 1, 1))}
+            disabled={sessionPage === 1}
+            style={{ 
+              border: '1px solid #dee2e6',
+              padding: '0.25rem 0.5rem'
+            }}
+          >
+            Previous
+          </Button>
+          
+          <div className="mx-1 d-flex gap-1">
+            {Array.from(
+              { length: Math.ceil(selectedClass.sessions.length / sessionsPerPage) }, 
+              (_, i) => (
+                <Button
+                  key={i + 1}
+                  variant={i + 1 === sessionPage ? "primary" : "light"}
+                  size="sm"
+                  onClick={() => setSessionPage(i + 1)}
+                  style={{ 
+                    border: '1px solid #dee2e6',
+                    padding: '0.25rem 0.5rem',
+                    minWidth: '32px'
+                  }}
+                >
+                  {i + 1}
+                </Button>
+              )
+            ).slice(
+              Math.max(0, sessionPage - 2),
+              Math.min(
+                Math.ceil(selectedClass.sessions.length / sessionsPerPage),
+                sessionPage + 1
+              )
             )}
-            
+          </div>
+          
+          <Button
+            variant="light"
+            size="sm"
+            onClick={() => setSessionPage(prev => 
+              Math.min(prev + 1, Math.ceil(selectedClass.sessions.length / sessionsPerPage))
+            )}
+            disabled={sessionPage >= Math.ceil(selectedClass.sessions.length / sessionsPerPage)}
+            style={{ 
+              border: '1px solid #dee2e6',
+              padding: '0.25rem 0.5rem'
+            }}
+          >
+            Next
+          </Button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
             {/* Additional Information */}
             <div className="row">
               <div className="col-md-6">
@@ -667,8 +995,8 @@ const convertTo24Hour = (timeStr) => {
     )}
   </Modal.Body>
   <Modal.Footer style={{ padding: '1rem', justifyContent: 'flex-end' }}>
-    <Button 
-      variant="outline-secondary" 
+    <Button
+      variant="outline-secondary"
       onClick={() => setShowDetailsModal(false)}
       style={{ padding: '0.375rem 0.75rem' }}
     >
@@ -676,198 +1004,294 @@ const convertTo24Hour = (timeStr) => {
     </Button>
   </Modal.Footer>
 </Modal>
-<Modal show={showEditModal} onHide={() => { setShowEditModal(false); setSelectedClass(null); }} centered>
-  <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
-    <Modal.Title>Edit Class</Modal.Title>
-  </Modal.Header>
-  <Modal.Body style={{ backgroundColor: 'var(--accent)' }}>
-    {selectedClass ? (
-      <Form id="editClassForm">
-        <Form.Group className="mb-3">
-    <Form.Label>Title</Form.Label>
-    <Form.Control 
-      name="title" 
-      defaultValue={selectedClass.title} 
-      required 
-    />
-  </Form.Group>
+      <Modal show={showEditModal} onHide={() => { setShowEditModal(false); setSelectedClass(null); }} centered>
+        <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
+          <Modal.Title>Edit Class</Modal.Title>
+        </Modal.Header>
+        <Modal.Body style={{ backgroundColor: 'var(--accent)' }}>
+          {selectedClass ? (
+            <Form id="editClassForm">
+              <Form.Group className="mb-3">
+                <Form.Label>Title</Form.Label>
+                <Form.Control
+                  name="title"
+                  defaultValue={selectedClass.title}
+                  required
+                />
+              </Form.Group>
 
-  {/* Theme Field */}
-  <Form.Group className="mb-3">
-    <Form.Label>Theme</Form.Label>
-    <Form.Control 
-      name="theme" 
-      defaultValue={selectedClass.theme} 
-      required 
-    />
-  </Form.Group>
 
-   <Form.Group className="mb-3">
-    <Form.Label>Start Date</Form.Label>
-    <Form.Control
-      type="date"
-      name="startDate"
-      defaultValue={selectedClass.startDate ? selectedClass.startDate.split('T')[0] : ''}
-      required
-    />
-  </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Theme</Form.Label>
+                <Form.Control
+                  as="textarea"
+                  rows={3}  // Adjust number of visible rows
+                  name="theme"
+                  defaultValue={selectedClass.theme}
+                  required
+                  style={{
+                    minHeight: '100px',  // Minimum height
+                    resize: 'vertical'   // Allow vertical resizing
+                  }}
+                />
+              </Form.Group>
 
-  <Form.Group className="mb-3">
-    <Form.Label>End Date</Form.Label>
-    <Form.Control
-      type="date"
-      name="endDate"
-      defaultValue={selectedClass.endDate ? selectedClass.endDate.split('T')[0] : ''}
-      required
-    />
-  </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Start Date</Form.Label>
+                <Form.Control
+                  type="date"
+                  name="startDate"
+                  defaultValue={selectedClass.startDate ? selectedClass.startDate.split('T')[0] : ''}
+                  required
+                />
+              </Form.Group>
 
-  <Form.Group className="mb-3">
-    <Form.Label>Session Type</Form.Label>
-    <Form.Select 
-      name="sessionType" 
-      defaultValue={selectedClass.sessionType || 'weekly'}
-      required
-    >
-      <option value="weekly">Weekly</option>
-      <option value="daily">Daily</option>
-      <option value="monthly">Monthly</option>
-    </Form.Select>
-  </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>End Date</Form.Label>
+                <Form.Control
+                  type="date"
+                  name="endDate"
+                  defaultValue={selectedClass.endDate ? selectedClass.endDate.split('T')[0] : ''}
+                  required
+                />
+              </Form.Group>
 
- {/* Start Time Field from Sessions[0] */}
-<Form.Group className="mb-3">
-  <Form.Label>Start Time</Form.Label>
-  <Form.Control
-    type="time"
-    name="startTime"
-    defaultValue={
-      selectedClass.sessions && selectedClass.sessions.length > 0
-        ? convertTo24Hour(selectedClass.sessions[0].startTime)
-        : ''
-    }
-    required
-  />
+              <Form.Group className="mb-3">
+                <Form.Label>Session Type</Form.Label>
+                <Form.Select
+                  name="sessionType"
+                  defaultValue={selectedClass.sessionType || 'weekly'}
+                  required
+                >
+                  <option value="weekly">Weekly</option>
+                  <option value="daily">Daily</option>
+                  <option value="monthly">Monthly</option>
+                </Form.Select>
+              </Form.Group>
+
+            
+              <Row className="mb-3">
+                {/* START TIME */}
+      {/* Start Time */}
+<Form.Group as={Col} md={6} controlId="startTime">
+  <Form.Label>Start Time <span className="text-danger">*</span></Form.Label>
+  <div className="d-flex gap-2 align-items-start">
+    <div>
+      <Form.Label className="small">Hour</Form.Label>
+      <Form.Select
+        name="startTimeHour"
+        defaultValue={selectedClass.startTimeParts?.hour || ''}
+      >
+        <option value="">Hour</option>
+        {[1,2,3,4,5,6,7,8,9,10,11,12].map(h => (
+          <option key={`sh-${h}`} value={h}>{h}</option>
+        ))}
+      </Form.Select>
+    </div>
+    
+    <div>
+      <Form.Label className="small">Minute</Form.Label>
+      <Form.Select
+        name="startTimeMinute"
+        defaultValue={selectedClass.startTimeParts?.minute || ''}
+      >
+        <option value="">Min</option>
+        {['00','05','10','15','20','25','30','35','40','45','50','55'].map(m => (
+          <option key={`sm-${m}`} value={m}>{m}</option>
+        ))}
+      </Form.Select>
+    </div>
+    
+    <div>
+      <Form.Label className="small">AM/PM</Form.Label>
+      <Form.Select
+        name="startTimeAmPm"
+        defaultValue={selectedClass.startTimeParts?.ampm || ''}
+      >
+        <option value="">--</option>
+        <option value="AM">AM</option>
+        <option value="PM">PM</option>
+      </Form.Select>
+    </div>
+  </div>
 </Form.Group>
 
-{/* End Time Field from Sessions[0] */}
+{/* End Time - same structure as Start Time */}
+<Form.Group as={Col} md={6} controlId="endTime">
+  <Form.Label>End Time <span className="text-danger">*</span></Form.Label>
+  <div className="d-flex gap-2 align-items-start">
+    <div>
+      <Form.Label className="small">Hour</Form.Label>
+      <Form.Select
+        name="endTimeHour"
+        defaultValue={selectedClass.endTimeParts?.hour || ''}
+      >
+        <option value="">Hour</option>
+        {[1,2,3,4,5,6,7,8,9,10,11,12].map(h => (
+          <option key={`eh-${h}`} value={h}>{h}</option>
+        ))}
+      </Form.Select>
+    </div>
+    
+    <div>
+      <Form.Label className="small">Minute</Form.Label>
+      <Form.Select
+        name="endTimeMinute"
+        defaultValue={selectedClass.endTimeParts?.minute || ''}
+      >
+        <option value="">Min</option>
+        {['00','05','10','15','20','25','30','35','40','45','50','55'].map(m => (
+          <option key={`em-${m}`} value={m}>{m}</option>
+        ))}
+      </Form.Select>
+    </div>
+    
+    <div>
+      <Form.Label className="small">AM/PM</Form.Label>
+      <Form.Select
+        name="endTimeAmPm"
+        defaultValue={selectedClass.endTimeParts?.ampm || ''}
+      >
+        <option value="">--</option>
+        <option value="AM">AM</option>
+        <option value="PM">PM</option>
+      </Form.Select>
+    </div>
+  </div>
+</Form.Group>
+              </Row>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Type</Form.Label>
+                <Form.Select
+                  name="Type"
+                  defaultValue={selectedClass.Type || 'Workshop'}
+                  required
+                >
+                  <option value="Regular Class">Regular Class</option>
+                  <option value="Workshop">Workshop</option>
+                  <option value="Special Event">Special Event</option>
+                </Form.Select>
+              </Form.Group>
+
+
+
+              {/* Location Field */}
+              {/* Location Field */}
 <Form.Group className="mb-3">
-  <Form.Label>End Time</Form.Label>
-  <Form.Control
-    type="time"
-    name="sessionEndTime"
-    defaultValue={
-      selectedClass.sessions && selectedClass.sessions.length > 0
-        ? convertTo24Hour(selectedClass.sessions[0].endTime)
-        : ''
-    }
+  <Form.Label>Location</Form.Label>
+  <Form.Select
+    name="location"
+    defaultValue={selectedClass.location?._id}
     required
-  />
+    onChange={async (e) => {
+      const locationId = e.target.value;
+      // Update the form value
+      setValue('location', locationId);
+      // Fetch instructors for this location
+      await fetchInstructorsByLocation(locationId);
+    }}
+  >
+    <option value="">Select a location</option>
+    {allLocations.map((location) => (
+      <option key={location._id} value={location._id}>
+        {location.location}
+      </option>
+    ))}
+  </Form.Select>
 </Form.Group>
 
-
-  <Form.Group className="mb-3">
-    <Form.Label>Type</Form.Label>
-    <Form.Select 
-      name="Type" 
-      defaultValue={selectedClass.Type || 'Workshop'}
-      required
-    >
-      <option value="Regular Class">Regular Class</option>
-      <option value="Workshop">Workshop</option>
-      <option value="Special Event">Special Event</option>
-    </Form.Select>
-  </Form.Group>
-
- 
-
-  {/* Location Field */}
-  <Form.Group className="mb-3">
-    <Form.Label>Location</Form.Label>
-    <Form.Select 
-      name="location" 
-      defaultValue={selectedClass.location?._id} 
-      required
-    >
-      <option value="">Select a location</option>
-      {allLocations.map((location) => (
-        <option key={location._id} value={location._id}>
-          {location.location}
-        </option>
-      ))}
-    </Form.Select>
-  </Form.Group>
-
-  {/* Instructor Field */}
-  <Form.Group className="mb-3">
-    <Form.Label>Instructor</Form.Label>
+              {/* Instructor Field */}
+   {/* Instructor Field */}
+<Form.Group className="mb-3">
+  <Form.Label>Instructor</Form.Label>
+  {loadingInstructors ? (
+    <div className="d-flex align-items-center">
+      <Spinner animation="border" size="sm" className="me-2" />
+      <span>Loading instructors...</span>
+    </div>
+  ) : noInstructorsAvailable ? (
+    <Alert variant="warning" className="py-2 mb-0">
+      No instructors available for this location
+    </Alert>
+  ) : (
     <Form.Select 
       name="instructor" 
       defaultValue={selectedClass.Instructor?._id} 
       required
     >
       <option value="">Select an instructor</option>
-      {instructors.map((instructor) => (
+      {editModalInstructors.map((instructor) => (
         <option key={instructor._id} value={instructor._id}>
           {instructor.name}
         </option>
       ))}
     </Form.Select>
-  </Form.Group>
+  )}
+</Form.Group>
 
-  {/* Image Field */}
-  <Form.Group className="mb-3">
-    <Form.Label>Image</Form.Label>
-    <Form.Control 
-      type="file" 
-      name="image" 
-      accept="image/*" 
-    />
-    {selectedClass.Image && (
-      <div className="mt-2">
-        <small>Current Image:</small>
-        <img 
-          src={selectedClass.Image} 
-          alt="Current class" 
-          style={{ 
-            maxWidth: '100px',
-            maxHeight: '100px',
-            display: 'block',
-            marginTop: '5px'
-          }} 
-        />
-      </div>
-    )}
-  </Form.Group>
+              {/* Image Field */}
+              <Form.Group className="mb-3">
+                <Form.Label>Image</Form.Label>
+                <Form.Control
+                  type="file"
+                  name="image"
+                  accept="image/*"
+                />
+                {selectedClass.Image && (
+                  <div className="mt-2">
+                    <small>Current Image:</small>
+                    <img
+                      src={selectedClass.Image}
+                      alt="Current class"
+                      style={{
+                        maxWidth: '100px',
+                        maxHeight: '100px',
+                        display: 'block',
+                        marginTop: '5px'
+                      }}
+                    />
+                  </div>
+                )}
+              </Form.Group>
 
-        <div className="d-flex justify-content-end">
-          <Button 
-            variant="secondary" 
-            onClick={() => setShowEditModal(false)} 
-            className="me-2"
-          >
-            Cancel
-          </Button>
-     <Button
-  type="button"
-  variant="primary"
-  onClick={handleUpdateClass}
-  style={{ backgroundColor: 'var(--primary)', borderColor: 'var(--primary)' }}
->
-  Save Changes
-</Button>
-        </div>
-      </Form>
-    ) : (
-      <div className="text-center">Loading...</div>
-    )}
-  </Modal.Body>
-</Modal>
+              <div className="d-flex justify-content-end">
+                <Button
+                  variant="secondary"
+                  onClick={() => setShowEditModal(false)}
+                  className="me-2"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  variant="primary"
+                  onClick={handleUpdateClass}
+                  style={{ backgroundColor: 'var(--primary)', borderColor: 'var(--primary)' }}
+                >
+                  Save Changes
+                </Button>
+              </div>
+            </Form>
+          ) : (
+            <div className="text-center">Loading...</div>
+          )}
+        </Modal.Body>
+      </Modal>
 
 
 
- <Modal show={showAddQuestionModal} onHide={() => { setShowAddQuestionModal(false); setQuestionText(''); setEditingQuestion(null); }} centered size="lg">
-        <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
+<Modal 
+  show={showAddQuestionModal} 
+  onHide={() => { 
+    setShowAddQuestionModal(false); 
+    setQuestionText(''); 
+    setEditingQuestion(null);
+    setQuestions([]); // Reset questions when modal closes
+  }} 
+  centered 
+  size="lg"
+>        <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
           <Modal.Title>
             {editingQuestion ? 'Edit Question' : `Add Questions for ${selectedClass?.title}`}
           </Modal.Title>
@@ -883,18 +1307,18 @@ const convertTo24Hour = (timeStr) => {
           }}>
             <Form.Group className="mb-3">
               <Form.Label>Question Text</Form.Label>
-              <Form.Control 
-                as="textarea" 
-                rows={3} 
-                value={questionText} 
-                onChange={(e) => setQuestionText(e.target.value)} 
-                required 
+              <Form.Control
+                as="textarea"
+                rows={3}
+                value={questionText}
+                onChange={(e) => setQuestionText(e.target.value)}
+                required
               />
             </Form.Group>
             <div className="d-flex justify-content-end mb-3">
-              <Button variant="secondary" onClick={() => { 
-                setQuestionText(''); 
-                setEditingQuestion(null); 
+              <Button variant="secondary" onClick={() => {
+                setQuestionText('');
+                setEditingQuestion(null);
               }} className="me-2">
                 Clear
               </Button>
@@ -941,58 +1365,58 @@ const convertTo24Hour = (timeStr) => {
         </Modal.Footer>
       </Modal>
 
-   
+
 
       {/* View Questions Modal */}
-<Modal show={showViewQuestionsModal} onHide={() => setShowViewQuestionsModal(false)} centered size="lg">
-  <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
-    <Modal.Title>Questions for {selectedClass?.title}</Modal.Title>
-  </Modal.Header>
-  <Modal.Body style={{ backgroundColor: 'var(--accent)' }}>
-    {questions.length === 0 ? (
-      <div className="text-center text-muted">No questions added yet.</div>
-    ) : (
-      <ListGroup>
-        {questions.map((q, index) => (
-          <ListGroup.Item key={q._id} className="d-flex justify-content-between align-items-center">
-            <div style={{ flex: 1 }}>
-              <strong>{index + 1}.</strong> {q.questionText}
-            </div>
-            <div>
-              <Button
-                variant="outline-warning"
-                size="sm"
-                className="me-2"
-                onClick={() => {
-                  setEditingQuestion(q);
-                  setQuestionText(q.questionText);
-                  setShowViewQuestionsModal(false);
-                  setShowAddQuestionModal(true);
-                }}
-              >
-                Edit
-              </Button>
-        
-            </div>
-          </ListGroup.Item>
-        ))}
-      </ListGroup>
-    )}
-  </Modal.Body>
-  <Modal.Footer style={{ backgroundColor: 'var(--accent)' }}>
-    <Button variant="secondary" onClick={() => setShowViewQuestionsModal(false)}>
-      Close
-    </Button>
-    <Button variant="primary" onClick={() => {
-      setQuestionText('');
-      setEditingQuestion(null);
-      setShowViewQuestionsModal(false);
-      setShowAddQuestionModal(true);
-    }}>
-      Add New Question
-    </Button>
-  </Modal.Footer>
-</Modal>
+      <Modal show={showViewQuestionsModal} onHide={() => setShowViewQuestionsModal(false)} centered size="lg">
+        <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
+          <Modal.Title>Questions for {selectedClass?.title}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body style={{ backgroundColor: 'var(--accent)' }}>
+          {questions.length === 0 ? (
+            <div className="text-center text-muted">No questions added yet.</div>
+          ) : (
+            <ListGroup>
+              {questions.map((q, index) => (
+                <ListGroup.Item key={q._id} className="d-flex justify-content-between align-items-center">
+                  <div style={{ flex: 1 }}>
+                    <strong>{index + 1}.</strong> {q.questionText}
+                  </div>
+                  <div>
+                    <Button
+                      variant="outline-warning"
+                      size="sm"
+                      className="me-2"
+                      onClick={() => {
+                        setEditingQuestion(q);
+                        setQuestionText(q.questionText);
+                        setShowViewQuestionsModal(false);
+                        setShowAddQuestionModal(true);
+                      }}
+                    >
+                      Edit
+                    </Button>
+
+                  </div>
+                </ListGroup.Item>
+              ))}
+            </ListGroup>
+          )}
+        </Modal.Body>
+        <Modal.Footer style={{ backgroundColor: 'var(--accent)' }}>
+          <Button variant="secondary" onClick={() => setShowViewQuestionsModal(false)}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={() => {
+            setQuestionText('');
+            setEditingQuestion(null);
+            setShowViewQuestionsModal(false);
+            setShowAddQuestionModal(true);
+          }}>
+            Add New Question
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

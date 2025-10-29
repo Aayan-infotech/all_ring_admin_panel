@@ -5,7 +5,8 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Table, Button, ButtonGroup, Badge, InputGroup, Form, 
-  Spinner, Modal, Card, ListGroup, Alert, Row, Col 
+  Spinner, Modal, Card, ListGroup, Alert, Row, Col,
+  Pagination 
 } from 'react-bootstrap';
 import {
   Search,
@@ -14,14 +15,15 @@ import {
   PeopleFill,
   InfoCircle,
   CheckCircle,
-  XCircle,
-  PlusCircle,
-  EyeFill,
-  LockFill
+  XCircle
 } from 'react-bootstrap-icons';
 import axios from 'axios';
-import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
+import API_BASE_URL from '../../../config/api';
+
+// Helper: Find and return array of items with assigned status
+const getPreselected = (items) =>
+  items.filter(item => item.status === 'Assigned');
 
 const AssignMentorTeam = () => {
   // State variables
@@ -41,35 +43,61 @@ const AssignMentorTeam = () => {
   const [loadingAssignment, setLoadingAssignment] = useState(false);
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [userSearchTerm, setUserSearchTerm] = useState('');
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [filters, setFilters] = useState({
+    search: '',
+    location: '',
+    status: ''
+  });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+  const [totalMentors, setTotalMentors] = useState(0);
 
-  // Helper function to get location string
   const getLocationString = (location) => {
     if (!location) return '-';
     return typeof location === 'object' ? location.location : location;
   };
 
-  // Fetch mentors data
+  // Fetch mentors data with pagination and filters
   const fetchMentors = async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('adminToken');
-      const res = await axios.get('http://52.20.55.193:5010/api/admin/getRegister/mentor', {
+      let statusFilter = '';
+      if (filters.status === 'active') statusFilter = '1';
+      else if (filters.status === 'blocked') statusFilter = '2';
+      else if (filters.status === 'not verified') statusFilter = '0';
+      const params = {
+        page: currentPage,
+        limit: itemsPerPage,
+        search: filters.search,
+        filterLocation: filters.location,
+        status: statusFilter
+      };
+      const res = await axios.get(`${API_BASE_URL}/api/admin/getRegister/mentor`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        params
       });
       setMentors(res.data.users || []);
+      setTotalMentors(res.data.total || 0);
       setLoading(false);
     } catch (err) {
       console.error('Error fetching mentors:', err);
+      toast.error('Failed to load mentors');
       setLoading(false);
     }
   };
 
-  // Fetch locations data
   const fetchLocations = async () => {
     try {
-      const res = await axios.get('http://52.20.55.193:5010/api/location/getAllLocations');
+      const token = localStorage.getItem('adminToken');
+      const res = await axios.get(`${API_BASE_URL}/api/location/getAllLocations`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      });
       const locations = res.data?.data || [];
       const activeLocations = locations
         .filter(loc => loc.status === 'Active')
@@ -84,13 +112,36 @@ const AssignMentorTeam = () => {
     }
   };
 
-  // Fetch instructors by location
+  // Handle filter change
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (page) => setCurrentPage(page);
+
+  useEffect(() => {
+    fetchMentors();
+  }, [currentPage, itemsPerPage, filters]);
+
+  useEffect(() => {
+    fetchMentors();
+    fetchLocations();
+  }, []);
+
+  // --- Modal fetch and selection logic ---
+
+  // Fetch instructors by mentor/location, mark assigned as selected
   const fetchInstructorsByLocation = async (mentorId) => {
     try {
       setLoadingInstructors(true);
       const token = localStorage.getItem('adminToken');
       const res = await axios.get(
-        `http://52.20.55.193:5010/api/assignInstructor/getInstructorByLocation/${mentorId}`,
+        `${API_BASE_URL}/api/assignInstructor/getInstructorByLocation/${mentorId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -98,24 +149,26 @@ const AssignMentorTeam = () => {
         }
       );
       setInstructors(res.data.instructors || []);
+      // Preselect instructors with status 'Assigned'
+      setSelectedInstructors(getPreselected(res.data.instructors || []));
       setLoadingInstructors(false);
     } catch (err) {
       console.error('Error fetching instructors:', err);
       toast.error('Failed to load instructors');
+      setInstructors([]);
+      setSelectedInstructors([]);
       setLoadingInstructors(false);
     }
   };
 
-  // Fetch users by instructors
+  // Fetch users by selected instructor(s), and mark assigned as selected
   const fetchUsersByInstructors = async (instructorIds) => {
     try {
       setLoadingUsers(true);
       const token = localStorage.getItem('adminToken');
-      
-      // Fetch users for each instructor and combine
       const usersPromises = instructorIds.map(async (instructorId) => {
         const res = await axios.get(
-          `http://52.20.55.193:5010/api/assignInstructor/getUsersByInstructor/${instructorId}`,
+          `${API_BASE_URL}/api/assignInstructor/getUsersByInstructor/${instructorId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -124,57 +177,85 @@ const AssignMentorTeam = () => {
         );
         return res.data.users || [];
       });
-      
       const usersArrays = await Promise.all(usersPromises);
       const combinedUsers = usersArrays.flat();
-      
-      // Remove duplicates
+      // Only unique users by _id
       const uniqueUsers = combinedUsers.filter(
         (user, index, self) => index === self.findIndex(u => u._id === user._id)
       );
-      
+
       setUsers(uniqueUsers);
+      // Preselect users with status 'Assigned'
+      setSelectedUsers(getPreselected(uniqueUsers));
       setLoadingUsers(false);
     } catch (err) {
       console.error('Error fetching users:', err);
-      toast.error('Failed to load users');
+      setUsers([]);
+      setSelectedUsers([]);
       setLoadingUsers(false);
+      toast.error('Failed to load users');
     }
   };
 
-
-const handleAssignTeam = async () => {
-    if (selectedInstructors.length === 0 || selectedUsers.length === 0) {
-      toast.error('Please select at least one instructor and one user');
-      return;
+  // When selectedInstructors change, refetch their users and preselect
+  useEffect(() => {
+    if (selectedInstructors.length > 0) {
+      fetchUsersByInstructors(selectedInstructors.map(i => i._id));
+    } else {
+      setUsers([]);
+      setSelectedUsers([]);
     }
+  }, [selectedInstructors]);
 
+  // Filter users based on search term
+  useEffect(() => {
+    if (users.length > 0) {
+      const filtered = users.filter(user =>
+        user.name?.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
+        user.email?.toLowerCase().includes(userSearchTerm.toLowerCase())
+      );
+      setFilteredUsers(filtered);
+    } else {
+      setFilteredUsers([]);
+    }
+  }, [users, userSearchTerm]);
+
+  const clearSelections = () => {
+    setSelectedInstructors([]);
+    setSelectedUsers([]);
+  };
+
+  // Modal open will preselect based on data from backend
+  const openAssignModal = (mentor) => {
+    setSelectedUser(mentor);
+    setUserSearchTerm('');
+    setUsers([]);
+    setSelectedUsers([]);
+    setInstructors([]);
+    setSelectedInstructors([]);
+    fetchInstructorsByLocation(mentor._id);
+    setShowAssignModal(true);
+  };
+
+  // Assign Team logic -- always send selected, even if empty for unassignment
+  const handleAssignTeam = async () => {
     try {
       setLoadingAssignment(true);
       const token = localStorage.getItem('adminToken');
-      
-      // Create payload in the required format
       const payload = {
         instructors: selectedInstructors.map(instructor => ({
           instructorId: instructor._id,
           userIds: selectedUsers.map(user => user._id)
         }))
       };
-
       await axios.post(
-        `http://52.20.55.193:5010/api/assignInstructor/assignInstructorAndUsers/${selectedUser._id}`,
+        `${API_BASE_URL}/api/assignInstructor/assignInstructorAndUsers/${selectedUser._id}`,
         payload,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-
       toast.success('Team assigned successfully!');
       setShowAssignModal(false);
-      setSelectedInstructors([]);
-      setSelectedUsers([]);
+      clearSelections();
       setLoadingAssignment(false);
     } catch (err) {
       console.error('Error assigning team:', err);
@@ -182,11 +263,13 @@ const handleAssignTeam = async () => {
       setLoadingAssignment(false);
     }
   };
-  // Toggle instructor selection
+
+  // Individual instructor selection toggle
   const toggleInstructorSelection = (instructor) => {
     setSelectedInstructors(prev => {
       const isSelected = prev.some(i => i._id === instructor._id);
       if (isSelected) {
+        // Also remove from selected users users of this instructor
         return prev.filter(i => i._id !== instructor._id);
       } else {
         return [...prev, instructor];
@@ -194,7 +277,7 @@ const handleAssignTeam = async () => {
     });
   };
 
-  // Toggle user selection
+  // Individual user selection toggle
   const toggleUserSelection = (user) => {
     setSelectedUsers(prev => {
       const isSelected = prev.some(u => u._id === user._id);
@@ -206,53 +289,6 @@ const handleAssignTeam = async () => {
     });
   };
 
-  // Open assign modal
-  const openAssignModal = (mentor) => {
-    setSelectedUser(mentor);
-    setSelectedInstructors([]);
-    setSelectedUsers([]);
-    fetchInstructorsByLocation(mentor._id);
-    setShowAssignModal(true);
-  };
-
-  // Filter mentors based on search and filters
-  const filteredMentors = mentors.filter((mentor) => {
-    const nameMatch =
-      mentor.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      mentor.email?.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const locationMatch = selectedLocation 
-      ? mentor.location?._id === selectedLocation 
-      : true;
-
-    const statusMatch = selectedStatus 
-      ? mentor.accountStatus === selectedStatus 
-      : true;
-
-    return nameMatch && locationMatch && statusMatch;
-  });
-
-  // Filter users based on search
-  const filteredUsers = users.filter(user => 
-    user.name?.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
-    user.email?.toLowerCase().includes(userSearchTerm.toLowerCase())
-  );
-
-  // Initial data fetch
-  useEffect(() => {
-    fetchMentors();
-    fetchLocations();
-  }, []);
-
-  // Fetch users when selected instructors change
-  useEffect(() => {
-    if (selectedInstructors.length > 0) {
-      fetchUsersByInstructors(selectedInstructors.map(i => i._id));
-    } else {
-      setUsers([]);
-    }
-  }, [selectedInstructors]);
-
   return (
     <div className="p-4" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -260,143 +296,184 @@ const handleAssignTeam = async () => {
       </div>
 
       {/* Filters Section */}
-      <div className="row mb-4">
-        <div className="col-md-4 mb-2">
-          <InputGroup>
-            <InputGroup.Text style={{ backgroundColor: 'var(--accent)', borderColor: 'var(--accent)' }}>
-              <Search style={{ color: 'var(--primary)' }} />
-            </InputGroup.Text>
-            <Form.Control
-              placeholder="Search by name or email..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              style={{ 
-                border: '1px solid var(--accent)',
-                borderRadius: '0 8px 8px 0',
-                backgroundColor: 'var(--accent)'
-              }}
-            />
-          </InputGroup>
-        </div>
-
-        <div className="col-md-4 mb-2">
+      <Row className="mb-4 g-3">
+        <Col md={4}>
+          <Form.Control
+            placeholder="Search by name or email..."
+            name="search"
+            value={filters.search}
+            onChange={handleFilterChange}
+            style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
+          />
+        </Col>
+        <Col md={4}>
           <Form.Select
-            value={selectedLocation}
-            onChange={(e) => setSelectedLocation(e.target.value)}
-            style={{ 
-              borderRadius: '8px',
-              border: '1px solid var(--accent)',
-              backgroundColor: 'var(--accent)'
-            }}
+            name="location"
+            value={filters.location}
+            onChange={handleFilterChange}
+            style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
           >
-            <option value="">Filter by Location</option>
-            {locationList.map((loc, idx) => (
-              <option key={idx} value={loc.id}>
+            <option value="">All Locations</option>
+            {locationList.map((loc) => (
+              <option key={loc.id} value={loc.id}>
                 {loc.name}
               </option>
             ))}
           </Form.Select>
-        </div>
-
-        <div className="col-md-4 mb-2">
+        </Col>
+        <Col md={4}>
           <Form.Select
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-            style={{ 
-              borderRadius: '8px',
-              border: '1px solid var(--accent)',
-              backgroundColor: 'var(--accent)'
-            }}
+            name="status"
+            value={filters.status}
+            onChange={handleFilterChange}
+            style={{ border: '2px solid var(--accent)', borderRadius: '8px' }}
           >
-            <option value="">Filter by Status</option>
+            <option value="">All Status</option>
             <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
+            <option value="blocked">Blocked</option>
+            <option value="not verified">Not Verified</option>
           </Form.Select>
-        </div>
-      </div>
+        </Col>
+      </Row>
 
       {/* Mentors Table */}
       {loading ? (
         <div className="text-center my-5">
-          <Spinner animation="border" variant="primary" style={{ color: 'var(--primary)' }} />
+          <Spinner animation="border" variant="primary" />
         </div>
       ) : (
-        <div className="table-responsive">
-          <Table striped bordered hover style={{ borderRadius: '10px', overflow: 'hidden' }}>
-            <thead style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
-              <tr>
-                <th>#</th>
-                <th>Profile</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Location</th>
-                <th>Expertise</th>
-                {/* <th>Status</th> */}
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredMentors.map((mentor, index) => (
-                <tr key={mentor._id}>
-                  <td>{index + 1}</td>
-                  <td>
-                    <img
-                      src={mentor.profilePicture || 'https://via.placeholder.com/40'}
-                      alt="Profile"
-                      style={{ 
-                        width: '40px', 
-                        height: '40px', 
-                        borderRadius: '50%', 
-                        objectFit: 'cover',
-                        border: '2px solid var(--accent)'
-                      }}
-                    />
-                  </td>
-                  <td>{mentor.name || '-'}</td>
-                  <td>{mentor.email || '-'}</td>
-                  <td>{getLocationString(mentor.location)}</td>
-                  <td>{mentor.expertise || '-'}</td>
-                  {/* <td>
-                    <Badge 
-                      bg={mentor.accountStatus === 'active' ? 'success' : 'danger'}
-                      style={{ 
-                        backgroundColor: mentor.accountStatus === 'active' ? 'var(--success)' : 'var(--danger)'
-                      }}
+        <>
+        <div className="table-responsive mb-3">
+        <Table striped bordered hover style={{ borderRadius: '10px', overflow: 'hidden' }}>
+          <thead style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
+            <tr>
+              <th>#</th>
+              <th>Profile</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Location</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {mentors.map((mentor, index) => (
+              <tr key={mentor._id}>
+                <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                <td>
+                  <img
+                    src={mentor.profilePicture || 'https://via.placeholder.com/40'}
+                    alt="Profile"
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '50%',
+                      objectFit: 'cover',
+                      border: '2px solid var(--accent)'
+                    }}
+                  />
+                </td>
+                <td>{mentor.name || '-'}</td>
+                <td>{mentor.email || '-'}</td>
+                <td>{getLocationString(mentor.location)}</td>
+                <td>
+                  <Badge 
+                    pill 
+                    bg={
+                      mentor.accountStatus === 'active' ? 'success' : 
+                      mentor.accountStatus === 'blocked' ? 'danger' : 
+                      'warning'
+                    }
+                  >
+                    {mentor.accountStatus === 'active' ? 'Active' : 
+                    mentor.accountStatus === 'blocked' ? 'Blocked' : 
+                    mentor.accountStatus === 'not verified' ? 'Not Verified' : 
+                    mentor.accountStatus}
+                  </Badge>
+                </td>
+                <td>
+                  <ButtonGroup>
+                    <Button 
+                      variant="outline-success" 
+                      size="sm" 
+                      onClick={() => openAssignModal(mentor)}
+                      title="Assign Team"
+                      style={{ borderColor: 'var(--primary)', color: 'var(--primary)' }}
                     >
-                      {mentor.accountStatus || 'inactive'}
-                    </Badge>
-                  </td> */}
-                  <td>
-                    <ButtonGroup>
-                      <Button 
-                        variant="outline-success" 
-                        size="sm" 
-                        onClick={() => openAssignModal(mentor)}
-                        title="Assign Team"
-                        style={{ borderColor: 'var(--primary)', color: 'var(--primary)' }}
-                      >
-                        <PersonPlus />
-                      </Button>
-                    </ButtonGroup>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
+                      <PersonPlus />
+                    </Button>
+                  </ButtonGroup>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
         </div>
+        {/* Pagination */}
+        {totalMentors > itemsPerPage && (
+        <div className="d-flex justify-content-between align-items-center">
+          <div>
+            Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
+            {Math.min(currentPage * itemsPerPage, totalMentors)} of {totalMentors} mentors
+          </div>
+          <Pagination>
+            <Pagination.First 
+              onClick={() => handlePageChange(1)} 
+              disabled={currentPage === 1} 
+            />
+            <Pagination.Prev 
+              onClick={() => handlePageChange(currentPage - 1)} 
+              disabled={currentPage === 1} 
+            />
+            {Array.from({ length: Math.min(5, Math.ceil(totalMentors / itemsPerPage)) }, (_, i) => {
+              let pageNum;
+              const totalPages = Math.ceil(totalMentors / itemsPerPage);
+              if (totalPages <= 5) {
+                pageNum = i + 1;
+              } else if (currentPage <= 3) {
+                pageNum = i + 1;
+              } else if (currentPage >= totalPages - 2) {
+                pageNum = totalPages - 4 + i;
+              } else {
+                pageNum = currentPage - 2 + i;
+              }
+              return (
+                <Pagination.Item
+                  key={pageNum}
+                  active={pageNum === currentPage}
+                  onClick={() => handlePageChange(pageNum)}
+                >
+                  {pageNum}
+                </Pagination.Item>
+              );
+            })}
+            <Pagination.Next 
+              onClick={() => handlePageChange(currentPage + 1)} 
+              disabled={currentPage === Math.ceil(totalMentors / itemsPerPage)} 
+            />
+            <Pagination.Last 
+              onClick={() => handlePageChange(Math.ceil(totalMentors / itemsPerPage))} 
+              disabled={currentPage === Math.ceil(totalMentors / itemsPerPage)} 
+            />
+          </Pagination>
+        </div>
+        )}
+        </>
       )}
 
       {/* Assign Team Modal */}
-      <Modal 
-        show={showAssignModal} 
-        onHide={() => {
-          setShowAssignModal(false);
-          setSelectedInstructors([]);
-          setSelectedUsers([]);
-        }}
-        size="xl"
-        centered
-      >
+<Modal 
+  show={showAssignModal} 
+  onHide={() => {
+    setShowAssignModal(false);
+    clearSelections();
+  }}
+  style={{ zIndex: 9999 }}  // Increased to very high value
+  backdropStyle={{ zIndex: 9998 }} // For the backdrop
+  className="z-9999"
+  size="xl"
+  centered
+>
         <Modal.Header closeButton style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
           <Modal.Title className="d-flex align-items-center">
             <PeopleFill className="me-2" size={24} />
@@ -405,8 +482,16 @@ const handleAssignTeam = async () => {
               <small className="text-white-50">Select instructors and their users</small>
             </div>
           </Modal.Title>
+          <Button 
+            variant="light"
+            className="ms-3"
+            onClick={clearSelections}
+            size="sm"
+            style={{ borderColor: 'var(--danger)', color: 'var(--danger)' }}
+          >
+            Clear Selection
+          </Button>
         </Modal.Header>
-        
         <Modal.Body style={{ backgroundColor: 'var(--accent)' }}>
           <Row>
             {/* Instructors Column */}
@@ -422,34 +507,30 @@ const handleAssignTeam = async () => {
                   </div>
                   {loadingInstructors && <Spinner animation="border" size="sm" variant="light" />}
                 </Card.Header>
-
                 <Card.Body style={{ maxHeight: '400px', overflowY: 'auto' }}>
                   {instructors.length > 0 ? (
                     <ListGroup variant="flush">
                       {instructors.map(instructor => (
-                    
                         <ListGroup.Item
-  key={instructor._id}
-  action
-  active={selectedInstructors.some(i => i._id === instructor._id)}
-  onClick={() => toggleInstructorSelection(instructor)}
-  className="py-3"
-  style={{
-    backgroundColor:
-      instructor.status === 'Assigned'
-        ? 'rgba(0, 123, 255, 0.1)' // light blue for pre-assigned
-        : selectedInstructors.some(i => i._id === instructor._id)
-        ? 'rgba(13, 110, 253, 0.1)'
-        : 'white',
-    borderLeft:
-      instructor.status === 'Assigned'
-        ? '4px solid var(--primary)'
-        : selectedInstructors.some(i => i._id === instructor._id)
-        ? '4px solid var(--primary)'
-        : 'none',
-  }}
->
-
+                          key={instructor._id}
+                          action
+                          active={selectedInstructors.some(i => i._id === instructor._id)}
+                          onClick={() => toggleInstructorSelection(instructor)}
+                          className="py-3"
+                          style={{
+                            backgroundColor:
+                              instructor.status === 'Assigned'
+                                ? 'rgba(25, 135, 84, 0.1)'
+                                : selectedInstructors.some(i => i._id === instructor._id)
+                                ? 'rgba(13, 110, 253, 0.1)' : 'white',
+                            borderLeft:
+                              instructor.status === 'Assigned'
+                                ? '4px solid var(--success)'
+                                : selectedInstructors.some(i => i._id === instructor._id)
+                                ? '4px solid var(--primary)'
+                                : 'none',
+                          }}
+                        >
                           <div className="d-flex align-items-center">
                             <div className="position-relative me-3">
                               <img
@@ -478,7 +559,6 @@ const handleAssignTeam = async () => {
                                 )}
                               </Badge>
                             </div>
-
                             <div className="flex-grow-1">
                               <div className="d-flex justify-content-between align-items-center">
                                 <h6 className="mb-0" style={{ color: 'var(--secondary)' }}>
@@ -489,7 +569,7 @@ const handleAssignTeam = async () => {
                                   bg={instructor.status === 'Assigned' ? 'success' : 'light'}
                                   text={instructor.status === 'Assigned' ? 'white' : 'dark'}
                                 >
-                                  {instructor.status}
+                                  {instructor.status || 'Unassigned'}
                                 </Badge>
                               </div>
                               <small className="text-muted d-block">{instructor.email}</small>
@@ -507,11 +587,10 @@ const handleAssignTeam = async () => {
                 </Card.Body>
               </Card>
             </Col>
-            
             {/* Users Column */}
             <Col md={7} className="ps-2">
               <Card className="h-100 shadow-sm" style={{ borderColor: 'var(--secondary)' }}>
-                <Card.Header className="d-flex justify-content-between align-items-center" 
+                <Card.Header className="d-flex justify-content-between align-items-center"
                   style={{ backgroundColor: 'var(--secondary)', color: 'white' }}>
                   <div>
                     <h5 className="mb-0">
@@ -527,7 +606,6 @@ const handleAssignTeam = async () => {
                   </div>
                   {loadingUsers && <Spinner animation="border" size="sm" variant="light" />}
                 </Card.Header>
-                
                 <Card.Body style={{ maxHeight: '400px', overflowY: 'auto' }}>
                   {selectedInstructors.length > 0 ? (
                     <>
@@ -543,156 +621,75 @@ const handleAssignTeam = async () => {
                           />
                         </InputGroup>
                       </div>
-                      
                       {filteredUsers.length > 0 ? (
-                        // <ListGroup variant="flush">
-                        //   {filteredUsers.map(user => (
-                        //     <ListGroup.Item 
-                        //       key={user._id}
-                        //       action
-                        //       active={selectedUsers.some(u => u._id === user._id)}
-                        //       onClick={() => toggleUserSelection(user)}
-                        //       className="py-3"
-                        //       style={{ 
-                        //         backgroundColor: selectedUsers.some(u => u._id === user._id) 
-                        //           ? 'rgba(13, 110, 253, 0.1)' 
-                        //           : 'white',
-                        //         borderLeft: selectedUsers.some(u => u._id === user._id) 
-                        //           ? '4px solid var(--primary)' 
-                        //           : 'none'
-                        //       }}
-                        //     >
-                        //       <div className="d-flex align-items-center">
-                        //         <div className="position-relative me-3">
-                        //           <img
-                        //             src={user.profilePicture || 'https://via.placeholder.com/50'}
-                        //             alt="Profile"
-                        //             style={{ 
-                        //               width: '40px', 
-                        //               height: '40px', 
-                        //               borderRadius: '50%',
-                        //               objectFit: 'cover',
-                        //               border: '2px solid var(--accent)'
-                        //             }}
-                        //           />
-                        //           {selectedUsers.some(u => u._id === user._id) && (
-                        //             <Badge 
-                        //               bg="primary"
-                        //               className="position-absolute top-0 start-100 translate-middle"
-                        //               pill
-                        //               style={{ backgroundColor: 'var(--primary)' }}
-                        //             >
-                        //               <CheckCircle size={12} />
-                        //             </Badge>
-                        //           )}
-                        //         </div>
-                                
-                        //         <div className="flex-grow-1">
-                        //           <div className="d-flex justify-content-between align-items-center">
-                        //             <h6 className="mb-0" style={{ color: 'var(--secondary)' }}>
-                        //               {user.name}
-                        //             </h6>
-                        //             <Badge 
-                        //               pill 
-                        //               bg={user.status === 'Assigned' ? 'success' : 'light'} 
-                        //               text={user.status === 'Assigned' ? 'white' : 'dark'}
-                        //             >
-                        //               {user.status || 'Unassigned'}
-                        //             </Badge>
-                        //           </div>
-                        //           <small className="text-muted d-block">{user.email}</small>
-                        //           <small className="text-muted">{user.number}</small>
-                        //         </div>
-                        //       </div>
-                        //     </ListGroup.Item>
-                        //   ))}
-                        // </ListGroup>
-
                         <ListGroup variant="flush">
-  {filteredUsers.map(user => (
-    // <ListGroup.Item 
-    //   key={user._id}
-    //   action
-    //   active={selectedUsers.some(u => u._id === user._id)}
-    //   onClick={() => toggleUserSelection(user)}
-    //   className="py-3"
-    //   style={{ 
-    //     backgroundColor: selectedUsers.some(u => u._id === user._id) 
-    //       ? 'rgba(13, 110, 253, 0.1)' 
-    //       : 'white',
-    //     borderLeft: selectedUsers.some(u => u._id === user._id) 
-    //       ? '4px solid var(--primary)' 
-    //       : 'none'
-    //   }}
-    // >
-    <ListGroup.Item
-  key={user._id}
-  action
-  active={selectedUsers.some(u => u._id === user._id)}
-  onClick={() => toggleUserSelection(user)}
-  className="py-3"
-  style={{
-    backgroundColor:
-      user.status === 'Assigned'
-        ? 'rgba(0, 123, 255, 0.1)'
-        : selectedUsers.some(u => u._id === user._id)
-        ? 'rgba(13, 110, 253, 0.1)'
-        : 'white',
-    borderLeft:
-      user.status === 'Assigned'
-        ? '4px solid var(--primary)'
-        : selectedUsers.some(u => u._id === user._id)
-        ? '4px solid var(--primary)'
-        : 'none',
-  }}
->
-
-      <div className="d-flex align-items-center">
-        <div className="position-relative me-3">
-          <img
-            src={user.profilePicture || 'https://via.placeholder.com/50'}
-            alt="Profile"
-            style={{ 
-              width: '40px', 
-              height: '40px', 
-              borderRadius: '50%',
-              objectFit: 'cover',
-              border: '2px solid var(--accent)'
-            }}
-          />
-          <Badge
-            bg={user.status === 'Assigned' ? 'success' : 'secondary'}
-            className="position-absolute top-0 start-100 translate-middle"
-            pill
-          >
-            {user.status === 'Assigned' ? (
-              <CheckCircle size={12} />
-            ) : (
-              <XCircle size={12} />
-            )}
-          </Badge>
-        </div>
-        
-        <div className="flex-grow-1">
-          <div className="d-flex justify-content-between align-items-center">
-            <h6 className="mb-0" style={{ color: 'var(--secondary)' }}>
-              {user.name}
-            </h6>
-            <Badge 
-              pill 
-              bg={user.status === 'Assigned' ? 'success' : 'light'} 
-              text={user.status === 'Assigned' ? 'white' : 'dark'}
-            >
-              {user.status || 'Unassigned'}
-            </Badge>
-          </div>
-          <small className="text-muted d-block">{user.email}</small>
-          <small className="text-muted">{user.number}</small>
-        </div>
-      </div>
-    </ListGroup.Item>
-  ))}
-</ListGroup>
+                          {filteredUsers.map(user => (
+                            <ListGroup.Item
+                              key={user._id}
+                              action
+                              active={selectedUsers.some(u => u._id === user._id)}
+                              onClick={() => toggleUserSelection(user)}
+                              className="py-3"
+                              style={{
+                                backgroundColor:
+                                  user.status === 'Assigned'
+                                    ? 'rgba(25, 135, 84, 0.1)'
+                                    : selectedUsers.some(u => u._id === user._id)
+                                    ? 'rgba(13, 110, 253, 0.1)'
+                                    : 'white',
+                                borderLeft:
+                                  user.status === 'Assigned'
+                                    ? '4px solid var(--success)'
+                                    : selectedUsers.some(u => u._id === user._id)
+                                    ? '4px solid var(--primary)'
+                                    : 'none',
+                              }}
+                            >
+                              <div className="d-flex align-items-center">
+                                <div className="position-relative me-3">
+                                  <img
+                                    src={user.profilePicture || 'https://via.placeholder.com/50'}
+                                    alt="Profile"
+                                    style={{
+                                      width: '40px',
+                                      height: '40px',
+                                      borderRadius: '50%',
+                                      objectFit: 'cover',
+                                      border: '2px solid var(--accent)'
+                                    }}
+                                  />
+                                  <Badge
+                                    bg={user.status === 'Assigned' ? 'success' : 'secondary'}
+                                    className="position-absolute top-0 start-100 translate-middle"
+                                    pill
+                                  >
+                                    {user.status === 'Assigned' ? (
+                                      <CheckCircle size={12} />
+                                    ) : (
+                                      <XCircle size={12} />
+                                    )}
+                                  </Badge>
+                                </div>
+                                <div className="flex-grow-1">
+                                  <div className="d-flex justify-content-between align-items-center">
+                                    <h6 className="mb-0" style={{ color: 'var(--secondary)' }}>
+                                      {user.name}
+                                    </h6>
+                                    <Badge 
+                                      pill 
+                                      bg={user.status === 'Assigned' ? 'success' : 'light'} 
+                                      text={user.status === 'Assigned' ? 'white' : 'dark'}
+                                    >
+                                      {user.status || 'Unassigned'}
+                                    </Badge>
+                                  </div>
+                                  <small className="text-muted d-block">{user.email}</small>
+                                  <small className="text-muted">{user.number}</small>
+                                </div>
+                              </div>
+                            </ListGroup.Item>
+                          ))}
+                        </ListGroup>
                       ) : (
                         <Alert variant="info" className="text-center">
                           {loadingUsers ? 'Loading users...' : 'No users found matching your search'}
@@ -806,14 +803,12 @@ const handleAssignTeam = async () => {
             )}
           </div>
         </Modal.Body>
-        
         <Modal.Footer style={{ backgroundColor: 'var(--accent)' }}>
           <Button 
             variant="outline-secondary" 
             onClick={() => {
               setShowAssignModal(false);
-              setSelectedInstructors([]);
-              setSelectedUsers([]);
+              clearSelections();
             }}
             style={{ borderColor: 'var(--secondary)', color: 'var(--secondary)' }}
           >
@@ -822,7 +817,7 @@ const handleAssignTeam = async () => {
           <Button 
             variant="primary" 
             onClick={handleAssignTeam}
-            disabled={selectedInstructors.length === 0 || selectedUsers.length === 0 || loadingAssignment}
+            disabled={loadingAssignment}
             className="d-flex align-items-center"
             style={{ backgroundColor: 'var(--primary)', borderColor: 'var(--primary)' }}
           >

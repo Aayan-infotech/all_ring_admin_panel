@@ -33,7 +33,7 @@ const Header = ({ toggleSidebar, sidebarCollapsed, toggleMobileSidebar }) => {
         <div className="header-spacer" />
 
         <div className="user-profile">
-          <PersonCircle size={28} className="user-icon" />
+          {/* <PersonCircle size={28} className="user-icon" /> */}
           <span className="user-email">{userEmail}</span>
           <button onClick={openConfirm} className="logout-button">
             Logout

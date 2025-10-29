@@ -9,8 +9,9 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { XCircleFill, CheckCircleFill } from 'react-bootstrap-icons';
 import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api';
+import API_BASE_URL from '../../../config/api';
 
-const API_BASE = 'http://52.20.55.193:5010/api/location';
+const API_BASE = `${API_BASE_URL}/api/location`;
 
 // Map settings
 const mapContainerStyle = {
@@ -328,11 +329,11 @@ const Data = () => {
       </Button>
     </OverlayTrigger>
 
-    <OverlayTrigger placement="top" overlay={<Tooltip>Delete Location</Tooltip>}>
+    {/* <OverlayTrigger placement="top" overlay={<Tooltip>Delete Location</Tooltip>}>
       <Button size="sm" variant="danger" onClick={() => confirmDelete(item)}>
         Delete
       </Button>
-    </OverlayTrigger>
+    </OverlayTrigger> */}
 
     {item.status === 'Active' ? (
       <OverlayTrigger placement="top" overlay={<Tooltip>Block this location</Tooltip>}>
