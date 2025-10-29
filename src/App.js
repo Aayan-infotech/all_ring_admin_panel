@@ -32,15 +32,27 @@ import AssignMentorTeam from "./Pages/management/MentorManagement/AssignMentorTe
 import CreateNotification from "./Pages/management/Notification/CreateNotification";
 import ParticipantsJournals from "./Pages/management/DataManagement/ParticipantsJournals";
 import Tickets from "./Pages/management/Support/Tickets";
+import StaticContent from "./Pages/management/staticContent/staticContent";
+
+// Import public pages
+import AboutUs from "./Pages/public/AboutUs";
+import TermsAndConditions from "./Pages/public/TermsAndConditions";
+import PrivacyPolicy from "./Pages/public/PrivacyPolicy";
+
 function App() {
   return (
     <Router>
       <ToastContainer />
       <Routes>
+        {/* Public Routes - Accessible without authentication */}
+        <Route path="/about-us" element={<AboutUs />} />
+        <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        
         <Route path="/login" element={<Login />} />
-
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
+        {/* Protected Routes - Require authentication */}
         <Route
           element={
             <PrivateRoute>
@@ -52,29 +64,28 @@ function App() {
           <Route path="/users" element={<Users />} />
           <Route path="/mentors" element={<Mentors />} />
           <Route path="/support/tickets" element={<Tickets />} />
-
+          <Route path="/static-content/data" element={<StaticContent />} />
           <Route path="/instructors" element={<Instructors />} />
           <Route path="/assignteam" element={<AssignTeam />} />
           <Route path="/reminders" element={<CreateNotification />} />
           <Route path="/data" element={<Data />} />
-          <Route path="data/classses" element={<ClassesWorkshops />} />
-          <Route path="data/attendance" element={<ClassAttendance />} />
+          <Route path="/data/classses" element={<ClassesWorkshops />} />
+          <Route path="/data/attendance" element={<ClassAttendance />} />
           <Route
-            path="data/pariticipantsjournal"
+            path="/data/pariticipantsjournal"
             element={<ParticipantsJournals />}
           />
-
           <Route path="/feedback/:classId" element={<FeedbackPage />} />
-
-          <Route path="data/media" element={<ClassMediaPage />} />
-          <Route path="*" element={<NotFound />} />
+          <Route path="/data/media" element={<ClassMediaPage />} />
           <Route path="/prisoners" element={<PrisonerList />} />
-
           <Route path="/adduser" element={<AddUserOffcanvas />} />
           <Route path="/addmentor" element={<AddMentorOffcanvas />} />
           <Route path="/assignmentorteam" element={<AssignMentorTeam />} />
           <Route path="/addinstructor" element={<AddInstructorOffcanvas />} />
         </Route>
+
+        {/* Catch all route - should be last */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );

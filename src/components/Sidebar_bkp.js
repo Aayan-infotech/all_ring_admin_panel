@@ -121,6 +121,18 @@ const Sidebar = ({
         },
       ],
     },
+    {
+      label: "Static Content",
+      icon: <QuestionCircleFill />,
+      module: "staticContent",
+      children: [
+        {
+          label: "Static Content",
+          path: "/static-content/data",
+          icon: <TicketFill />,
+        },
+      ],
+    },
   ];
 
   return (

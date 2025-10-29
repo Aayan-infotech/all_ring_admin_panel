@@ -90,6 +90,12 @@ const Sidebar = ({ collapsed, mobileVisible, onMobileClose, setSidebarCollapsed 
       module: "support",
       children: [{ label: "Support Tickets", path: "/support/tickets", icon: <TicketFill /> }],
     },
+    {
+      label: "Static Content",
+      icon: <QuestionCircleFill />,
+      module: "staticContent",
+      children: [{ label: "Static Content Data", path: "/static-content/data", icon: <TicketFill /> }],
+    },
   ];
 
   // Auto-open dropdown when visiting a child route
