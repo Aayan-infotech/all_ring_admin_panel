@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Spinner, Alert } from 'react-bootstrap';
 import API_BASE_URL from '../../config/api';
 
-const deleteAccount = () => {
+const DeleteAccount = () => {
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -56,17 +56,25 @@ const deleteAccount = () => {
     <div style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', minHeight: '100vh' }}>
       <Container className="py-5">
         <div className="text-center mb-5">
-          <h1 style={{ color: 'white', fontSize: '3rem', fontWeight: 'bold' }}>Privacy Policy</h1>
-          <div style={{ height: '4px', width: '100px', background: 'white', margin: '20px auto', borderRadius: '2px' }}></div>
+          <h1 style={{ color: 'white', fontSize: '3rem', fontWeight: 'bold' }}>Account Deletion Policy</h1>
+          <div
+            style={{
+              height: '4px',
+              width: '100px',
+              background: 'white',
+              margin: '20px auto',
+              borderRadius: '2px',
+            }}
+          ></div>
         </div>
-        
-        <div 
+
+        <div
           className="p-5 rounded shadow"
-          style={{ 
+          style={{
             backgroundColor: 'white',
             minHeight: '400px',
             lineHeight: '1.8',
-            fontSize: '1.1rem'
+            fontSize: '1.1rem',
           }}
         >
           <div style={{ whiteSpace: 'pre-wrap' }}>{content}</div>
@@ -76,4 +84,4 @@ const deleteAccount = () => {
   );
 };
 
-export default deleteAccount;
+export default DeleteAccount;

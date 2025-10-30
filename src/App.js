@@ -38,6 +38,7 @@ import StaticContent from "./Pages/management/staticContent/staticContent";
 import AboutUs from "./Pages/public/AboutUs";
 import TermsAndConditions from "./Pages/public/TermsAndConditions";
 import PrivacyPolicy from "./Pages/public/PrivacyPolicy";
+import deleteAccount from "./Pages/public/deleteAccountPolicy"; 
 
 
 function App() {
