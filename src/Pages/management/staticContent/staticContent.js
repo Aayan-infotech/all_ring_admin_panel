@@ -8,19 +8,20 @@ const StaticContent = () => {
   const [content, setContent] = useState({
     aboutUs: '',
     termsAndConditions: '',
-    privacyPolicy: ''
+    privacyPolicy: '',
+    deleteAccount: ''
   });
   const [originalContent, setOriginalContent] = useState({
     aboutUs: '',
     termsAndConditions: '',
-    privacyPolicy: ''
+    privacyPolicy: '',
+    deleteAccount: ''
   });
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
   const [previewContent, setPreviewContent] = useState({ show: false, title: '', content: '' });
 
-  // Fetch content when tab changes
   useEffect(() => {
     fetchContent(activeTab);
   }, [activeTab]);
@@ -48,7 +49,6 @@ const StaticContent = () => {
       const result = await response.json();
       console.log('API Response:', result);
 
-      // Handle the response based on your API structure
       if (result.data) {
         const contentValue = result.data.content || '';
         
@@ -61,14 +61,12 @@ const StaticContent = () => {
           [section]: contentValue
         }));
         
-        // Show success message only if we actually got content
         if (contentValue) {
           setMessage({ type: 'success', text: `${getSectionTitle(section)} content loaded successfully` });
         } else {
           setMessage({ type: 'info', text: `No content found for ${getSectionTitle(section)}. You can create new content.` });
         }
       } else {
-        // If no data exists for this section, initialize with empty content
         setContent(prev => ({
           ...prev,
           [section]: ''
@@ -92,7 +90,6 @@ const StaticContent = () => {
       
       setMessage({ type: 'danger', text: errorMessage });
       
-      // Initialize with empty content even on error
       setContent(prev => ({
         ...prev,
         [activeTab]: ''
@@ -165,7 +162,8 @@ const StaticContent = () => {
     const titles = {
       aboutUs: 'About Us',
       termsAndConditions: 'Terms and Conditions',
-      privacyPolicy: 'Privacy Policy'
+      privacyPolicy: 'Privacy Policy',
+      deleteAccount: 'Delete Account'
     };
 
     setPreviewContent({
@@ -183,7 +181,8 @@ const StaticContent = () => {
     const titles = {
       aboutUs: 'About Us',
       termsAndConditions: 'Terms & Conditions',
-      privacyPolicy: 'Privacy Policy'
+      privacyPolicy: 'Privacy Policy',
+      deleteAccount: 'Delete Account'
     };
     return titles[section];
   };
@@ -274,12 +273,18 @@ const StaticContent = () => {
                             Privacy Policy
                           </Nav.Link>
                         </Nav.Item>
+                        <Nav.Item>
+                          <Nav.Link eventKey="deleteAccount" className="d-flex align-items-center">
+                            <i className="fas fa-trash-alt me-2"></i>
+                            Delete Account
+                          </Nav.Link>
+                        </Nav.Item>
                       </Nav>
                     </Col>
                     
                     <Col md={9}>
                       <Tab.Content>
-                        {['aboutUs', 'termsAndConditions', 'privacyPolicy'].map(section => (
+                        {['aboutUs', 'termsAndConditions', 'privacyPolicy', 'deleteAccount'].map(section => (
                           <Tab.Pane key={section} eventKey={section}>
                             <Card>
                               <Card.Header className="d-flex justify-content-between align-items-center">
