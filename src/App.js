@@ -39,6 +39,7 @@ import AboutUs from "./Pages/public/AboutUs";
 import TermsAndConditions from "./Pages/public/TermsAndConditions";
 import PrivacyPolicy from "./Pages/public/PrivacyPolicy";
 
+
 function App() {
   return (
     <Router>
