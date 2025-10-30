@@ -38,7 +38,7 @@ import StaticContent from "./Pages/management/staticContent/staticContent";
 import AboutUs from "./Pages/public/AboutUs";
 import TermsAndConditions from "./Pages/public/TermsAndConditions";
 import PrivacyPolicy from "./Pages/public/PrivacyPolicy";
-import deleteAccount from "./Pages/public/deleteAccountPolicy"; 
+import DeleteAccount from "./Pages/public/deleteAccountPolicy"; 
 
 
 function App() {
@@ -50,7 +50,7 @@ function App() {
         <Route path="/about-us" element={<AboutUs />} />
         <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-        <Route path="/delete-account" element={<deleteAccount />} />
+        <Route path="/delete-account" element={<DeleteAccount />} />
         
         <Route path="/login" element={<Login />} />
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
